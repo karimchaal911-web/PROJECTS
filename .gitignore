@@ -45,14 +45,10 @@ desktop.ini
 !**/data/README.md
 
 # =========================
-# Reports / generated outputs
+# Reports / final figures
 # =========================
-**/reports/figures/*.png
-**/reports/figures/*.jpg
-**/reports/figures/*.jpeg
-**/reports/figures/*.svg
-**/reports/figures/*.pdf
-
+# Keep final report figures on GitHub for portfolio projects.
+# Do not ignore reports/figures.
 # =========================
 # Models / heavy files
 # =========================
