@@ -1,357 +1,379 @@
 # The Rare Art of Football Greatness
 
-**What This Is**: A deep dive into what makes certain football players truly exceptional  
-**Time Period**: 2005-2026 (21 seasons)  
-**The Big Question**: How rare is extraordinary? And who's the rarest of them all?
+**What This Is**: A data-driven look at how rare elite attacking production is in modern football  
+**Dataset Window**: 2012-2025  
+**The Big Question**: How rare is extraordinary attacking output, and who stands furthest above the field?
 
 ---
 
 ## The TL;DR
 
-Here's the thing: Messi's best season in 2011-2012 was so good that it would happen maybe once in every 15,000 football players. That's not just good. That's generational greatness.
+Using the current processed analysis data, Lionel Messi still comes out as the clearest statistical outlier.
 
-Beyond Messi:
-- The truly elite players (Ronaldo, Haaland, Lewandowski, Suárez) perform about **2-3 times better** than your average professional attacker
-- Most players can have ONE amazing season, but **sustaining excellence across a career is incredibly rare** — only a handful of players ever do it
-- The difference between "very good" and "all-time great" isn't incremental — it's exponential. Small improvements at the elite level mean you're beating out thousands of competitors
-- Career legends like Messi and Ronaldo stand completely alone in their consistency — nobody else even comes close
+- Messi's best season in the dataset is **2012**, with **1.70 goals + assists per 90 minutes**
+- His career rate in the dataset is **1.36 G+A/90**, the highest among all qualifying attackers
+- Cristiano Ronaldo, Kylian Mbappe, Erling Haaland, Luis Suarez, and Robert Lewandowski are also exceptional, but Messi remains well clear
+- The report previously used older numbers. This version is aligned with the processed full-analysis data in `data/processed/`
+
+Important context: the current processed data covers **2012-2025**, not 2005-2026.
 
 ---
 
 ## Where This Data Comes From
 
-Think of this like building a massive highlight reel. We collected:
+The analysis uses the cleaned and processed project datasets:
 
-- **62,500+ game appearances** across 21 seasons (2005-2026)
-- **Data from the biggest leagues**: Premier League, La Liga, Serie A, Bundesliga, Ligue 1, plus Champions League and cup competitions
-- **1,000+ attacking players** tracked across their careers
-- **One filtering rule**: To be counted, a player had to actually play meaningful minutes (at least 10 full matches in a season, or 33 career matches for career stats)
+- **1,889,406 cleaned appearance records**
+- **1,885,175 merged appearance/game/player records**
+- **55,921 qualifying player-season records**
+- **13,595 qualifying attacker-season records**
+- **11,311 qualifying career records**
+- **2,795 qualifying attacking career records**
 
-Why? Because we wanted to compare apples to apples. A player who came off the bench for 5 minutes and scored isn't the same as someone who played 90 minutes every week all season.
+Filtering rules:
 
-### By The Numbers: Single Season Performance
+- Season analysis includes player-seasons with **900+ minutes**
+- Career analysis includes players with **3,000+ minutes**
+- Attacker filtering is based on positions matching attacking labels such as `Attack`, `Forward`, `Centre-Forward`, `Winger`, `Second Striker`, `Left Winger`, and `Right Winger`
 
-When we look at attackers who played a full season (900+ minutes), here's what we find:
+This means the "average" in this report is not the average footballer worldwide. It is the average among players who appear in the dataset, pass the minutes threshold, and are classified as attackers.
 
-| The Stat | What It Means |
+---
+
+## By The Numbers: Single-Season Performance
+
+For qualifying attacker seasons:
+
+| The Stat | Current Value |
 |----------|---------------|
-| **Average goals + assists per 90 mins** | 0.38 |
-| **Middle player (median)** | 0.30 per 90 mins |
-| **Typical range** | 0.19 to 0.50 per 90 mins |
-| **Best season ever** | 1.13 per 90 mins (Messi, 2011-12) |
+| **Average G+A/90** | 0.476 |
+| **Median G+A/90** | 0.447 |
+| **Typical range, Q1-Q3** | 0.309 to 0.614 |
+| **Best season in dataset** | 1.815 G+A/90, Claudio Pizarro 2012 |
+| **Messi's best season** | 1.703 G+A/90, Lionel Messi 2012 |
 
-**In plain English**: The average attacker who plays a full season scores or assists for about 3-4 goals per 10 matches. The truly elite? They're doing 10+ per match.
+**Plain English**: the median qualifying attacker produces about 0.45 goals plus assists per 90 minutes. The elite seasons are not just a little better; the best seasons are roughly 3 to 4 times the median output.
 
-### By The Numbers: Career Performance
+### Top Single Seasons
 
-For players with full careers (3,000+ minutes played):
+| Rank | Player | Season | G+A | Minutes | G+A/90 |
+|------|--------|--------|-----|---------|--------|
+| 1 | Claudio Pizarro | 2012 | 22 | 1,091 | 1.815 |
+| 2 | Ricardo Pepi | 2024 | 20 | 1,054 | 1.708 |
+| 3 | Lionel Messi | 2012 | 77 | 4,070 | 1.703 |
+| 4 | Mario Gomez | 2012 | 23 | 1,216 | 1.702 |
+| 5 | Sergio Aguero | 2013 | 40 | 2,165 | 1.663 |
+| 6 | Lionel Messi | 2018 | 73 | 4,024 | 1.633 |
+| 7 | Cristiano Ronaldo | 2014 | 84 | 4,641 | 1.629 |
+| 8 | Luis Muriel | 2020 | 37 | 2,090 | 1.593 |
+| 9 | Lionel Messi | 2014 | 89 | 5,061 | 1.583 |
+| 10 | Luis Suarez | 2015 | 83 | 4,766 | 1.567 |
 
-| The Stat | What It Means |
-|----------|---------------|
-| **Average career rate** | 0.44 goals + assists per 90 mins |
-| **Middle career** | 0.39 per 90 mins |
-| **Best career ever** | 0.82 per 90 mins (Messi's entire career) |
-| **Only 12 players** | Ever achieved 0.60+ per 90 mins for their career |
-
-**Translation**: Most career players average around 4 goals/assists per 10 matches. But the absolute legends? They're doing 6-8 per match, year after year, for their entire career.
+The highest raw rate belongs to Pizarro, but Messi's 2012 season is the strongest high-minute superstar season in the data: **77 combined goals and assists across 4,070 minutes**.
 
 ---
 
 ## How We Measure "Rare"
 
-This is the nerdy part, but stick with it — it makes the results way more meaningful.
+The analysis uses three related ideas:
 
-### Think of It Like Heights
+**1. Z-score**
 
-Imagine we're measuring the height of all men in a country:
-- Average height is 5'9"
-- Most people fall between 5'4" and 6'0"
-- Someone who's 6'6" is tall, but we can say exactly how rare they are by measuring the gap between them and average
+A z-score measures how many standard deviations a player is above or below the dataset average.
 
-**That's what we do with football performance.** We compare each player's goals+assists per 90 minutes against the average, and measure the gap.
+**2. Empirical rarity**
 
-### The Three Ways We Measure Rarity
+This asks: in the actual dataset, how many qualifying players matched or exceeded this number?
 
-**1. Z-Score (The Gap Measurement)**
-- Z = 0 means you're perfectly average
-- Z = 1 means you're noticeably above average (better than 84% of players)
-- Z = 2 means you're really good (better than 97.5%)
-- Z = 3 means you're entering "once in a generation" territory
+**3. Normal-model rarity**
 
-Think of it as: "How many typical performance gaps separate you from the average?"
+This estimates rarity using a normal distribution. It is useful as a mathematical reference, but football performance is not perfectly normally distributed, especially at the extreme top end.
 
-**2. Empirical Ranking (Where You Rank)**
-- Top 50% = average
-- Top 10% = very good
-- Top 1% = elite
-- Top 0.1% = legendary
-
-This is simple: Out of all the players, what percentage did you beat?
-
-**3. Normal Distribution (The Odds)**
-- If someone scores at the level, we calculate the odds of someone random matching that performance
-- A 1 in 100 chance means you beat 99 players to be there
-- A 1 in 10,000 chance means only a handful of players in the world ever reach that level
+Because elite football output has a long right tail, empirical rarity is usually more trustworthy for player comparisons than the normal-model estimate.
 
 ---
 
-## The Best Single Seasons: The Elite Five
+## The Best Single Seasons: Elite Players Compared
 
-We looked at the best season each of these five legendary attackers ever had.
+### Lionel Messi - 2012
 
-### Lionel Messi - 2011-2012 Season | The Statistical Anomaly
+- **G+A/90**: 1.703
+- **Goals + assists**: 77
+- **Minutes**: 4,070
+- **Empirical rarity**: about **1 in 6,798 attacker-seasons**
+- **Normal-model rarity**: about **1 in 12.9 million**
+- **Z-score**: 5.25 standard deviations above the season attacker mean
 
-This wasn't just a great season. This was *freakish*.
+Messi's 2012 season is not the highest rate in the dataset, but it is the standout high-volume elite season.
 
-- **Goals + assists per 90 minutes**: 1.13
-- **What that means**: In every full match (90 minutes), he was involved in over 1 goal or assist. That's basically scoring/assisting every game, plus some extra
-- **How rare is this**: A score of 1.13 is so rare that if we looked at every attacker to ever play professionally, we'd expect to find this about 1 in 15,000 times
-- **The gap from average**: He was performing 3 full performance gaps better than the average attacker (3 times the typical deviation)
+### Cristiano Ronaldo - 2014
 
-**Bottom line**: This season doesn't just belong in "elite." It belongs in its own category.
+- **G+A/90**: 1.629
+- **Goals + assists**: 84
+- **Minutes**: 4,641
+- **Best season rank**: #7 overall
 
-### Cristiano Ronaldo - Best Season | The Competitor
+Ronaldo's best season combines huge minutes with huge production. His rate is slightly below Messi's 2012 season, but his total G+A is higher.
 
-- **Performance level**: 0.95 goals + assists per 90 mins
-- **How good**: Better than 98.9% of all attackers
-- **What makes it special**: Ronaldo achieved this year after year. He wasn't a one-hit wonder
+### Erling Haaland - 2019
 
-### Erling Haaland - Best Season | The Modern Elite
+- **G+A/90**: 1.516
+- **Goals + assists**: 28
+- **Minutes**: 1,662
 
-- **Performance level**: 0.89 goals + assists per 90 mins  
-- **How good**: Top 2% of all attackers
-- **The story**: Young, aggressive, ruthlessly efficient. His best season rivals players twice his age
+Haaland's best rate in the dataset comes from a smaller minutes sample than Messi or Ronaldo, but it still places him deep into elite territory.
 
-### Robert Lewandowski - Best Season | The Consistent Machine
+### Robert Lewandowski - 2020
 
-- **Performance level**: 0.87 goals + assists per 90 mins
-- **How good**: Top 2.5%
-- **The signature**: Lewandowski's is that his "good seasons" look like everyone else's "best seasons"
+- **G+A/90**: 1.514
+- **Goals + assists**: 57
+- **Minutes**: 3,389
 
-### Luis Suárez - Best Season | The Underrated Finisher
+Lewandowski's 2020 season is one of the strongest high-minute striker seasons in the dataset.
 
-- **Performance level**: 0.85 goals + assists per 90 mins
-- **How good**: Top 3%
-- **The reality**: Put Suárez on any team and he's a guaranteed difference-maker
+### Luis Suarez - 2015
 
-### The Elite Five Compared
+- **G+A/90**: 1.567
+- **Goals + assists**: 83
+- **Minutes**: 4,766
 
-All five of these players cluster between 0.85-1.13. But here's the thing: **they're not closer to normal players, they're further apart from each other.** Even being 0.10 goals/assists per 90 minutes different is a massive gap when everyone's this good. The spacing shows clear hierarchy, but everyone in this group is genuinely exceptional.
+Suarez's 2015 season is ahead of Haaland and Lewandowski by rate, and it came on a very large minutes sample.
+
+### Elite Best Seasons Summary
+
+| Player | Best Season | G+A/90 |
+|--------|-------------|--------|
+| Lionel Messi | 2012 | 1.703 |
+| Cristiano Ronaldo | 2014 | 1.629 |
+| Luis Suarez | 2015 | 1.567 |
+| Erling Haaland | 2019 | 1.516 |
+| Robert Lewandowski | 2020 | 1.514 |
+
+These elite seasons cluster around **1.51 to 1.70 G+A/90**, not 0.85 to 1.13 as the previous report stated.
 
 ---
 
-## The Long Game: Career Performance
+## By The Numbers: Career Performance
 
-Here's where legends are made. Having one amazing season? Possible. Having 15 amazing seasons? That's different.
+For qualifying attacking careers:
 
-### The Career Tiers
+| The Stat | Current Value |
+|----------|---------------|
+| **Average career G+A/90** | 0.463 |
+| **Median career G+A/90** | 0.447 |
+| **Best career G+A/90** | 1.360, Lionel Messi |
+| **Players at 0.60+ career G+A/90** | 516 |
+| **Players at 0.70+ career G+A/90** | 232 |
+| **Players at 0.80+ career G+A/90** | 79 |
+| **Players at 1.00+ career G+A/90** | 14 |
 
-We ranked every player who played enough to have a meaningful career (3,000+ minutes):
+The earlier report said only 12 players reached 0.60+ career G+A/90. In the current processed data, that threshold is much less exclusive: **516 qualifying attackers** reach it. A more genuinely rare career threshold in this dataset is **1.00+ G+A/90**, reached by **14 players**.
 
-| Tier | Players | Average Rate | Who These Are |
-|------|---------|----------------|---------------|
-| **Legendary Elite** | 12 | 0.68 G+A/90 | The only ones in the conversation |
-| **World-Class** | 35 | 0.54 G+A/90 | The best of the very good |
-| **Top Professional** | 85 | 0.44 G+A/90 | Really good; would start for most clubs |
-| **Solid Starter** | 78 | 0.35 G+A/90 | Professional standard; gets the job done |
-| **Role Player** | 40 | 0.24 G+A/90 | Useful to have around |
+---
 
-**What jumps out**: Only 12 players in 21 years and across thousands of attackers ever reach "legendary elite" status. That's how rare career excellence is.
+## Career Tiers
 
-### The Legends: Career Performance
+These tiers use the current career dataset:
 
-#### Messi - The Untouchable
-- **Career average**: 0.82 goals + assists per 90 minutes
-- **Rank**: #1 by a massive margin
-- **Context**: No other player in our entire dataset touches 0.80
-- **What this means**: For his entire career, Messi performed almost 2 full performance gaps better than average, every single season, for decades
-- **The reality**: Messi isn't just better. He's in a different tier entirely
+| Tier | Rule | Players | Average Rate |
+|------|------|---------|--------------|
+| **Legendary Elite** | 1.00+ G+A/90 | 14 | 1.113 |
+| **World-Class** | 0.80 to 0.99 G+A/90 | 65 | 0.864 |
+| **Elite Professional** | 0.60 to 0.79 G+A/90 | 437 | 0.681 |
+| **Strong Professional** | 0.40 to 0.59 G+A/90 | 1,232 | 0.490 |
+| **Role Player** | Below 0.40 G+A/90 | 1,047 | 0.307 |
 
-#### Ronaldo - The Ironman
-- **Career average**: 0.71 goals + assists per 90 minutes
-- **Rank**: #2 (still far behind Messi)
-- **The story**: What makes Ronaldo's career special isn't that one season was great — it's that he had 15+ seasons of "great"
-- **Staying power**: He's maintained elite-level production across two decades
+The main lesson changes slightly: 0.60+ is very good, but it is not the tiny all-time group. The real separation starts around 0.80+, and the truly extreme career club is 1.00+.
 
-#### Lewandowski - The Reliable Elite
-- **Career average**: 0.68 goals + assists per 90 minutes
+---
+
+## The Legends: Career Performance
+
+### Messi - The Outlier
+
+- **Career G+A/90**: 1.360
+- **Rank**: #1
+- **Period in dataset**: 2012 to 2025
+- **Goals + assists**: 676
+- **Minutes**: 44,740
+
+Messi is the clear career leader. He is not just above average; he is more than five standard deviations above the career attacker mean.
+
+### Kylian Mbappe - The Closest Challenger
+
+- **Career G+A/90**: 1.204
+- **Rank**: #2
+- **Period in dataset**: 2015 to 2025
+- **Goals + assists**: 438
+- **Minutes**: 32,736
+
+Mbappe ranks above Ronaldo and Haaland in the current career table.
+
+### Cristiano Ronaldo - Elite Longevity
+
+- **Career G+A/90**: 1.194
 - **Rank**: #3
-- **The signature**: Ask any team: you know exactly what you're getting with Lewandowski, and it's world-class
+- **Period in dataset**: 2012 to 2022
+- **Goals + assists**: 546
+- **Minutes**: 41,150
 
-#### Suárez - The Forgotten Tier
-- **Career average**: 0.61 goals + assists per 90 minutes
-- **Rank**: #5
-- **Often overlooked**: Suárez sustained elite performance while being the third option on some teams
+Ronaldo remains one of the strongest career profiles in the dataset, combining volume and elite rate.
 
-#### Haaland - The Trajectory*
-- **Career average**: 0.58 goals + assists per 90 minutes*
+### Erling Haaland - The Modern Rate Monster
+
+- **Career G+A/90**: 1.174
+- **Rank**: #4
+- **Period in dataset**: 2019 to 2025
+- **Goals + assists**: 306
+- **Minutes**: 23,456
+
+Haaland's career is shorter than the older legends, but his rate is already historically high in this dataset.
+
+### Luis Suarez - Peak And Volume
+
+- **Career G+A/90**: 1.097
 - **Rank**: #6
-- **The note**: Haaland's career is still being written
-- **Looking ahead**: If he maintains this pace, he's already a future legend. If he improves, he could challenge the top tier
-- **Why it matters**: We're watching his legend happen in real-time
+- **Period in dataset**: 2012 to 2021
+- **Goals + assists**: 438
+- **Minutes**: 35,950
 
-### Career vs. Best Season
+Suarez's career rate is higher than Lewandowski's in the current processed data.
 
-Here's something interesting: **it's not the same people.**
+### Robert Lewandowski - The Reliable Elite
 
-Some players peak once and never quite hit that level again. But the true legends? Their "average season" would be many players' "best season." Messi and Ronaldo didn't just have one amazing year — they had 10+ of them.
+- **Career G+A/90**: 1.079
+- **Rank**: #9
+- **Period in dataset**: 2012 to 2025
+- **Goals + assists**: 650
+- **Minutes**: 54,203
 
-**The rarest achievement**: Maintaining elite performance consistently across a full career. Only Messi and Ronaldo really pull it off at the 0.70+ level.
+Lewandowski has the largest minutes total among the top career players listed here and remains comfortably in the 1.00+ career elite group.
+
+### Top 10 Career Attackers
+
+| Rank | Player | Period | G+A | Minutes | G+A/90 |
+|------|--------|--------|-----|---------|--------|
+| 1 | Lionel Messi | 2012-2025 | 676 | 44,740 | 1.360 |
+| 2 | Kylian Mbappe | 2015-2025 | 438 | 32,736 | 1.204 |
+| 3 | Cristiano Ronaldo | 2012-2022 | 546 | 41,150 | 1.194 |
+| 4 | Erling Haaland | 2019-2025 | 306 | 23,456 | 1.174 |
+| 5 | Zlatan Ibrahimovic | 2012-2022 | 274 | 21,715 | 1.136 |
+| 6 | Luis Suarez | 2012-2021 | 438 | 35,950 | 1.097 |
+| 7 | Franculino | 2023-2025 | 58 | 4,788 | 1.090 |
+| 8 | Sergio Aguero | 2012-2020 | 277 | 22,962 | 1.086 |
+| 9 | Robert Lewandowski | 2012-2025 | 650 | 54,203 | 1.079 |
+| 10 | Viktor Gyokeres | 2018-2025 | 132 | 11,071 | 1.073 |
 
 ---
 
 ## What We Actually Learned
 
-### #1: The Gap Between Good and Great is MASSIVE
+### #1: The Average And Median Are Higher Than The Old Report Said
 
-It's not gradual. It's a cliff.
+The old report listed a season average of 0.38 and a median of 0.30. The current processed data says:
 
-- Average attacker: 0.38 goals + assists per 90 mins
-- Elite best seasons: 0.85-1.13 goals + assists per 90 mins
+- **Season mean**: 0.476
+- **Season median**: 0.447
+- **Career mean**: 0.463
+- **Career median**: 0.447
 
-That's literally 2-3 times better. If an average player scores every 2-3 matches, an elite player scores every match. That's not an incremental improvement — that's a complete transformation of what's possible.
+So the baseline attacker in this processed dataset is more productive than the previous report suggested.
 
-### #2: "Rare" Gets Exponentially Rarer
+### #2: Elite Seasons Are Around 1.5+ G+A/90
 
-Here's the brutal part:
+The old report placed elite best seasons around 0.85 to 1.13. In the current analysis, the elite comparison group is around **1.51 to 1.70 G+A/90**.
 
-- **0.50 G+A/90**: You're in the top 30% (pretty good, realistic goal)
-- **0.70 G+A/90**: You're in the top 5% (elite, rare)
-- **0.90 G+A/90**: You're in the top 1% (very rare, generational)
-- **1.10+ G+A/90**: You're in the top 0.01% (Messi territory)
+That changes the scale of the story: the best players are not just 2 to 3 times the average. At their peaks, they can be roughly **3 to 4 times** the median qualifying attacker.
 
-Each small improvement gets exponentially harder. The jump from 0.70 to 0.90 might sound small, but you're going from top 5% to top 1%. You're beating out thousands of competitors just for a 0.20 improvement.
+### #3: Messi Is Still The Career Outlier
 
-### #3: Messi Isn't Just Better — He's a Different Creature
+The exact numbers changed, but the core conclusion did not: Messi is the strongest statistical profile in the dataset.
 
-We keep saying Messi is the best. But here's what "the best" actually means statistically:
+- His best season: **1.703 G+A/90**
+- His career rate: **1.360 G+A/90**
+- Career rank: **#1**
+- Gap over #2 Mbappe: **0.156 G+A/90**
+- Gap over #3 Ronaldo: **0.166 G+A/90**
 
-- His 2011-2012 season was 3 standard deviations above the mean
-- In pure probability terms: You'd expect this performance maybe once every 15,000 elite attackers
-- His entire career? He's still 2 standard deviations above average
-- His closest competitor (Ronaldo)? **0.11 goals + assists per 90 below him** — a massive gap at this level
+At this level, those gaps are substantial.
 
-There's a reason we spend more time debating Messi vs. Ronaldo than Ronaldo vs. anyone else. Ronaldo is untouchably elite. Messi is something else entirely.
+### #4: Career Rarity Needs A Higher Threshold
 
-### #4: Having One Great Season Is Common. Having Ten Isn't
+The previous report treated 0.60+ career G+A/90 as a tiny legendary group. The current data says 516 attackers meet that mark.
 
-This is the secret lesson:
+Better thresholds for this dataset:
 
-- Many players have one peak season (0.70+)
-- Almost nobody sustains it
-- Only Messi and Ronaldo consistently perform at elite levels across their careers
+| Career Level | Players | Share |
+|--------------|---------|-------|
+| 0.60+ G+A/90 | 516 | 18.46% |
+| 0.70+ G+A/90 | 232 | 8.30% |
+| 0.80+ G+A/90 | 79 | 2.83% |
+| 0.90+ G+A/90 | 29 | 1.04% |
+| 1.00+ G+A/90 | 14 | 0.50% |
+| 1.10+ G+A/90 | 5 | 0.18% |
 
-**Why this matters**: In recruiting or evaluating players, one great season is interesting. But it's not predictive. A player's best season might be a fluke, or they might decline. But if someone has had multiple elite seasons? That's the signal that they're genuinely different.
+In this version of the analysis, **1.00+ career G+A/90** is the cleaner "legendary elite" cutoff.
 
-### #5: Competition Matters, But Not Like You'd Think
+### #5: The Dataset Starts In 2012
 
-- **Champions League**: Elite players shine brightest (higher variance, separation between best and rest is bigger)
-- **Domestic leagues**: More consistent data (larger samples, steadier performance)
-- **Cup competitions**: Smaller samples (less reliable for evaluation)
+The old report repeatedly described the analysis as 2005-2026. The processed analysis data currently runs from **2012 to 2025**.
 
-The interesting thing: Elite players are elite *everywhere*. Messi doesn't perform at 1.13 in La Liga and 0.50 in Champions League. He's consistently great across all competitions.
-
----
-
-## The Honest Parts: What This Analysis Doesn't Tell Us
-
-We should be upfront about what we don't know:
-
-### Data Gaps
-- **Recent seasons aren't finished yet**: 2024-2026 are still ongoing, so those numbers might change
-- **Some players are classified differently**: One source might call someone a winger, another a forward — that affects which group they're in
-- **Injuries happen**: Our data includes games where injured players took the field but didn't perform at their normal level
-- **Minimum thresholds bias results upward**: We only counted players with meaningful minutes, which means we filtered out the truly bad players. So our "average" isn't truly average — it's average among people good enough to play
-
-### Statistical Assumptions
-- **We assume normal distribution**: Reality's a bit messier than that
-- **We weighted everyone equally**: A player's performance in a weak league counts the same as performance in the Premier League (ideally, we'd adjust for that)
-- **Context matters**: Teammates affect numbers. Playing for a team that dominates possession will inflate your numbers compared to playing for a team that parks the bus
-- **Assists are sometimes subjective**: Historical assist data can be inconsistent
-
-### What We Can't Know
-- **Why someone performs at a level**: Stats tell us Messi was better, but not whether it was genetic talent, work ethic, better teammates, or perfect circumstances
-- **Future performance**: Just because someone had an elite career doesn't guarantee they'll stay elite (see: age)
-- **Playing style differences**: Different positions naturally generate different assist rates — a center forward's rate differs from a winger's
-- **Mental factors**: We can't measure pressure, confidence, or motivation in these numbers
+That matters because some early Messi and Ronaldo seasons are outside the processed window. The results should be interpreted as a dataset-window analysis, not a complete career analysis from debut to retirement.
 
 ---
 
-## So What Does All This Mean?
+## Limitations
 
-### What We Proved
+### Data Window
 
-1. **Elite players are statistically exceptional, not just "better"**: The gap between average and elite isn't a matter of degree — it's a matter of kind. Elite attackers perform 2-3x better than average. That's not just good coaching or better teams. That's rare talent.
+The current processed dataset covers **2012-2025**. It does not include the full 2005-2011 period that the old report referenced.
 
-2. **Messi is historically unique**: We talk about Messi and Ronaldo like they're in the same tier, and Ronaldo is absolutely elite. But statistically, Messi operates in a different universe. His 2011-2012 season has no peer in our dataset. His career average is 0.11 better than his nearest competitor — a massive gap at this level.
+### 2025 Data May Be Incomplete
 
-3. **Rarity is the true measure of greatness**: Going from "very good" (0.50) to "elite" (0.70) doesn't sound like much. But statistically, you're beating out thousands of competitors to make that jump. The small improvements at the top require the biggest leaps in ability.
+The processed data includes 2025, but depending on the source refresh timing, the latest season may be incomplete or still subject to updates.
 
-4. **Sustaining excellence is the real test**: Any player can have a great season. But maintaining elite production across 15+ seasons? Only Messi and Ronaldo have done it. That's the hallmark of true greatness — not peaking, but staying at the peak.
+### Position Classification
 
-### Why This Actually Matters
+The attacker group depends on position labels in the player data. If a player is classified differently across sources, they may be included or excluded differently.
 
-**For anyone who watches football**: It validates what you already know. Messi and Ronaldo aren't just the best players of their era. They're statistical anomalies. You should expect to wait decades between players of this level. Enjoy them while they're here.
+### Competition Context
 
-**For clubs evaluating talent**: One great season is interesting but not predictive. Look for players with multiple elite seasons. Look for consistency. The player who averages 0.50 over 10 seasons is more valuable than the player who had one 0.80 season and then declined.
+The current rates are not adjusted for league strength, team strength, role, opponent quality, or competition type.
 
-**For young players**: If you're ambitious, the data says elite performance isn't impossible — but it's rare. The players we analyzed didn't reach these levels by luck. They reached them by being genuinely different. That's worth knowing.
+### Normal Distribution Assumption
 
-### Questions for Next Time
-
-- Are performance standards rising or falling? Are players today better or worse than players in 2005?
-- How much does team strength matter? Can we measure the context?
-- What predicts future performance best?
-- Are certain positions or leagues naturally higher-scoring than others?
+Normal-model rarity becomes unstable at the extreme top end. Empirical rankings are more grounded for this dataset.
 
 ---
 
 ## The Simple Version
 
-**Here's the headline**: Messi is statistically the rarest footballer we've seen in 21 seasons of data. Ronaldo is elite but significantly below Messi. Everyone else, even world-class players like Lewandowski and Haaland, is in a different tier entirely.
+The report's previous numbers did not match the full analysis data. After recalculating from the processed files, the corrected headline is:
 
-**The shocking part**: The gap between elite and average isn't just bigger than you think — it's **exponentially** bigger. The best players aren't 2x better; they're 3x better, and that compounds.
-
-**The real story**: We often talk about greatness in subjective terms. This analysis shows it in objective terms. And the numbers confirm what we already believed — Messi is genuinely special.
+**Messi is still the rarest attacking profile in the dataset, but the actual scale is higher than the previous report stated. Elite peak seasons are around 1.5 to 1.7 G+A/90, Messi's career rate is 1.36 G+A/90, and the processed dataset covers 2012-2025.**
 
 ---
 
-## For the Nerdy Details (The Appendix)
+## Appendix: Current Method
 
-If you want to dig deeper, here are the mechanics:
+1. Loaded cleaned processed data from `data/processed/`
+2. Used `season_stats_cleaned.csv` for single-season analysis
+3. Used `career_stats_cleaned.csv` for career analysis
+4. Filtered attackers using attacking position labels
+5. Applied minimum minutes thresholds:
+   - 900+ minutes for season analysis
+   - 3,000+ minutes for career analysis
+6. Calculated goals plus assists per 90 minutes:
 
-### How Rare Are Various Performance Levels?
+```text
+G+A/90 = (goals + assists) / (minutes_played / 90)
+```
 
-Using the normal distribution:
-
-| Performance Level | Odds | Translation |
-|-------------------|------|-------------|
-| Z = 1.0 | Top 16% | About 1 in 6 players |
-| Z = 2.0 | Top 2.3% | About 1 in 44 players |
-| Z = 3.0 | Top 0.13% | About 1 in 740 players |
-
-This is why Z = 3.0 is so shocking. At Z = 3.0, you're beating out everyone except 1 in 740 elite players. For Messi's 2011-2012 season, we're talking about beating literally thousands of competitors.
-
-### How We Actually Did This Analysis
-
-1. **Step 1**: Grabbed all the raw data (games, players, appearances, competition info)
-2. **Step 2**: Cleaned it up (removed duplicates, fixed missing data, made sure everything matched)
-3. **Step 3**: Calculated goals + assists per 90 minutes for every attacker
-4. **Step 4**: Filtered to only meaningful sample sizes (900+ min for season, 3000+ min for career)
-5. **Step 5**: Calculated where each player ranked against everyone else
-6. **Step 6**: Generated visualizations so we could actually see what we were talking about
-
-### The Charts
-
-1. **Best Season Performance**: Shows how Messi's best season stands alone above everyone else
-2. **Elite Players Compared**: Overlays the five elite players to show them side-by-side
-3. **Rankings by Performance**: A simple bar chart showing the hierarchy
-4. **Career Distribution**: Shows how rare 0.60+ career performance really is
-5. **Top 20 Career Performers**: The actual best 20 players ranked by career average
+7. Compared player rates against the relevant qualifying attacker distribution
 
 ---
 
-**Created**: 2025  
-**Data**: 21 seasons, 62,500+ appearances, 1,000+ attackers  
-**Method**: Python analysis (Pandas, SciPy, statistical modeling)  
-**Bottom line**: Messi is statistically the most rare attacker we've ever measured
+**Updated**: 2026-07-09  
+**Data Used**: Processed project data, 2012-2025  
+**Method**: Python analysis with Pandas and SciPy  
+**Bottom line**: The old report was out of sync; this version matches the current full-analysis data.
