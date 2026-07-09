@@ -406,3 +406,98 @@ def consolidate_pipeline(df, operations):
         print(f"✓ Applied: {op_name}")
     
     return result
+
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+
+def print_section(title):
+    print("\n" + "=" * 60)
+    print(title)
+    print("=" * 60)
+
+
+def remove_exact_duplicates(df):
+    before = df.shape[0]
+    df = df.drop_duplicates().copy()
+    after = df.shape[0]
+    print(f"Removed duplicates: {before - after}")
+    return df
+
+
+def drop_missing_critical_ids(df, critical_cols):
+    existing_cols = [col for col in critical_cols if col in df.columns]
+
+    if not existing_cols:
+        print("No critical ID columns found. No rows dropped.")
+        return df
+
+    before = df.shape[0]
+    df = df.dropna(subset=existing_cols).copy()
+    after = df.shape[0]
+
+    print(f"Dropped rows missing critical IDs: {before - after}")
+    return df
+
+
+def fill_numeric_columns(df, numeric_cols, fill_value=0):
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(fill_value)
+
+    return df
+
+
+def convert_numeric_columns_keep_missing(df, numeric_cols):
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    return df
+
+
+def fill_text_columns(df, text_cols, fill_value="Unknown"):
+    for col in text_cols:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype("string")
+                .str.strip()
+                .str.replace(r"\s+", " ", regex=True)
+                .fillna(fill_value)
+            )
+
+    return df
+
+
+def clean_text_columns_keep_missing(df, text_cols):
+    for col in text_cols:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype("string")
+                .str.strip()
+                .str.replace(r"\s+", " ", regex=True)
+            )
+
+    return df
+
+
+def convert_date_columns(df, date_cols):
+    for col in date_cols:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col], errors="coerce")
+
+    return df
+
+
+def quality_report(df, name):
+    print(f"\n{name} shape: {df.shape[0]} rows, {df.shape[1]} columns")
+    print("\nMissing values:")
+    print(df.isnull().sum().sort_values(ascending=False).head(15))
+
+    print("\nData types:")
+    print(df.dtypes)
+
+    print("\nDuplicate rows:")
+    print(df.duplicated().sum())
