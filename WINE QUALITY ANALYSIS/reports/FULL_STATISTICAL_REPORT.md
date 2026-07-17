@@ -68,9 +68,9 @@ The 95% Wilson confidence interval for the proportion scoring at least 6 is 50.2
 
 The red-versus-white score distributions differ statistically (chi-square = 92.13, 5 df, Holm-adjusted p = 4.00e-18), but the association is small (Cramer's V = 0.132). Scores 8 and 9 were pooled for this test to avoid a sparse expected count; the minimum expected count is then 7.66. A Mann-Whitney comparison gives the same directional conclusion (U for red = 2,290,875; Holm-adjusted p = 4.00e-18; rank-biserial correlation = -0.149). Because score values are ordinal and the two datasets may not share the same sampling and judging process, these results describe dataset differences rather than an intrinsic quality advantage for white wine.
 
-![Red wine quality distribution](figures/RED_WINE_PLOTS/quality_score_distribution.png)
+![Red wine quality distribution for deduplicated records](figures/RED_WINE_PLOTS/quality_score_distribution.png)
 
-![White wine quality distribution](figures/WHITE_WINE_PLOTS/quality_score_distribution.png)
+![White wine quality distribution for deduplicated records](figures/WHITE_WINE_PLOTS/quality_score_distribution.png)
 
 ## 4. Physicochemical profiles
 
@@ -108,9 +108,9 @@ The red-versus-white score distributions differ statistically (chi-square = 92.1
 
 The distribution plots show substantial skewness and outliers in several chemical measurements, particularly residual sugar, chlorides, and sulfur dioxide. This supports using rank correlation for quality association and cautions against relying on means alone.
 
-![Red wine feature distributions](figures/RED_WINE_PLOTS/physicochemical_feature_distributions.png)
+![Red wine feature distributions for deduplicated records](figures/RED_WINE_PLOTS/physicochemical_feature_distributions.png)
 
-![White wine feature distributions](figures/WHITE_WINE_PLOTS/physicochemical_feature_distributions.png)
+![White wine feature distributions for deduplicated records](figures/WHITE_WINE_PLOTS/physicochemical_feature_distributions.png)
 
 ## 5. Associations with quality
 
