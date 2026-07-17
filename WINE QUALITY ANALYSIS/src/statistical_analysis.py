@@ -19,8 +19,7 @@ def spearman_table(df, feature_columns, target="quality"):
     """Calculate feature-to-target Spearman associations with Holm adjustment."""
     rows = []
     for feature in feature_columns:
-        result = stats.perasonr(df[feature], df[target])
-    
+        result = stats.spearmanr(df[feature], df[target])
         rows.append(
             {
                 "feature": feature,
@@ -36,7 +35,7 @@ def spearman_table(df, feature_columns, target="quality"):
 
 
 def welch_comparison(low, high, confidence=0.95):
-    """Return a Welch comparison, confidence interval, and Hedges' g."""
+    """Return a Welch test, pointwise mean-difference CI, and pooled-SD Hedges' g."""
     low, high = np.asarray(low, dtype=float), np.asarray(high, dtype=float)
     n1, n2 = len(low), len(high)
     mean_difference = low.mean() - high.mean()
