@@ -93,9 +93,9 @@ cells.
 
 ## Data setup
 
-Raw and processed dryer data are excluded from Git because they may be large
-or operationally sensitive. The `.gitkeep` files preserve the required folder
-structure, but you must supply the data locally before running the notebooks.
+The four prototype datasets required by the notebooks are versioned in Git so
+the project runs after cloning. Future raw or processed operational data should
+remain private unless it has been explicitly approved for sharing.
 
 Place the files in these locations:
 
