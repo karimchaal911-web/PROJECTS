@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data and model artefacts
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+/models/**/*.pkl
+/models/**/*.joblib
+/models/**/*.json
+
+# Outputs
+/figures/*
+!/figures/.gitkeep
+/reports/*
+!/reports/.gitkeep
+
+# Environment
+.env
+.DS_Store
+Thumbs.db
