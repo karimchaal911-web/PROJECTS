@@ -1,69 +1,28 @@
-# =========================
 # Python
-# =========================
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 .venv/
 venv/
-env/
-ENV/
-.env
 
-# =========================
 # Jupyter
-# =========================
 .ipynb_checkpoints/
 
-# =========================
-# VS Code / editors
-# =========================
-.vscode/
-.idea/
+# Data and model artefacts
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+/models/**/*.pkl
+/models/**/*.joblib
+/models/**/*.json
 
-# =========================
-# System files
-# =========================
+# Outputs
+/figures/*
+!/figures/.gitkeep
+/reports/*
+!/reports/.gitkeep
+
+# Environment
+.env
 .DS_Store
 Thumbs.db
-desktop.ini
-
-# =========================
-# Data files
-# Keep raw/processed data local by default
-# =========================
-**/data/raw/*
-**/data/processed/*
-
-# But keep the folders visible on GitHub
-!**/data/raw/.gitkeep
-!**/data/processed/.gitkeep
-
-# Allow sample data if you want to upload small examples
-!**/data/sample/**
-!**/data/README.md
-
-# =========================
-# Reports / final figures
-# =========================
-# Keep final report figures on GitHub for portfolio projects.
-# Do not ignore reports/figures.
-# =========================
-# Models / heavy files
-# =========================
-**/models/*
-!**/models/.gitkeep
-
-# =========================
-# Logs and temporary files
-# =========================
-*.log
-*.tmp
-*.bak
-
-# =========================
-# Excel temporary files
-# =========================
-~$*.xlsx
-~$*.xls
