@@ -54,6 +54,8 @@ desktop.ini
 # =========================
 **/models/*
 !**/models/.gitkeep
+!MAP-Dryer-AI/src/models/
+!MAP-Dryer-AI/src/models/*.py
 
 # =========================
 # Logs and temporary files
