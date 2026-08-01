@@ -1,0 +1,49 @@
+version: diag_thresholds_v1.0
+diagnostic_version: diag_v1.0
+cadence_minutes: 120
+attribution:
+  robust_deviation_weight: 0.40
+  counterfactual_weight: 0.60
+  direction_z_threshold: 1.50
+  display_robust_z_cap: 9.99
+  top_n: 5
+  epsilon: 1.0e-9
+temporal:
+  history_window: 6
+  sudden_delta_scale: 2.50
+  drift_slope_scale: 0.45
+  drift_direction_consistency: 0.75
+  oscillation_min_reversals: 3
+  oscillation_std_iqr_ratio: 0.55
+  stuck_observations: 4
+  stuck_tolerance_iqr_fraction: 0.01
+  related_movement_iqr_fraction: 0.25
+  context_related_delta_scale: 1.00
+  persistent_observations: 2
+  persistent_z_threshold: 1.50
+confidence:
+  weights:
+    required: 0.35
+    supporting: 0.20
+    attribution: 0.20
+    temporal: 0.15
+    contradiction_absence: 0.10
+  minimum_rule_confidence: 0.30
+  medium_cutoff: 0.45
+  high_cutoff: 0.70
+instrumentation_guard:
+  pattern_strength_threshold: 0.55
+  process_rule_discount: 0.50
+severity:
+  weights:
+    distance_from_threshold: 0.45
+    persistence: 0.20
+    critical_features: 0.25
+    approved_limit_crossing: 0.10
+  moderate_cutoff: 0.35
+  high_cutoff: 0.70
+  critical_feature_z: 2.50
+  high_distance_ratio: 0.50
+  statement: Model-based operational severity; not a safety classification.
+event_grouping:
+  maximum_inactive_gap_observations: 1

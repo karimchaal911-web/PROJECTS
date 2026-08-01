@@ -21,6 +21,8 @@ venv/
 /models/**/*.pkl
 /models/**/*.joblib
 /models/**/*.json
+!/models/diagnosis/
+!/models/diagnosis/*.json
 
 # Outputs
 /figures/*

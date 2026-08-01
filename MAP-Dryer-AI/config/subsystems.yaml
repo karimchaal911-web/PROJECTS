@@ -1,0 +1,39 @@
+version: diag_subsystems_v1.0
+subsystems:
+  thermal_system:
+    display_name: Thermal / steam
+    members:
+      steam_pressure: 1.0
+      dryer_air_temperature: 1.0
+      product_inlet_temperature: 0.5
+      final_product_temp: 0.5
+      temperature_drop: 0.75
+      air_product_delta: 0.5
+      steam_temp_interaction: 1.0
+      heating_index: 0.5
+  drying_air_exhaust:
+    display_name: Drying-air / exhaust
+    members:
+      air_flow_rate: 1.0
+      fan_speed: 1.0
+      vacuum: 1.0
+      air_per_feed: 0.75
+  feed_loading:
+    display_name: Feed / loading
+    members:
+      wet_product_feed_rate: 1.0
+      product_inlet_temperature: 0.5
+      residence_time: 1.0
+      product_density: 0.5
+      air_product_delta: 0.5
+      air_per_feed: 0.75
+      heating_index: 0.5
+  cooling_system:
+    display_name: Cooling system
+    members:
+      cooler_air_temperature: 1.0
+      final_product_temp: 0.75
+      temperature_drop: 0.5
+  instrumentation:
+    display_name: Instrumentation
+    members: {}

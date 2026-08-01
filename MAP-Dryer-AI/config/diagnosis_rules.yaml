@@ -1,0 +1,139 @@
+version: diag_rules_v1.0
+rules:
+  - id: D01
+    subsystem: drying_air_exhaust
+    diagnosis: Insufficient drying-air supply
+    required: [air_flow_rate:LOW]
+    supporting: [air_per_feed:LOW, fan_speed:LOW, vacuum:LOW|HIGH, dryer_air_temperature:LOW]
+    contradictions: [air_flow_rate:HIGH]
+    temporal: [air_flow_rate:SUDDEN_DROP|DRIFT|PERSISTENT]
+    suspected_causes:
+      - Fan underperformance
+      - Air-path restriction
+      - Damper or control issue
+      - Air-flow measurement problem
+    recommended_checks:
+      - Check fan speed and motor current when available.
+      - Inspect damper position and controller output.
+      - Check air-path restriction or pressure drop.
+      - Verify the air-flow transmitter.
+  - id: D02
+    subsystem: thermal_system
+    diagnosis: Insufficient thermal-energy supply
+    required: [steam_pressure:LOW, dryer_air_temperature:LOW]
+    supporting: [final_product_temp:LOW, steam_temp_interaction:LOW, heating_index:LOW]
+    contradictions: [steam_pressure:HIGH, dryer_air_temperature:HIGH]
+    temporal: [steam_pressure:SUDDEN_DROP|DRIFT|PERSISTENT, dryer_air_temperature:DRIFT|PERSISTENT]
+    suspected_causes:
+      - Low steam supply
+      - Control-valve issue
+      - Heat-transfer degradation
+      - Steam measurement problem
+    recommended_checks:
+      - Check steam pressure and setpoint.
+      - Compare valve command with valve position.
+      - Verify upstream steam supply.
+      - Inspect heat-exchanger condition.
+  - id: D03
+    subsystem: feed_loading
+    diagnosis: Dryer overloaded relative to available heat and air
+    required: [wet_product_feed_rate:HIGH, air_per_feed:LOW]
+    supporting: [heating_index:LOW, residence_time:LOW, final_product_temp:LOW]
+    contradictions: [wet_product_feed_rate:LOW, air_per_feed:HIGH]
+    temporal: [wet_product_feed_rate:SUDDEN_RISE|DRIFT|PERSISTENT]
+    suspected_causes:
+      - Excess feed rate
+      - Load change not matched by heat or air
+      - Control-coordination issue
+    recommended_checks:
+      - Verify feed rate and operator setpoint.
+      - Compare air flow and steam pressure with the load change.
+      - Check residence time and upstream feed stability.
+  - id: D04
+    subsystem: cooling_system
+    diagnosis: Reduced cooling effectiveness
+    required: [cooler_air_temperature:HIGH, final_product_temp:HIGH]
+    supporting: [temperature_drop:LOW]
+    contradictions: [cooler_air_temperature:LOW, final_product_temp:LOW]
+    temporal: [cooler_air_temperature:DRIFT|PERSISTENT, final_product_temp:DRIFT|PERSISTENT]
+    suspected_causes:
+      - Insufficient cooling air
+      - Cooler fan problem
+      - Cooler restriction
+      - High ambient load
+    recommended_checks:
+      - Check cooling fan and cooling-air flow.
+      - Compare cooler inlet and outlet temperatures.
+      - Inspect restrictions and ambient conditions when available.
+  - id: D05
+    subsystem: drying_air_exhaust
+    diagnosis: Abnormal exhaust or pressure condition
+    required: [vacuum:LOW|HIGH]
+    supporting: [air_flow_rate:LOW|HIGH, fan_speed:LOW|HIGH]
+    contradictions: [vacuum:NORMAL]
+    temporal: [vacuum:SUDDEN_DROP|SUDDEN_RISE|DRIFT|OSCILLATION|PERSISTENT]
+    suspected_causes:
+      - Exhaust fan problem
+      - Duct restriction
+      - Damper-position problem
+      - Leakage
+      - Pressure measurement problem
+    recommended_checks:
+      - Verify the vacuum measurement.
+      - Inspect the exhaust fan and duct restrictions.
+      - Check dampers and leak paths.
+  - id: D06
+    subsystem: instrumentation
+    diagnosis: Possible temperature-sensor bias or jump
+    required: []
+    supporting: [dryer_air_temperature:LOW|HIGH, cooler_air_temperature:LOW|HIGH, product_inlet_temperature:LOW|HIGH, final_product_temp:LOW|HIGH]
+    contradictions: []
+    temporal:
+      - dryer_air_temperature:ISOLATED_JUMP
+      - cooler_air_temperature:ISOLATED_JUMP
+      - product_inlet_temperature:ISOLATED_JUMP
+      - final_product_temp:ISOLATED_JUMP
+    temporal_mode: any
+    temporal_required: true
+    suspected_causes:
+      - Sensor bias
+      - Transmitter fault
+      - Wiring or signal problem
+    recommended_checks:
+      - Compare redundant or physically related temperatures.
+      - Inspect trend continuity.
+      - Verify transmitter health and calibration.
+  - id: D07
+    subsystem: instrumentation
+    diagnosis: Possible stuck sensor
+    required: []
+    supporting: []
+    contradictions: []
+    temporal: ['*:STUCK']
+    temporal_mode: any
+    temporal_required: true
+    suspected_causes:
+      - Frozen signal
+      - Communication problem
+      - Transmitter failure
+    recommended_checks:
+      - Verify the live PCS7 tag.
+      - Check transmitter and communication health.
+      - Compare with a manual or local reading when available.
+  - id: D08
+    subsystem: relevant_subsystem
+    diagnosis: Process instability or oscillation
+    required: []
+    supporting: []
+    contradictions: []
+    temporal: ['*:OSCILLATION']
+    temporal_mode: any
+    temporal_required: true
+    suspected_causes:
+      - Control-loop tuning problem
+      - Actuator hunting
+      - Unstable feed or utility supply
+    recommended_checks:
+      - Inspect process trends and controller output or setpoint.
+      - Check valve or damper motion.
+      - Investigate upstream disturbances.
