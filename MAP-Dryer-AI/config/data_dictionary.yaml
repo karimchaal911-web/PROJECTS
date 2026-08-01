@@ -1,0 +1,124 @@
+version: map_dryer_data_dictionary_v1.2
+dataset_status: prototype
+unit_policy: Units are explicit prototype conventions used consistently across the notebooks and figures.
+features:
+  date:
+    display_name: Date
+    unit: calendar date
+    unit_status: defined
+    role: identifier
+    interpretation: Calendar component of the observation timestamp.
+  time:
+    display_name: Time
+    unit: clock time
+    unit_status: defined
+    role: identifier
+    interpretation: Clock component of the observation timestamp.
+  timestamp:
+    display_name: Timestamp
+    unit: datetime
+    unit_status: defined
+    role: identifier
+    interpretation: Date and time combined for chronological ordering.
+  dryer_air_temperature:
+    display_name: Dryer air temperature
+    unit: "°C"
+    unit_status: prototype_unit
+    role: process_input
+    interpretation: Dryer inlet-air temperature.
+  cooler_air_temperature:
+    display_name: Cooler air temperature
+    unit: "°C"
+    unit_status: prototype_unit
+    role: process_input
+    interpretation: Cooling-air temperature.
+  air_flow_rate:
+    display_name: Air flow rate
+    unit: "m³/h"
+    unit_status: defined
+    role: process_input
+    interpretation: Volumetric airflow rate in cubic metres per hour.
+  wet_product_feed_rate:
+    display_name: Wet product feed rate
+    unit: "m³/h"
+    unit_status: defined
+    role: process_input
+    interpretation: Volumetric wet-product feed rate in cubic metres per hour.
+  product_inlet_temperature:
+    display_name: Product inlet temperature
+    unit: "°C"
+    unit_status: prototype_unit
+    role: process_input
+    interpretation: Product temperature at dryer entry.
+  residence_time:
+    display_name: Residence time
+    unit: min
+    unit_status: prototype_unit
+    role: process_input
+    interpretation: Time spent in the drying process.
+  vacuum:
+    display_name: Vacuum
+    unit: mmH2O
+    unit_status: defined
+    role: process_input
+    interpretation: Vacuum in millimetres of water column; more-negative values mean stronger depressure.
+  steam_pressure:
+    display_name: Steam pressure
+    unit: bar
+    unit_status: defined
+    role: process_input
+    interpretation: Steam pressure in bar.
+  fan_speed:
+    display_name: Fan speed
+    unit: rpm
+    unit_status: defined
+    role: process_input
+    interpretation: Fan rotational speed in revolutions per minute.
+  product_density:
+    display_name: Product density
+    unit: kg/L
+    unit_status: prototype_unit
+    role: process_input
+    interpretation: Product density.
+  final_product_temp:
+    display_name: Final product temperature
+    unit: "°C"
+    unit_status: prototype_unit
+    role: process_input
+    interpretation: Product temperature after drying and cooling.
+  final_moisture_h₂o:
+    display_name: Final moisture
+    unit: "% H2O"
+    unit_status: prototype_unit
+    role: prediction_target
+    interpretation: Percentage-point scale; 0.075 means 0.075% H2O, not 7.5%.
+  temperature_drop:
+    display_name: Temperature drop
+    unit: "Δ°C"
+    unit_status: derived
+    role: engineered_feature
+    interpretation: Dryer air temperature minus final product temperature.
+  air_product_delta:
+    display_name: Air-product temperature delta
+    unit: "Δ°C"
+    unit_status: derived
+    role: engineered_feature
+    interpretation: Dryer air temperature minus product inlet temperature.
+  air_per_feed:
+    display_name: Air per feed
+    unit: dimensionless ratio
+    unit_status: derived
+    role: engineered_feature
+    interpretation: Air flow rate divided by wet product feed rate; the common m³/h units cancel.
+  steam_temp_interaction:
+    display_name: Steam-temperature interaction
+    unit: "bar · °C"
+    unit_status: derived
+    role: engineered_feature
+    interpretation: Steam pressure multiplied by dryer air temperature.
+  heating_index:
+    display_name: Heating index
+    unit: "min · °C"
+    unit_status: derived
+    role: engineered_feature
+    interpretation: Residence time multiplied by dryer air temperature.

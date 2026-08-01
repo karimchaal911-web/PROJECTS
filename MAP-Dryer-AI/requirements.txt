@@ -1,0 +1,11 @@
+jupyter
+matplotlib
+nbformat
+numpy
+openpyxl
+pandas
+PyYAML
+scikit-learn
+scipy
+seaborn
+shap

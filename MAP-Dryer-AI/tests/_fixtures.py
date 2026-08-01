@@ -10,7 +10,7 @@ from sklearn.svm import OneClassSVM
 from anomaly.scoring import canonical_anomaly_score
 from diagnosis.config import load_diagnostic_configuration
 from diagnosis.reference_profile import build_reference_profile
-from diagnosis.scenarios import RAW_FEATURES, recompute_engineered_features
+from features.engineering import RAW_PROCESS_FEATURES, recompute_engineered_features
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -47,7 +47,7 @@ def build_fixture(seed: int = 17):
     raw = pd.DataFrame(
         {
             feature: rng.normal(centers[feature], scales[feature], size=480)
-            for feature in RAW_FEATURES
+            for feature in RAW_PROCESS_FEATURES
         }
     )
     normal = recompute_engineered_features(raw)

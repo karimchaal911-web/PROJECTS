@@ -1,1 +1,0 @@
-event_id,timestamp,model_anomaly_score,predicted_subsystem,predicted_diagnosis,predicted_confidence,operator_status,confirmed_fault_category,confirmed_root_cause,maintenance_action,process_action,quality_impact,lab_moisture_after_event,notes

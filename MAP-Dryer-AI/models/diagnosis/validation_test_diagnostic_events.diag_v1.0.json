@@ -1,9 +1,9 @@
 [
   {
     "anomaly": true,
-    "anomaly_score": -0.4918889811434147,
+    "anomaly_score": -0.6341550750378124,
     "config_versions": {
-      "feature_metadata": "diag_features_v1.0",
+      "feature_metadata": "diag_features_v1.3",
       "rules": "diag_rules_v1.0",
       "subsystems": "diag_subsystems_v1.0",
       "thresholds": "diag_thresholds_v1.0"
@@ -12,13 +12,194 @@
     "confirmed_root_cause": null,
     "diagnoses": [
       {
-        "confidence": 0.7196694733765634,
+        "confidence": 0.6873243638108982,
+        "confidence_band": "MEDIUM",
+        "contradictory_evidence": [],
+        "diagnosis": "Process instability or oscillation",
+        "evidence": [
+          "steam_pressure OSCILLATION (3 direction reversals; rolling standard deviation is 0.67 reference IQR.)",
+          "Temporal evidence features: steam_pressure"
+        ],
+        "instrumentation_discount_applied": false,
+        "recommended_checks": [
+          "Inspect process trends and controller output or setpoint.",
+          "Check valve or damper motion.",
+          "Investigate upstream disturbances."
+        ],
+        "rule_id": "D08",
+        "subsystem": "feed_loading",
+        "suspected_causes": [
+          "Control-loop tuning problem",
+          "Actuator hunting",
+          "Unstable feed or utility supply"
+        ]
+      }
+    ],
+    "diagnostic_version": "diag_v1.0",
+    "event_id": "MAPD-9DEFB1AD5D126535",
+    "lab_moisture_after_event": 0.076,
+    "maintenance_action": null,
+    "notes": "Retrospective prototype diagnosis; operator evidence unavailable.",
+    "operator_status": "UNREVIEWED",
+    "primary_subsystem": "feed_loading",
+    "process_action": null,
+    "quality_impact": null,
+    "severity": "INFO",
+    "severity_basis": "Model-based operational severity; not a safety classification.",
+    "severity_score": 0.325,
+    "subsystem_scores": {
+      "cooling_system": 0.04727292173785602,
+      "drying_air_exhaust": 0.32645102682090343,
+      "feed_loading": 0.43662181905449154,
+      "instrumentation": 0.0,
+      "thermal_system": 0.18965423238674908
+    },
+    "temporal_patterns": [
+      {
+        "direction": "LOW",
+        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "feature": "steam_pressure",
+        "pattern": "PERSISTENT",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "BIDIRECTIONAL",
+        "evidence": "3 direction reversals; rolling standard deviation is 0.67 reference IQR.",
+        "feature": "steam_pressure",
+        "pattern": "OSCILLATION",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "BIDIRECTIONAL",
+        "evidence": "3 direction reversals; rolling standard deviation is 0.67 reference IQR.",
+        "feature": "air_flow_rate",
+        "pattern": "OSCILLATION",
+        "strength": 1.0,
+        "window_observations": 6
+      }
+    ],
+    "threshold": -0.6341550750378124,
+    "timestamp": "2026-06-16T23:00:00",
+    "top_features": [
+      {
+        "attribution": 0.3147576360903121,
+        "counterfactual_contribution": 0.4305739611363079,
+        "criticality": "high",
+        "current_value": 2.6296296296296298,
+        "direction": "HIGH",
+        "explanation_group": "air_to_feed_balance",
+        "feature": "air_per_feed",
+        "kind": "engineered",
+        "parents": [
+          "air_flow_rate",
+          "wet_product_feed_rate"
+        ],
+        "reference_median": 2.338462077183181,
+        "robust_deviation": 2.505915555894173,
+        "robust_z": 2.505915555894173,
+        "subsystems": [
+          "drying_air_exhaust",
+          "feed_loading"
+        ],
+        "unit": "dimensionless ratio"
+      },
+      {
+        "attribution": 0.13863478669422452,
+        "counterfactual_contribution": 0.19123524393099026,
+        "criticality": "high",
+        "current_value": 9.45,
+        "direction": "NORMAL",
+        "explanation_group": "feed_loading",
+        "feature": "wet_product_feed_rate",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 10.184999999999999,
+        "robust_deviation": 1.0613718411552353,
+        "robust_z": -1.0613718411552353,
+        "subsystems": [
+          "feed_loading"
+        ],
+        "unit": "m\u00b3/h"
+      },
+      {
+        "attribution": 0.09739396703161056,
+        "counterfactual_contribution": 0.1172992078215985,
+        "criticality": "high",
+        "current_value": -1.54,
+        "direction": "NORMAL",
+        "explanation_group": "exhaust_pressure",
+        "feature": "vacuum",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": -0.94,
+        "robust_deviation": 1.2000000000000002,
+        "robust_z": -1.2000000000000002,
+        "subsystems": [
+          "drying_air_exhaust"
+        ],
+        "unit": "mmH2O"
+      },
+      {
+        "attribution": 0.077524162659168,
+        "counterfactual_contribution": 0.11670025149738582,
+        "criticality": "low",
+        "current_value": 1.029,
+        "direction": "NORMAL",
+        "explanation_group": "product_properties",
+        "feature": "product_density",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 1.027,
+        "robust_deviation": 0.3333333333333333,
+        "robust_z": 0.3333333333333333,
+        "subsystems": [
+          "feed_loading"
+        ],
+        "unit": "kg/L"
+      },
+      {
+        "attribution": 0.07184114164160331,
+        "counterfactual_contribution": 0.060775143663551925,
+        "criticality": "high",
+        "current_value": 4.47,
+        "direction": "LOW",
+        "explanation_group": "steam_supply",
+        "feature": "steam_pressure",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 4.8,
+        "robust_deviation": 1.571428571428572,
+        "robust_z": -1.571428571428572,
+        "subsystems": [
+          "thermal_system"
+        ],
+        "unit": "bar"
+      }
+    ]
+  },
+  {
+    "anomaly": true,
+    "anomaly_score": -0.21857480838182142,
+    "config_versions": {
+      "feature_metadata": "diag_features_v1.3",
+      "rules": "diag_rules_v1.0",
+      "subsystems": "diag_subsystems_v1.0",
+      "thresholds": "diag_thresholds_v1.0"
+    },
+    "confirmed_fault": null,
+    "confirmed_root_cause": null,
+    "diagnoses": [
+      {
+        "confidence": 0.8389693433299579,
         "confidence_band": "HIGH",
         "contradictory_evidence": [],
         "diagnosis": "Abnormal exhaust or pressure condition",
         "evidence": [
-          "vacuum LOW (robust z=-1.86)",
-          "fan_speed HIGH (robust z=1.75)",
+          "vacuum LOW (robust z=-2.46)",
+          "air_flow_rate HIGH (robust z=2.03)",
+          "fan_speed HIGH (robust z=2.41)",
           "vacuum PERSISTENT (Abnormal in the same direction for the last 2 observations.)",
           "Temporal evidence features: vacuum"
         ],
@@ -39,13 +220,567 @@
         ]
       },
       {
-        "confidence": 0.6701006953211942,
+        "confidence": 0.6807414467023424,
         "confidence_band": "MEDIUM",
         "contradictory_evidence": [],
         "diagnosis": "Process instability or oscillation",
         "evidence": [
-          "vacuum OSCILLATION (3 direction reversals; rolling standard deviation is 0.57 reference IQR.)",
+          "vacuum OSCILLATION (3 direction reversals; rolling standard deviation is 0.77 reference IQR.)",
           "Temporal evidence features: vacuum"
+        ],
+        "instrumentation_discount_applied": false,
+        "recommended_checks": [
+          "Inspect process trends and controller output or setpoint.",
+          "Check valve or damper motion.",
+          "Investigate upstream disturbances."
+        ],
+        "rule_id": "D08",
+        "subsystem": "feed_loading",
+        "suspected_causes": [
+          "Control-loop tuning problem",
+          "Actuator hunting",
+          "Unstable feed or utility supply"
+        ]
+      }
+    ],
+    "diagnostic_version": "diag_v1.0",
+    "event_id": "MAPD-73E35A0A87704853",
+    "lab_moisture_after_event": 0.066,
+    "maintenance_action": null,
+    "notes": "Retrospective prototype diagnosis; operator evidence unavailable.",
+    "operator_status": "UNREVIEWED",
+    "primary_subsystem": "feed_loading",
+    "process_action": null,
+    "quality_impact": null,
+    "severity": "MODERATE",
+    "severity_basis": "Model-based operational severity; not a safety classification.",
+    "severity_score": 0.65,
+    "subsystem_scores": {
+      "cooling_system": 0.1131654297660941,
+      "drying_air_exhaust": 0.194846716649789,
+      "feed_loading": 0.40370723351171195,
+      "instrumentation": 0.0,
+      "thermal_system": 0.28828062007240496
+    },
+    "temporal_patterns": [
+      {
+        "direction": "LOW",
+        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "feature": "vacuum",
+        "pattern": "PERSISTENT",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "BIDIRECTIONAL",
+        "evidence": "3 direction reversals; rolling standard deviation is 0.77 reference IQR.",
+        "feature": "vacuum",
+        "pattern": "OSCILLATION",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "BIDIRECTIONAL",
+        "evidence": "4 direction reversals; rolling standard deviation is 0.78 reference IQR.",
+        "feature": "steam_pressure",
+        "pattern": "OSCILLATION",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "HIGH",
+        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "feature": "product_inlet_temperature",
+        "pattern": "PERSISTENT",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "BIDIRECTIONAL",
+        "evidence": "3 direction reversals; rolling standard deviation is 0.85 reference IQR.",
+        "feature": "product_density",
+        "pattern": "OSCILLATION",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "BIDIRECTIONAL",
+        "evidence": "3 direction reversals; rolling standard deviation is 0.63 reference IQR.",
+        "feature": "final_product_temp",
+        "pattern": "OSCILLATION",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "HIGH",
+        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "feature": "fan_speed",
+        "pattern": "PERSISTENT",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "HIGH",
+        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "feature": "air_flow_rate",
+        "pattern": "PERSISTENT",
+        "strength": 1.0,
+        "window_observations": 6
+      }
+    ],
+    "threshold": -0.6341550750378124,
+    "timestamp": "2026-06-25T19:00:00",
+    "top_features": [
+      {
+        "attribution": 0.22885306947847447,
+        "counterfactual_contribution": 0.31448773376408423,
+        "criticality": "medium",
+        "current_value": 51.8,
+        "direction": "HIGH",
+        "explanation_group": "inlet_temperature",
+        "feature": "product_inlet_temperature",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 47.5,
+        "robust_deviation": 2.1499999999999986,
+        "robust_z": 2.1499999999999986,
+        "subsystems": [
+          "feed_loading",
+          "thermal_system"
+        ],
+        "unit": "\u00b0C"
+      },
+      {
+        "attribution": 0.15940676835022602,
+        "counterfactual_contribution": 0.22416845968446047,
+        "criticality": "low",
+        "current_value": 1.035,
+        "direction": "NORMAL",
+        "explanation_group": "product_properties",
+        "feature": "product_density",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 1.027,
+        "robust_deviation": 1.3333333333333333,
+        "robust_z": 1.3333333333333333,
+        "subsystems": [
+          "feed_loading"
+        ],
+        "unit": "kg/L"
+      },
+      {
+        "attribution": 0.10114564277167878,
+        "counterfactual_contribution": 0.11734959004001194,
+        "criticality": "medium",
+        "current_value": 32.5,
+        "direction": "HIGH",
+        "explanation_group": "cooler_temperature",
+        "feature": "cooler_air_temperature",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 23.45,
+        "robust_deviation": 1.6454545454545455,
+        "robust_z": 1.6454545454545455,
+        "subsystems": [
+          "cooling_system"
+        ],
+        "unit": "\u00b0C"
+      },
+      {
+        "attribution": 0.08622849350175713,
+        "counterfactual_contribution": 0.10072218657156291,
+        "criticality": "high",
+        "current_value": 4.51,
+        "direction": "NORMAL",
+        "explanation_group": "steam_supply",
+        "feature": "steam_pressure",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 4.8,
+        "robust_deviation": 1.3809523809523814,
+        "robust_z": -1.3809523809523814,
+        "subsystems": [
+          "thermal_system"
+        ],
+        "unit": "bar"
+      },
+      {
+        "attribution": 0.06993667769794909,
+        "counterfactual_contribution": 0.039976124937466356,
+        "criticality": "high",
+        "current_value": -2.17,
+        "direction": "LOW",
+        "explanation_group": "exhaust_pressure",
+        "feature": "vacuum",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": -0.94,
+        "robust_deviation": 2.46,
+        "robust_z": -2.46,
+        "subsystems": [
+          "drying_air_exhaust"
+        ],
+        "unit": "mmH2O"
+      }
+    ]
+  },
+  {
+    "anomaly": true,
+    "anomaly_score": -0.39418615804220325,
+    "config_versions": {
+      "feature_metadata": "diag_features_v1.3",
+      "rules": "diag_rules_v1.0",
+      "subsystems": "diag_subsystems_v1.0",
+      "thresholds": "diag_thresholds_v1.0"
+    },
+    "confirmed_fault": null,
+    "confirmed_root_cause": null,
+    "diagnoses": [
+      {
+        "confidence": 0.683529279500314,
+        "confidence_band": "MEDIUM",
+        "contradictory_evidence": [],
+        "diagnosis": "Abnormal exhaust or pressure condition",
+        "evidence": [
+          "vacuum LOW (robust z=-2.72)",
+          "air_flow_rate HIGH (robust z=2.75)",
+          "fan_speed HIGH (robust z=2.90)"
+        ],
+        "instrumentation_discount_applied": false,
+        "recommended_checks": [
+          "Verify the vacuum measurement.",
+          "Inspect the exhaust fan and duct restrictions.",
+          "Check dampers and leak paths."
+        ],
+        "rule_id": "D05",
+        "subsystem": "drying_air_exhaust",
+        "suspected_causes": [
+          "Exhaust fan problem",
+          "Duct restriction",
+          "Damper-position problem",
+          "Leakage",
+          "Pressure measurement problem"
+        ]
+      },
+      {
+        "confidence": 0.6818510206171717,
+        "confidence_band": "MEDIUM",
+        "contradictory_evidence": [],
+        "diagnosis": "Process instability or oscillation",
+        "evidence": [
+          "product_density OSCILLATION (3 direction reversals; rolling standard deviation is 0.89 reference IQR.)",
+          "Temporal evidence features: product_density"
+        ],
+        "instrumentation_discount_applied": false,
+        "recommended_checks": [
+          "Inspect process trends and controller output or setpoint.",
+          "Check valve or damper motion.",
+          "Investigate upstream disturbances."
+        ],
+        "rule_id": "D08",
+        "subsystem": "cooling_system",
+        "suspected_causes": [
+          "Control-loop tuning problem",
+          "Actuator hunting",
+          "Unstable feed or utility supply"
+        ]
+      }
+    ],
+    "diagnostic_version": "diag_v1.0",
+    "event_id": "MAPD-19CA13E753BC0AE9",
+    "lab_moisture_after_event": 0.097,
+    "maintenance_action": null,
+    "notes": "Retrospective prototype diagnosis; operator evidence unavailable.",
+    "operator_status": "UNREVIEWED",
+    "primary_subsystem": "cooling_system",
+    "process_action": null,
+    "quality_impact": null,
+    "severity": "HIGH",
+    "severity_basis": "Model-based operational severity; not a safety classification.",
+    "severity_score": 0.7905665803166058,
+    "subsystem_scores": {
+      "cooling_system": 0.40925510308585894,
+      "drying_air_exhaust": 0.1676463975015696,
+      "feed_loading": 0.2576886411141772,
+      "instrumentation": 0.0,
+      "thermal_system": 0.16540985829839422
+    },
+    "temporal_patterns": [
+      {
+        "direction": "BIDIRECTIONAL",
+        "evidence": "3 direction reversals; rolling standard deviation is 0.89 reference IQR.",
+        "feature": "product_density",
+        "pattern": "OSCILLATION",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "LOW",
+        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "feature": "final_product_temp",
+        "pattern": "PERSISTENT",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "HIGH",
+        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "feature": "cooler_air_temperature",
+        "pattern": "PERSISTENT",
+        "strength": 1.0,
+        "window_observations": 6
+      }
+    ],
+    "threshold": -0.6341550750378124,
+    "timestamp": "2026-07-10T19:00:00",
+    "top_features": [
+      {
+        "attribution": 0.3863900742949483,
+        "counterfactual_contribution": 0.5891070038384384,
+        "criticality": "medium",
+        "current_value": 33.3,
+        "direction": "HIGH",
+        "explanation_group": "cooler_temperature",
+        "feature": "cooler_air_temperature",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 23.45,
+        "robust_deviation": 1.7909090909090906,
+        "robust_z": 1.7909090909090906,
+        "subsystems": [
+          "cooling_system"
+        ],
+        "unit": "\u00b0C"
+      },
+      {
+        "attribution": 0.12749167636215042,
+        "counterfactual_contribution": 0.1853245321965375,
+        "criticality": "medium",
+        "current_value": 19.78,
+        "direction": "NORMAL",
+        "explanation_group": "residence_time",
+        "feature": "residence_time",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 20.58,
+        "robust_deviation": 0.8864265927977809,
+        "robust_z": -0.8864265927977809,
+        "subsystems": [
+          "feed_loading"
+        ],
+        "unit": "min"
+      },
+      {
+        "attribution": 0.10796755509579213,
+        "counterfactual_contribution": 0.1428110599006606,
+        "criticality": "medium",
+        "current_value": 2707.882,
+        "direction": "NORMAL",
+        "explanation_group": "thermal_exposure",
+        "feature": "heating_index",
+        "kind": "engineered",
+        "parents": [
+          "residence_time",
+          "dryer_air_temperature"
+        ],
+        "reference_median": 2867.1974999999998,
+        "robust_deviation": 1.2119071798324146,
+        "robust_z": -1.2119071798324146,
+        "subsystems": [
+          "feed_loading",
+          "thermal_system"
+        ],
+        "unit": "min \u00b7 \u00b0C"
+      },
+      {
+        "attribution": 0.05322509637973662,
+        "counterfactual_contribution": 0.0,
+        "criticality": "high",
+        "current_value": 1392.0,
+        "direction": "HIGH",
+        "explanation_group": "air_supply",
+        "feature": "fan_speed",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 1261.0,
+        "robust_deviation": 2.8950276243093924,
+        "robust_z": 2.8950276243093924,
+        "subsystems": [
+          "drying_air_exhaust"
+        ],
+        "unit": "rpm"
+      },
+      {
+        "attribution": 0.05052910959684781,
+        "counterfactual_contribution": 0.0,
+        "criticality": "high",
+        "current_value": 27.0,
+        "direction": "HIGH",
+        "explanation_group": "air_supply",
+        "feature": "air_flow_rate",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 23.805,
+        "robust_deviation": 2.748387096774199,
+        "robust_z": 2.748387096774199,
+        "subsystems": [
+          "drying_air_exhaust"
+        ],
+        "unit": "m\u00b3/h"
+      }
+    ]
+  },
+  {
+    "anomaly": true,
+    "anomaly_score": -0.4841568100423845,
+    "config_versions": {
+      "feature_metadata": "diag_features_v1.3",
+      "rules": "diag_rules_v1.0",
+      "subsystems": "diag_subsystems_v1.0",
+      "thresholds": "diag_thresholds_v1.0"
+    },
+    "confirmed_fault": null,
+    "confirmed_root_cause": null,
+    "diagnoses": [],
+    "diagnostic_version": "diag_v1.0",
+    "event_id": "MAPD-52E48F9D5A474A47",
+    "lab_moisture_after_event": 0.04,
+    "maintenance_action": null,
+    "notes": "Retrospective prototype diagnosis; operator evidence unavailable.",
+    "operator_status": "UNREVIEWED",
+    "primary_subsystem": "drying_air_exhaust",
+    "process_action": null,
+    "quality_impact": null,
+    "severity": "INFO",
+    "severity_basis": "Model-based operational severity; not a safety classification.",
+    "severity_score": 0.3378792212028512,
+    "subsystem_scores": {
+      "cooling_system": 0.0391961276360826,
+      "drying_air_exhaust": 0.4317116578443405,
+      "feed_loading": 0.31623580113420413,
+      "instrumentation": 0.0,
+      "thermal_system": 0.21285641338537276
+    },
+    "temporal_patterns": [],
+    "threshold": -0.6341550750378124,
+    "timestamp": "2026-07-14T01:00:00",
+    "top_features": [
+      {
+        "attribution": 0.339693268544597,
+        "counterfactual_contribution": 0.4408351566952916,
+        "criticality": "high",
+        "current_value": 2.639175257731959,
+        "direction": "HIGH",
+        "explanation_group": "air_to_feed_balance",
+        "feature": "air_per_feed",
+        "kind": "engineered",
+        "parents": [
+          "air_flow_rate",
+          "wet_product_feed_rate"
+        ],
+        "reference_median": 2.338462077183181,
+        "robust_deviation": 2.5880694145622236,
+        "robust_z": 2.5880694145622236,
+        "subsystems": [
+          "drying_air_exhaust",
+          "feed_loading"
+        ],
+        "unit": "dimensionless ratio"
+      },
+      {
+        "attribution": 0.12183186582163665,
+        "counterfactual_contribution": 0.16602428695394097,
+        "criticality": "high",
+        "current_value": 140.8,
+        "direction": "NORMAL",
+        "explanation_group": "dryer_temperature",
+        "feature": "dryer_air_temperature",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 139.5,
+        "robust_deviation": 0.7647058823529402,
+        "robust_z": 0.7647058823529402,
+        "subsystems": [
+          "thermal_system"
+        ],
+        "unit": "\u00b0C"
+      },
+      {
+        "attribution": 0.09566855997717011,
+        "counterfactual_contribution": 0.0834700580022635,
+        "criticality": "high",
+        "current_value": 1332.0,
+        "direction": "HIGH",
+        "explanation_group": "air_supply",
+        "feature": "fan_speed",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 1261.0,
+        "robust_deviation": 1.569060773480663,
+        "robust_z": 1.569060773480663,
+        "subsystems": [
+          "drying_air_exhaust"
+        ],
+        "unit": "rpm"
+      },
+      {
+        "attribution": 0.08768639072710746,
+        "counterfactual_contribution": 0.07137577768468392,
+        "criticality": "high",
+        "current_value": 25.6,
+        "direction": "HIGH",
+        "explanation_group": "air_supply",
+        "feature": "air_flow_rate",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 23.805,
+        "robust_deviation": 1.5440860215053807,
+        "robust_z": 1.5440860215053807,
+        "subsystems": [
+          "drying_air_exhaust"
+        ],
+        "unit": "m\u00b3/h"
+      },
+      {
+        "attribution": 0.07851007286776447,
+        "counterfactual_contribution": 0.06015355370589805,
+        "criticality": "high",
+        "current_value": -1.67,
+        "direction": "NORMAL",
+        "explanation_group": "exhaust_pressure",
+        "feature": "vacuum",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": -0.94,
+        "robust_deviation": 1.46,
+        "robust_z": -1.46,
+        "subsystems": [
+          "drying_air_exhaust"
+        ],
+        "unit": "mmH2O"
+      }
+    ]
+  },
+  {
+    "anomaly": true,
+    "anomaly_score": -0.5790518795396719,
+    "config_versions": {
+      "feature_metadata": "diag_features_v1.3",
+      "rules": "diag_rules_v1.0",
+      "subsystems": "diag_subsystems_v1.0",
+      "thresholds": "diag_thresholds_v1.0"
+    },
+    "confirmed_fault": null,
+    "confirmed_root_cause": null,
+    "diagnoses": [
+      {
+        "confidence": 0.7177558492077728,
+        "confidence_band": "HIGH",
+        "contradictory_evidence": [],
+        "diagnosis": "Process instability or oscillation",
+        "evidence": [
+          "steam_pressure OSCILLATION (3 direction reversals; rolling standard deviation is 0.81 reference IQR.)",
+          "Temporal evidence features: steam_pressure"
         ],
         "instrumentation_discount_applied": false,
         "recommended_checks": [
@@ -63,149 +798,86 @@
       }
     ],
     "diagnostic_version": "diag_v1.0",
-    "event_id": "MAPD-263B00C33675D26D",
-    "lab_moisture_after_event": 0.085,
+    "event_id": "MAPD-9B6D828F6A281C0A",
+    "lab_moisture_after_event": 0.078,
     "maintenance_action": null,
     "notes": "Retrospective prototype diagnosis; operator evidence unavailable.",
     "operator_status": "UNREVIEWED",
     "primary_subsystem": "thermal_system",
     "process_action": null,
     "quality_impact": null,
-    "severity": "MODERATE",
+    "severity": "INFO",
     "severity_basis": "Model-based operational severity; not a safety classification.",
-    "severity_score": 0.4019056371934316,
+    "severity_score": 0.07820307350748469,
     "subsystem_scores": {
-      "cooling_system": 0.21254442485404867,
-      "drying_air_exhaust": 0.09834736688281735,
-      "feed_loading": 0.3386047316571626,
+      "cooling_system": 0.30212021102428693,
+      "drying_air_exhaust": 0.03541283779755082,
+      "feed_loading": 0.07368770513929777,
       "instrumentation": 0.0,
-      "thermal_system": 0.35050347660597136
+      "thermal_system": 0.5887792460388644
     },
     "temporal_patterns": [
       {
-        "direction": "LOW",
-        "evidence": "Abnormal in the same direction for the last 2 observations.",
-        "feature": "vacuum",
-        "pattern": "PERSISTENT",
-        "strength": 1.0,
-        "window_observations": 6
-      },
-      {
         "direction": "BIDIRECTIONAL",
-        "evidence": "3 direction reversals; rolling standard deviation is 0.57 reference IQR.",
-        "feature": "vacuum",
+        "evidence": "3 direction reversals; rolling standard deviation is 0.81 reference IQR.",
+        "feature": "steam_pressure",
         "pattern": "OSCILLATION",
         "strength": 1.0,
         "window_observations": 6
       },
       {
-        "direction": "LOW",
-        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "direction": "BIDIRECTIONAL",
+        "evidence": "3 direction reversals; rolling standard deviation is 0.62 reference IQR.",
         "feature": "final_product_temp",
-        "pattern": "PERSISTENT",
-        "strength": 1.0,
-        "window_observations": 6
-      },
-      {
-        "direction": "HIGH",
-        "evidence": "Abnormal in the same direction for the last 2 observations.",
-        "feature": "fan_speed",
-        "pattern": "PERSISTENT",
-        "strength": 1.0,
-        "window_observations": 6
-      },
-      {
-        "direction": "BIDIRECTIONAL",
-        "evidence": "3 direction reversals; rolling standard deviation is 0.61 reference IQR.",
-        "feature": "fan_speed",
-        "pattern": "OSCILLATION",
-        "strength": 1.0,
-        "window_observations": 6
-      },
-      {
-        "direction": "HIGH",
-        "evidence": "Abnormal in the same direction for the last 2 observations.",
-        "feature": "cooler_air_temperature",
-        "pattern": "PERSISTENT",
-        "strength": 1.0,
-        "window_observations": 6
-      },
-      {
-        "direction": "BIDIRECTIONAL",
-        "evidence": "3 direction reversals; rolling standard deviation is 0.57 reference IQR.",
-        "feature": "air_flow_rate",
         "pattern": "OSCILLATION",
         "strength": 1.0,
         "window_observations": 6
       }
     ],
     "threshold": -0.6341550750378124,
-    "timestamp": "2026-07-10T21:00:00",
+    "timestamp": "2026-07-15T19:00:00",
     "top_features": [
       {
-        "attribution": 0.25223525569698624,
-        "counterfactual_contribution": 0.3722171576031411,
-        "criticality": "medium",
-        "current_value": 50.5,
-        "direction": "HIGH",
-        "explanation_group": "inlet_temperature",
-        "feature": "product_inlet_temperature",
+        "attribution": 0.25464963691736897,
+        "counterfactual_contribution": 0.3069825487493473,
+        "criticality": "high",
+        "current_value": 4.31,
+        "direction": "LOW",
+        "explanation_group": "steam_supply",
+        "feature": "steam_pressure",
         "kind": "raw",
         "parents": [],
-        "reference_median": 47.5,
-        "robust_deviation": 1.5,
-        "robust_z": 1.5,
+        "reference_median": 4.8,
+        "robust_deviation": 2.333333333333335,
+        "robust_z": -2.333333333333335,
         "subsystems": [
-          "feed_loading",
           "thermal_system"
         ],
-        "unit": "degC"
+        "unit": "bar"
       },
       {
-        "attribution": 0.18110236344169683,
-        "counterfactual_contribution": 0.2388392801852992,
+        "attribution": 0.20552987730909317,
+        "counterfactual_contribution": 0.26614175668063567,
         "criticality": "medium",
-        "current_value": 86.80000000000001,
-        "direction": "LOW",
-        "explanation_group": "inlet_temperature",
-        "feature": "air_product_delta",
-        "kind": "engineered",
-        "parents": [
-          "dryer_air_temperature",
-          "product_inlet_temperature"
-        ],
-        "reference_median": 91.9,
-        "robust_deviation": 1.961538461538453,
-        "robust_z": -1.961538461538453,
-        "subsystems": [
-          "thermal_system",
-          "feed_loading"
-        ],
-        "unit": "degC"
-      },
-      {
-        "attribution": 0.14623938991287488,
-        "counterfactual_contribution": 0.18913405659959961,
-        "criticality": "medium",
-        "current_value": 32.8,
+        "current_value": 31.8,
         "direction": "HIGH",
         "explanation_group": "cooler_temperature",
         "feature": "cooler_air_temperature",
         "kind": "raw",
         "parents": [],
         "reference_median": 23.45,
-        "robust_deviation": 1.6999999999999995,
-        "robust_z": 1.6999999999999995,
+        "robust_deviation": 1.5181818181818185,
+        "robust_z": 1.5181818181818185,
         "subsystems": [
           "cooling_system"
         ],
-        "unit": "degC"
+        "unit": "\u00b0C"
       },
       {
-        "attribution": 0.09499526871182386,
-        "counterfactual_contribution": 0.09007762295071699,
+        "attribution": 0.1758750443904144,
+        "counterfactual_contribution": 0.19875885835755946,
         "criticality": "medium",
-        "current_value": 101.3,
+        "current_value": 100.7,
         "direction": "HIGH",
         "explanation_group": "dryer_temperature",
         "feature": "temperature_drop",
@@ -215,31 +887,256 @@
           "final_product_temp"
         ],
         "reference_median": 96.20000000000002,
-        "robust_deviation": 2.1249999999999867,
-        "robust_z": 2.1249999999999867,
+        "robust_deviation": 1.8749999999999896,
+        "robust_z": 1.8749999999999896,
         "subsystems": [
           "thermal_system",
           "cooling_system"
         ],
-        "unit": "degC"
+        "unit": "\u0394\u00b0C"
       },
       {
-        "attribution": 0.0627856197644586,
-        "counterfactual_contribution": 0.0687005503350979,
+        "attribution": 0.1603683927183256,
+        "counterfactual_contribution": 0.16461190922831376,
         "criticality": "medium",
-        "current_value": 19.57,
+        "current_value": 601.6759999999999,
+        "direction": "LOW",
+        "explanation_group": "thermal_energy",
+        "feature": "steam_temp_interaction",
+        "kind": "engineered",
+        "parents": [
+          "steam_pressure",
+          "dryer_air_temperature"
+        ],
+        "reference_median": 670.6340000000001,
+        "robust_deviation": 2.039966275681519,
+        "robust_z": -2.039966275681519,
+        "subsystems": [
+          "thermal_system"
+        ],
+        "unit": "bar \u00b7 \u00b0C"
+      },
+      {
+        "attribution": 0.053343120034257105,
+        "counterfactual_contribution": 0.031027254472863322,
+        "criticality": "medium",
+        "current_value": 49.8,
+        "direction": "NORMAL",
+        "explanation_group": "inlet_temperature",
+        "feature": "product_inlet_temperature",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 47.5,
+        "robust_deviation": 1.1499999999999986,
+        "robust_z": 1.1499999999999986,
+        "subsystems": [
+          "feed_loading",
+          "thermal_system"
+        ],
+        "unit": "\u00b0C"
+      }
+    ]
+  },
+  {
+    "anomaly": true,
+    "anomaly_score": -0.49977563452696006,
+    "config_versions": {
+      "feature_metadata": "diag_features_v1.3",
+      "rules": "diag_rules_v1.0",
+      "subsystems": "diag_subsystems_v1.0",
+      "thresholds": "diag_thresholds_v1.0"
+    },
+    "confirmed_fault": null,
+    "confirmed_root_cause": null,
+    "diagnoses": [
+      {
+        "confidence": 0.6890467017638883,
+        "confidence_band": "MEDIUM",
+        "contradictory_evidence": [],
+        "diagnosis": "Process instability or oscillation",
+        "evidence": [
+          "steam_pressure OSCILLATION (4 direction reversals; rolling standard deviation is 0.64 reference IQR.)",
+          "Temporal evidence features: steam_pressure"
+        ],
+        "instrumentation_discount_applied": false,
+        "recommended_checks": [
+          "Inspect process trends and controller output or setpoint.",
+          "Check valve or damper motion.",
+          "Investigate upstream disturbances."
+        ],
+        "rule_id": "D08",
+        "subsystem": "thermal_system",
+        "suspected_causes": [
+          "Control-loop tuning problem",
+          "Actuator hunting",
+          "Unstable feed or utility supply"
+        ]
+      },
+      {
+        "confidence": 0.6735545605449967,
+        "confidence_band": "MEDIUM",
+        "contradictory_evidence": [],
+        "diagnosis": "Abnormal exhaust or pressure condition",
+        "evidence": [
+          "vacuum LOW (robust z=-1.82)",
+          "air_flow_rate HIGH (robust z=1.51)",
+          "fan_speed HIGH (robust z=1.90)"
+        ],
+        "instrumentation_discount_applied": false,
+        "recommended_checks": [
+          "Verify the vacuum measurement.",
+          "Inspect the exhaust fan and duct restrictions.",
+          "Check dampers and leak paths."
+        ],
+        "rule_id": "D05",
+        "subsystem": "drying_air_exhaust",
+        "suspected_causes": [
+          "Exhaust fan problem",
+          "Duct restriction",
+          "Damper-position problem",
+          "Leakage",
+          "Pressure measurement problem"
+        ]
+      }
+    ],
+    "diagnostic_version": "diag_v1.0",
+    "event_id": "MAPD-31BD7C1FDCB77BED",
+    "lab_moisture_after_event": 0.075,
+    "maintenance_action": null,
+    "notes": "Retrospective prototype diagnosis; operator evidence unavailable.",
+    "operator_status": "UNREVIEWED",
+    "primary_subsystem": "thermal_system",
+    "process_action": null,
+    "quality_impact": null,
+    "severity": "MODERATE",
+    "severity_basis": "Model-based operational severity; not a safety classification.",
+    "severity_score": 0.3907128101948184,
+    "subsystem_scores": {
+      "cooling_system": 0.038441372371172185,
+      "drying_air_exhaust": 0.11777280272498367,
+      "feed_loading": 0.39855231608440267,
+      "instrumentation": 0.0,
+      "thermal_system": 0.44523350881944135
+    },
+    "temporal_patterns": [
+      {
+        "direction": "BIDIRECTIONAL",
+        "evidence": "4 direction reversals; rolling standard deviation is 0.64 reference IQR.",
+        "feature": "steam_pressure",
+        "pattern": "OSCILLATION",
+        "strength": 1.0,
+        "window_observations": 6
+      },
+      {
+        "direction": "HIGH",
+        "evidence": "Abnormal in the same direction for the last 2 observations.",
+        "feature": "product_inlet_temperature",
+        "pattern": "PERSISTENT",
+        "strength": 1.0,
+        "window_observations": 6
+      }
+    ],
+    "threshold": -0.6341550750378124,
+    "timestamp": "2026-07-19T23:00:00",
+    "top_features": [
+      {
+        "attribution": 0.3200915694624683,
+        "counterfactual_contribution": 0.4557279000189758,
+        "criticality": "medium",
+        "current_value": 51.9,
+        "direction": "HIGH",
+        "explanation_group": "inlet_temperature",
+        "feature": "product_inlet_temperature",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 47.5,
+        "robust_deviation": 2.1999999999999993,
+        "robust_z": 2.1999999999999993,
+        "subsystems": [
+          "feed_loading",
+          "thermal_system"
+        ],
+        "unit": "\u00b0C"
+      },
+      {
+        "attribution": 0.1832775029918999,
+        "counterfactual_contribution": 0.2306951500969442,
+        "criticality": "medium",
+        "current_value": 86.4,
+        "direction": "LOW",
+        "explanation_group": "inlet_temperature",
+        "feature": "air_product_delta",
+        "kind": "engineered",
+        "parents": [
+          "dryer_air_temperature",
+          "product_inlet_temperature"
+        ],
+        "reference_median": 91.9,
+        "robust_deviation": 2.1153846153846083,
+        "robust_z": -2.1153846153846083,
+        "subsystems": [
+          "thermal_system",
+          "feed_loading"
+        ],
+        "unit": "\u0394\u00b0C"
+      },
+      {
+        "attribution": 0.08739756961655001,
+        "counterfactual_contribution": 0.10180010533740232,
+        "criticality": "medium",
+        "current_value": 19.46,
         "direction": "NORMAL",
         "explanation_group": "residence_time",
         "feature": "residence_time",
         "kind": "raw",
         "parents": [],
         "reference_median": 20.58,
-        "robust_deviation": 1.1191135734072002,
-        "robust_z": -1.1191135734072002,
+        "robust_deviation": 1.2409972299168948,
+        "robust_z": -1.2409972299168948,
         "subsystems": [
           "feed_loading"
         ],
-        "unit": "process_unit"
+        "unit": "min"
+      },
+      {
+        "attribution": 0.07335316357689182,
+        "counterfactual_contribution": 0.07496746007593905,
+        "criticality": "medium",
+        "current_value": 2691.318,
+        "direction": "NORMAL",
+        "explanation_group": "thermal_exposure",
+        "feature": "heating_index",
+        "kind": "engineered",
+        "parents": [
+          "residence_time",
+          "dryer_air_temperature"
+        ],
+        "reference_median": 2867.1974999999998,
+        "robust_deviation": 1.3379089218270352,
+        "robust_z": -1.3379089218270352,
+        "subsystems": [
+          "feed_loading",
+          "thermal_system"
+        ],
+        "unit": "min \u00b7 \u00b0C"
+      },
+      {
+        "attribution": 0.06887072358451815,
+        "counterfactual_contribution": 0.07102459826394608,
+        "criticality": "high",
+        "current_value": 5.06,
+        "direction": "NORMAL",
+        "explanation_group": "steam_supply",
+        "feature": "steam_pressure",
+        "kind": "raw",
+        "parents": [],
+        "reference_median": 4.8,
+        "robust_deviation": 1.2380952380952372,
+        "robust_z": 1.2380952380952372,
+        "subsystems": [
+          "thermal_system"
+        ],
+        "unit": "bar"
       }
     ]
   }

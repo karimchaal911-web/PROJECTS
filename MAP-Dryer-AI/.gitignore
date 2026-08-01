@@ -7,32 +7,18 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data and model artefacts
-# Version the four prototype datasets required to run the notebooks. Keep any
-# future raw or processed operational data ignored unless explicitly approved.
+# Keep only the datasets required by the four-notebook pipeline.
 /data/raw/*
-!/data/raw/.gitkeep
-!/data/raw/dryerMAP_original.xlsx
-!/data/raw/dryerMAP_prototype.xlsx
+!/data/raw/dryerMAP_prototype_2.xlsx
 /data/processed/*
-!/data/processed/.gitkeep
-!/data/processed/dryerMAP_prototype_deduplicated.xlsx
-!/data/processed/dryerMAP_prototype_processed.csv
+!/data/processed/dryerMAP_prototype_deduplicated_2.xlsx
+!/data/processed/dryerMAP_prototype_processed_2.csv
+
+# Serialized estimators are reproducible notebook outputs.
 /models/**/*.pkl
 /models/**/*.joblib
-/models/**/*.json
-!/models/diagnosis/
-!/models/diagnosis/*.json
 
-# Outputs
-/figures/*
-!/figures/.gitkeep
-!/figures/*/
-!/figures/*/.gitkeep
-/reports/*
-!/reports/.gitkeep
-
-# Environment
+# Local environment files
 .env
 .DS_Store
 Thumbs.db

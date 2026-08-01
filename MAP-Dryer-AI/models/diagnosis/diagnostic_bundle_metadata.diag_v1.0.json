@@ -1,13 +1,13 @@
 {
   "bundle_schema": "map_dryer_diagnostic_bundle_v1.0",
   "config_hashes_sha256": {
-    "feature_metadata": "9274905d28d6a21b146bfc099006bda241370c150409d0e91892dbe046dc7a41",
+    "feature_metadata": "abd176e1414bb42cee139670b13b8a05afa1314d83c0a9edda8631d979e42032",
     "rules": "6367c0e920d821cf43e18764b3d02735ecefa99b946aa2b17e60788003009036",
     "subsystems": "01ec7491ca543c2124f1794cd6140b895ee4a357080064d4766f6f6642a59f3c",
     "thresholds": "fa78a0a81e104b0f98e01fb23a1b06afc2c3f7bc37a24e42160d58ce4ec4fb4d"
   },
   "config_versions": {
-    "feature_metadata": "diag_features_v1.0",
+    "feature_metadata": "diag_features_v1.3",
     "rules": "diag_rules_v1.0",
     "subsystems": "diag_subsystems_v1.0",
     "thresholds": "diag_thresholds_v1.0"
@@ -51,7 +51,8 @@
         "subsystems": [
           "drying_air_exhaust"
         ],
-        "unit": "process_unit"
+        "unit": "m\u00b3/h",
+        "unit_status": "defined"
       },
       "air_per_feed": {
         "criticality": "high",
@@ -66,7 +67,8 @@
           "drying_air_exhaust",
           "feed_loading"
         ],
-        "unit": "ratio"
+        "unit": "dimensionless ratio",
+        "unit_status": "derived"
       },
       "air_product_delta": {
         "criticality": "medium",
@@ -81,7 +83,8 @@
           "thermal_system",
           "feed_loading"
         ],
-        "unit": "degC"
+        "unit": "\u0394\u00b0C",
+        "unit_status": "derived"
       },
       "cooler_air_temperature": {
         "criticality": "medium",
@@ -92,7 +95,8 @@
         "subsystems": [
           "cooling_system"
         ],
-        "unit": "degC"
+        "unit": "\u00b0C",
+        "unit_status": "prototype_unit"
       },
       "dryer_air_temperature": {
         "criticality": "high",
@@ -103,7 +107,8 @@
         "subsystems": [
           "thermal_system"
         ],
-        "unit": "degC"
+        "unit": "\u00b0C",
+        "unit_status": "prototype_unit"
       },
       "fan_speed": {
         "criticality": "high",
@@ -114,7 +119,8 @@
         "subsystems": [
           "drying_air_exhaust"
         ],
-        "unit": "rpm"
+        "unit": "rpm",
+        "unit_status": "defined"
       },
       "final_product_temp": {
         "criticality": "high",
@@ -126,7 +132,8 @@
           "cooling_system",
           "thermal_system"
         ],
-        "unit": "degC"
+        "unit": "\u00b0C",
+        "unit_status": "prototype_unit"
       },
       "heating_index": {
         "criticality": "medium",
@@ -141,7 +148,8 @@
           "feed_loading",
           "thermal_system"
         ],
-        "unit": "interaction"
+        "unit": "min \u00b7 \u00b0C",
+        "unit_status": "derived"
       },
       "product_density": {
         "criticality": "low",
@@ -152,7 +160,8 @@
         "subsystems": [
           "feed_loading"
         ],
-        "unit": "process_unit"
+        "unit": "kg/L",
+        "unit_status": "prototype_unit"
       },
       "product_inlet_temperature": {
         "criticality": "medium",
@@ -164,7 +173,8 @@
           "feed_loading",
           "thermal_system"
         ],
-        "unit": "degC"
+        "unit": "\u00b0C",
+        "unit_status": "prototype_unit"
       },
       "residence_time": {
         "criticality": "medium",
@@ -175,7 +185,8 @@
         "subsystems": [
           "feed_loading"
         ],
-        "unit": "process_unit"
+        "unit": "min",
+        "unit_status": "prototype_unit"
       },
       "steam_pressure": {
         "criticality": "high",
@@ -186,7 +197,8 @@
         "subsystems": [
           "thermal_system"
         ],
-        "unit": "process_unit"
+        "unit": "bar",
+        "unit_status": "defined"
       },
       "steam_temp_interaction": {
         "criticality": "medium",
@@ -200,7 +212,8 @@
         "subsystems": [
           "thermal_system"
         ],
-        "unit": "interaction"
+        "unit": "bar \u00b7 \u00b0C",
+        "unit_status": "derived"
       },
       "temperature_drop": {
         "criticality": "medium",
@@ -215,7 +228,8 @@
           "thermal_system",
           "cooling_system"
         ],
-        "unit": "degC"
+        "unit": "\u0394\u00b0C",
+        "unit_status": "derived"
       },
       "vacuum": {
         "criticality": "high",
@@ -226,7 +240,8 @@
         "subsystems": [
           "drying_air_exhaust"
         ],
-        "unit": "process_unit"
+        "unit": "mmH2O",
+        "unit_status": "defined"
       },
       "wet_product_feed_rate": {
         "criticality": "high",
@@ -237,7 +252,8 @@
         "subsystems": [
           "feed_loading"
         ],
-        "unit": "process_unit"
+        "unit": "m\u00b3/h",
+        "unit_status": "defined"
       }
     },
     "feature_names": [

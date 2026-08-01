@@ -1,7 +1,8 @@
-version: diag_features_v1.0
+version: diag_features_v1.3
 features:
   dryer_air_temperature:
-    unit: degC
+    unit: "°C"
+    unit_status: prototype_unit
     kind: raw
     parents: []
     subsystems: [thermal_system]
@@ -9,7 +10,8 @@ features:
     online_available: true
     explanation_group: dryer_temperature
   cooler_air_temperature:
-    unit: degC
+    unit: "°C"
+    unit_status: prototype_unit
     kind: raw
     parents: []
     subsystems: [cooling_system]
@@ -17,7 +19,8 @@ features:
     online_available: true
     explanation_group: cooler_temperature
   air_flow_rate:
-    unit: process_unit
+    unit: "m³/h"
+    unit_status: defined
     kind: raw
     parents: []
     subsystems: [drying_air_exhaust]
@@ -25,7 +28,8 @@ features:
     online_available: true
     explanation_group: air_supply
   wet_product_feed_rate:
-    unit: process_unit
+    unit: "m³/h"
+    unit_status: defined
     kind: raw
     parents: []
     subsystems: [feed_loading]
@@ -33,7 +37,8 @@ features:
     online_available: true
     explanation_group: feed_loading
   product_inlet_temperature:
-    unit: degC
+    unit: "°C"
+    unit_status: prototype_unit
     kind: raw
     parents: []
     subsystems: [feed_loading, thermal_system]
@@ -41,7 +46,8 @@ features:
     online_available: true
     explanation_group: inlet_temperature
   residence_time:
-    unit: process_unit
+    unit: min
+    unit_status: prototype_unit
     kind: raw
     parents: []
     subsystems: [feed_loading]
@@ -49,7 +55,8 @@ features:
     online_available: true
     explanation_group: residence_time
   vacuum:
-    unit: process_unit
+    unit: mmH2O
+    unit_status: defined
     kind: raw
     parents: []
     subsystems: [drying_air_exhaust]
@@ -57,7 +64,8 @@ features:
     online_available: true
     explanation_group: exhaust_pressure
   steam_pressure:
-    unit: process_unit
+    unit: bar
+    unit_status: defined
     kind: raw
     parents: []
     subsystems: [thermal_system]
@@ -66,6 +74,7 @@ features:
     explanation_group: steam_supply
   fan_speed:
     unit: rpm
+    unit_status: defined
     kind: raw
     parents: []
     subsystems: [drying_air_exhaust]
@@ -73,7 +82,8 @@ features:
     online_available: true
     explanation_group: air_supply
   product_density:
-    unit: process_unit
+    unit: kg/L
+    unit_status: prototype_unit
     kind: raw
     parents: []
     subsystems: [feed_loading]
@@ -81,7 +91,8 @@ features:
     online_available: true
     explanation_group: product_properties
   final_product_temp:
-    unit: degC
+    unit: "°C"
+    unit_status: prototype_unit
     kind: raw
     parents: []
     subsystems: [cooling_system, thermal_system]
@@ -89,7 +100,8 @@ features:
     online_available: true
     explanation_group: final_product_temperature
   temperature_drop:
-    unit: degC
+    unit: "Δ°C"
+    unit_status: derived
     kind: engineered
     parents: [dryer_air_temperature, final_product_temp]
     subsystems: [thermal_system, cooling_system]
@@ -97,7 +109,8 @@ features:
     online_available: true
     explanation_group: dryer_temperature
   air_product_delta:
-    unit: degC
+    unit: "Δ°C"
+    unit_status: derived
     kind: engineered
     parents: [dryer_air_temperature, product_inlet_temperature]
     subsystems: [thermal_system, feed_loading]
@@ -105,7 +118,8 @@ features:
     online_available: true
     explanation_group: inlet_temperature
   air_per_feed:
-    unit: ratio
+    unit: dimensionless ratio
+    unit_status: derived
     kind: engineered
     parents: [air_flow_rate, wet_product_feed_rate]
     subsystems: [drying_air_exhaust, feed_loading]
@@ -113,7 +127,8 @@ features:
     online_available: true
     explanation_group: air_to_feed_balance
   steam_temp_interaction:
-    unit: interaction
+    unit: "bar · °C"
+    unit_status: derived
     kind: engineered
     parents: [steam_pressure, dryer_air_temperature]
     subsystems: [thermal_system]
@@ -121,7 +136,8 @@ features:
     online_available: true
     explanation_group: thermal_energy
   heating_index:
-    unit: interaction
+    unit: "min · °C"
+    unit_status: derived
     kind: engineered
     parents: [residence_time, dryer_air_temperature]
     subsystems: [feed_loading, thermal_system]

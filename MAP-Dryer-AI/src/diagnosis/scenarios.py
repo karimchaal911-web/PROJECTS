@@ -7,22 +7,12 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from features.engineering import RAW_PROCESS_FEATURES, recompute_engineered_features
+
 from .reference_profile import ReferenceProfile
 
 
-RAW_FEATURES = [
-    "dryer_air_temperature",
-    "cooler_air_temperature",
-    "air_flow_rate",
-    "wet_product_feed_rate",
-    "product_inlet_temperature",
-    "residence_time",
-    "vacuum",
-    "steam_pressure",
-    "fan_speed",
-    "product_density",
-    "final_product_temp",
-]
+RAW_FEATURES = list(RAW_PROCESS_FEATURES)
 
 
 @dataclass(frozen=True)
@@ -35,26 +25,6 @@ class PhysicalScenario:
     @property
     def current(self) -> pd.Series:
         return self.history.iloc[-1]
-
-
-def recompute_engineered_features(data: pd.DataFrame) -> pd.DataFrame:
-    result = data.copy()
-    result["temperature_drop"] = (
-        result["dryer_air_temperature"] - result["final_product_temp"]
-    )
-    result["air_product_delta"] = (
-        result["dryer_air_temperature"] - result["product_inlet_temperature"]
-    )
-    result["air_per_feed"] = (
-        result["air_flow_rate"] / result["wet_product_feed_rate"]
-    )
-    result["steam_temp_interaction"] = (
-        result["steam_pressure"] * result["dryer_air_temperature"]
-    )
-    result["heating_index"] = (
-        result["residence_time"] * result["dryer_air_temperature"]
-    )
-    return result
 
 
 def _scale(profile: ReferenceProfile, feature: str) -> float:

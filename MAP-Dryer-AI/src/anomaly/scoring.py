@@ -39,3 +39,30 @@ def is_anomaly(score: float, threshold: float) -> bool:
     if not np.isfinite([score_value, threshold_value]).all():
         raise ValueError("Score and threshold must be finite.")
     return score_value >= threshold_value
+
+
+def build_anomaly_score_table(
+    detector: Any,
+    feature_names: list[str] | tuple[str, ...],
+    split_name: str,
+    timestamps: Any,
+    scaled_features: pd.DataFrame,
+) -> pd.DataFrame:
+    """Score one chronological split using the canonical score convention."""
+
+    ordered_features = list(feature_names)
+    missing = [feature for feature in ordered_features if feature not in scaled_features]
+    if missing:
+        raise KeyError(f"Scaled detector features are missing: {missing}")
+    if len(timestamps) != len(scaled_features):
+        raise ValueError("Timestamps and scaled features must have equal lengths.")
+    return pd.DataFrame(
+        {
+            "timestamp": np.asarray(timestamps),
+            "Split": split_name,
+            "Anomaly score": canonical_anomaly_score(
+                detector,
+                scaled_features.loc[:, ordered_features],
+            ),
+        }
+    )
