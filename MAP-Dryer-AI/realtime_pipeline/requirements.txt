@@ -1,0 +1,7 @@
+# Add pandas
+numpy
+psycopg[binary]
+python-dotenv
+joblib
+scikit-learn
+openpyxlrealtime pipeline dependencies here

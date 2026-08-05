@@ -13,7 +13,7 @@
     "thresholds": "diag_thresholds_v1.0"
   },
   "detector": {
-    "anomaly_threshold": -0.6341550750378124,
+    "anomaly_threshold": -0.6341550750378123,
     "name": "Tuned One-Class SVM",
     "parameters": {
       "gamma": "scale",

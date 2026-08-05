@@ -1,4 +1,4 @@
-import re
+﻿import re
 
 import pandas as pd
 
@@ -7,24 +7,27 @@ DRYER_MAP_COLUMNS = [
     "date", "time", "dryer_air_temperature", "cooler_air_temperature",
     "air_flow_rate", "wet_product_feed_rate", "product_inlet_temperature",
     "residence_time", "vacuum", "steam_pressure", "fan_speed",
-    "product_density", "final_product_temp", "final_moisture_h₂o",
+    "product_density", "final_product_temp", "final_moisture_h2o",
 ]
 
 OUTPUT_MEASUREMENT_COLUMNS = [
-    "product_density", "final_product_temp", "final_moisture_h₂o",
+    "product_density", "final_product_temp", "final_moisture_h2o",
 ]
 
 
 def clean_column_names(columns):
     """Return normalized snake_case column names and reject collisions."""
-    cleaned = [
-        re.sub(
-            r"_+",
-            "_",
-            re.sub(r"[^\w\s]", "_", str(column).strip().lower()).replace(" ", "_"),
-        ).strip("_")
-        for column in columns
-    ]
+    # Normalize subscript numerals to ascii digits (e.g. '₂' -> '2')
+    subscript_map = str.maketrans({
+        '\u2080': '0', '\u2081': '1', '\u2082': '2', '\u2083': '3', '\u2084': '4',
+        '\u2085': '5', '\u2086': '6', '\u2087': '7', '\u2088': '8', '\u2089': '9'
+    })
+    cleaned = []
+    for column in columns:
+        s = str(column).translate(subscript_map).strip().lower()
+        s = re.sub(r"[^\w\s]", "_", s).replace(" ", "_")
+        s = re.sub(r"_+", "_", s).strip("_")
+        cleaned.append(s)
     if len(cleaned) != len(set(cleaned)):
         raise ValueError("Column cleaning produced duplicate names.")
     return cleaned
@@ -76,3 +79,4 @@ def prepare_dryer_map(raw_df):
 
     return df
     
+

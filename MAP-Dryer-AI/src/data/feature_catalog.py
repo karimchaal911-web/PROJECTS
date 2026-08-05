@@ -37,6 +37,7 @@ def load_feature_catalog(path: str | Path) -> pd.DataFrame:
 
     catalog = pd.DataFrame.from_dict(rows, orient="index")
     catalog.index.name = "feature"
+
     catalog.attrs["version"] = str(payload.get("version", "unversioned"))
     catalog.attrs["dataset_status"] = str(payload.get("dataset_status", "unknown"))
     catalog.attrs["unit_policy"] = str(payload.get("unit_policy", ""))
@@ -50,11 +51,35 @@ def select_feature_catalog(
     """Return an ordered catalog view and reject undocumented features."""
 
     ordered = list(features)
-    missing = [feature for feature in ordered if feature not in catalog.index]
+
+    # If a requested feature is not present, allow ascii-subscripted names
+    # (e.g., final_moisture_h2o) to map to the canonical unicode name
+    # (final_moisture_h₂o) so notebooks that cleaned CSV headers work without
+    # changing the canonical data dictionary.
+    def _to_subscript(name: str) -> str:
+        trans = str.maketrans({
+            '0': '\u2080', '1': '\u2081', '2': '\u2082', '3': '\u2083',
+            '4': '\u2084', '5': '\u2085', '6': '\u2086', '7': '\u2087',
+            '8': '\u2088', '9': '\u2089'
+        })
+        return name.translate(trans)
+
+    resolved = []
+    missing = []
+    for feature in ordered:
+        if feature in catalog.index:
+            resolved.append(feature)
+        else:
+            alt = _to_subscript(feature)
+            if alt in catalog.index:
+                resolved.append(alt)
+            else:
+                missing.append(feature)
     if missing:
         raise KeyError(f"Features missing from the data dictionary: {missing}")
+
     return catalog.loc[
-        ordered,
+        resolved,
         [
             "display_name",
             "unit",

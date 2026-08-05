@@ -1,0 +1,25 @@
+{
+  "index": [
+    "date",
+    "time",
+    "timestamp",
+    "dryer_air_temperature",
+    "cooler_air_temperature",
+    "air_flow_rate",
+    "wet_product_feed_rate",
+    "product_inlet_temperature",
+    "residence_time",
+    "vacuum",
+    "steam_pressure",
+    "fan_speed",
+    "product_density",
+    "final_product_temp",
+    "final_moisture_h\u2082o",
+    "temperature_drop",
+    "air_product_delta",
+    "air_per_feed",
+    "steam_temp_interaction",
+    "heating_index",
+    "final_moisture_h2o"
+  ]
+}
