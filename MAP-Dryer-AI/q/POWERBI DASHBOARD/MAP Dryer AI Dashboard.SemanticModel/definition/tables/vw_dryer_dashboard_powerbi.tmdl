@@ -1,0 +1,813 @@
+/// Main Power BI process view: one row per observation timestamp with process
+/// measurements, model outputs, anomaly metadata and operator guidance.
+/// Written by realtime_pipeline into PostgreSQL; Power BI only reads it.
+table vw_dryer_dashboard_powerbi
+
+	/// ============================================================
+	/// 01 Freshness
+	/// ============================================================
+
+	measure 'Latest Timestamp' = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 01 Freshness
+
+	measure 'Data Freshness Minutes' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    BLANK (),
+			    DATEDIFF ( [Latest Timestamp], NOW (), MINUTE )
+			)
+		formatString: 0
+		displayFolder: 01 Freshness
+
+	measure 'Data Freshness Label' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    "NO DATA",
+			    IF (
+			        [Data Freshness Minutes] <= 3,
+			        "LIVE",
+			        "STALE · " & [Data Freshness Minutes] & " min"
+			    )
+			)
+		displayFolder: 01 Freshness
+
+	measure 'Data Freshness Color' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    "#8A9299",
+			    IF (
+			        [Data Freshness Minutes] <= 3,
+			        "#00843D",
+			        IF ( [Data Freshness Minutes] <= 10, "#E8A013", "#C8102E" )
+			    )
+			)
+		displayFolder: 01 Freshness
+
+	measure 'Refresh Cadence Label' = "DirectQuery · automatic page refresh 60 s"
+		displayFolder: 01 Freshness
+
+	measure 'Last Update Display' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    "—",
+			    FORMAT ( [Latest Timestamp], "yyyy-mm-dd hh:nn" )
+			)
+		displayFolder: 01 Freshness
+
+	/// ============================================================
+	/// 02 Latest KPIs
+	/// ============================================================
+
+	measure 'Latest Predicted Moisture' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0000
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Predicted Moisture Display' =
+			IF (
+			    ISBLANK ( [Latest Predicted Moisture] ),
+			    "—",
+			    FORMAT ( [Latest Predicted Moisture], "0.0000" ) & " % H2O"
+			)
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Laboratory Moisture' =
+			VAR LatestLabTs =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] ),
+			        NOT ISBLANK ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] )
+			    )
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestLabTs
+			    )
+		formatString: 0.0000
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Laboratory Moisture Timestamp' =
+			CALCULATE (
+			    MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] ),
+			    NOT ISBLANK ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] )
+			)
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Laboratory Moisture Display' =
+			IF (
+			    ISBLANK ( [Latest Laboratory Moisture] ),
+			    "—",
+			    FORMAT ( [Latest Laboratory Moisture], "0.0000" ) & " % H2O"
+			)
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Moisture Error' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Moisture Error] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: +0.0000;-0.0000;0.0000
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Moisture Error Display' =
+			IF (
+			    ISBLANK ( [Latest Moisture Error] ),
+			    "—",
+			    FORMAT ( [Latest Moisture Error], "+0.0000;-0.0000;0.0000" ) & " % H2O"
+			)
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Absolute Moisture Error' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Absolute Moisture Error] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0000
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Absolute Moisture Error Display' =
+			IF (
+			    ISBLANK ( [Latest Absolute Moisture Error] ),
+			    "—",
+			    FORMAT ( [Latest Absolute Moisture Error], "0.0000" ) & " % H2O"
+			)
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Anomaly Score' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Anomaly Score] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.000000
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Anomaly Score Display' =
+			IF (
+			    ISBLANK ( [Latest Anomaly Score] ),
+			    "—",
+			    FORMAT ( [Latest Anomaly Score], "0.000000" )
+			)
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Anomaly Status' =
+			VAR LatestTs = [Latest Timestamp]
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 02 Latest KPIs
+
+	measure 'Latest Severity' =
+			VAR LatestTs = [Latest Timestamp]
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Severity] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 02 Latest KPIs
+
+	/// ============================================================
+	/// 03 Diagnosis (latest event, operator guidance)
+	/// ============================================================
+
+	measure 'Latest Subsystem' =
+			VAR LatestTs = [Latest Timestamp]
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Subsystem] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 03 Diagnosis
+
+	measure 'Latest Diagnosis' =
+			VAR LatestTs = [Latest Timestamp]
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Diagnosis] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 03 Diagnosis
+
+	measure 'Latest Possible Causes' =
+			VAR LatestTs = [Latest Timestamp]
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Possible Causes] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 03 Diagnosis
+
+	measure 'Latest Recommended Verification' =
+			VAR LatestTs = [Latest Timestamp]
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Recommended Verification] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 03 Diagnosis
+
+	/// ============================================================
+	/// 04 Process Variables (latest observation)
+	/// ============================================================
+
+	measure 'Latest Dryer Air Temperature' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Dryer Air Temperature] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Dryer Air Temperature Display' =
+			IF (
+			    ISBLANK ( [Latest Dryer Air Temperature] ),
+			    "—",
+			    FORMAT ( [Latest Dryer Air Temperature], "0.0" ) & " °C"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Cooler Air Temperature' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Cooler Air Temperature] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Cooler Air Temperature Display' =
+			IF (
+			    ISBLANK ( [Latest Cooler Air Temperature] ),
+			    "—",
+			    FORMAT ( [Latest Cooler Air Temperature], "0.0" ) & " °C"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Air Flow Rate' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Air Flow Rate] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: #,0
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Air Flow Rate Display' =
+			IF (
+			    ISBLANK ( [Latest Air Flow Rate] ),
+			    "—",
+			    FORMAT ( [Latest Air Flow Rate], "#,0" ) & " m³/h"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Wet Product Feed Rate' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Wet Product Feed Rate] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.00
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Wet Product Feed Rate Display' =
+			IF (
+			    ISBLANK ( [Latest Wet Product Feed Rate] ),
+			    "—",
+			    FORMAT ( [Latest Wet Product Feed Rate], "0.00" ) & " m³/h"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Product Inlet Temperature' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Product Inlet Temperature] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Product Inlet Temperature Display' =
+			IF (
+			    ISBLANK ( [Latest Product Inlet Temperature] ),
+			    "—",
+			    FORMAT ( [Latest Product Inlet Temperature], "0.0" ) & " °C"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Residence Time' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Residence Time] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Residence Time Display' =
+			IF (
+			    ISBLANK ( [Latest Residence Time] ),
+			    "—",
+			    FORMAT ( [Latest Residence Time], "0.0" ) & " min"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Vacuum' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Vacuum] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Vacuum Display' =
+			IF (
+			    ISBLANK ( [Latest Vacuum] ),
+			    "—",
+			    FORMAT ( [Latest Vacuum], "0.0" ) & " mmH2O"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Steam Pressure' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Steam Pressure] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.00
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Steam Pressure Display' =
+			IF (
+			    ISBLANK ( [Latest Steam Pressure] ),
+			    "—",
+			    FORMAT ( [Latest Steam Pressure], "0.00" ) & " bar"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Fan Speed' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Fan Speed] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: #,0
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Fan Speed Display' =
+			IF (
+			    ISBLANK ( [Latest Fan Speed] ),
+			    "—",
+			    FORMAT ( [Latest Fan Speed], "#,0" ) & " rpm"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Product Density' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Product Density] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.000
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Product Density Display' =
+			IF (
+			    ISBLANK ( [Latest Product Density] ),
+			    "—",
+			    FORMAT ( [Latest Product Density], "0.000" ) & " kg/L"
+			)
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Final Product Temperature' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Final Product Temperature] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+
+	measure 'Latest Final Product Temperature Display' =
+			IF (
+			    ISBLANK ( [Latest Final Product Temperature] ),
+			    "—",
+			    FORMAT ( [Latest Final Product Temperature], "0.0" ) & " °C"
+			)
+		displayFolder: 04 Process Variables
+
+	/// ============================================================
+	/// 05 State Colors (dynamic formatting; hex strings consumed by
+	/// "Field value" conditional formatting on cards and charts)
+	/// ============================================================
+
+	measure 'Severity Color' =
+			SWITCH (
+			    UPPER ( [Latest Severity] ),
+			    "NORMAL", "#00843D",
+			    "LOW", "#E8A013",
+			    "MEDIUM", "#E8A013",
+			    "HIGH", "#C8102E",
+			    "CRITICAL", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 05 State Colors
+
+	measure 'Anomaly Status Color' =
+			SWITCH (
+			    UPPER ( [Latest Anomaly Status] ),
+			    "NORMAL", "#00843D",
+			    "ANOMALY", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 05 State Colors
+
+	measure 'Severity Color (Context)' =
+			SWITCH (
+			    UPPER ( SELECTEDVALUE ( 'vw_dryer_dashboard_powerbi'[Severity] ) ),
+			    "NORMAL", "#00843D",
+			    "LOW", "#E8A013",
+			    "MEDIUM", "#E8A013",
+			    "HIGH", "#C8102E",
+			    "CRITICAL", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 05 State Colors
+
+	measure 'Anomaly Status Color (Context)' =
+			SWITCH (
+			    UPPER ( SELECTEDVALUE ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] ) ),
+			    "NORMAL", "#00843D",
+			    "ANOMALY", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 05 State Colors
+
+	/// ============================================================
+	/// 06 Diagnostics Page (respond to the current filter context:
+	/// with a single selected event they describe that event, else
+	/// the most recent event inside the filtered window)
+	/// ============================================================
+
+	measure 'Selected Event Timestamp' = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Event Timestamp Display' =
+			IF (
+			    ISBLANK ( [Selected Event Timestamp] ),
+			    "—",
+			    FORMAT ( [Selected Event Timestamp], "yyyy-mm-dd hh:nn" )
+			)
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Anomaly Score' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Anomaly Score] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+		formatString: 0.000000
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Anomaly Score Display' =
+			IF (
+			    ISBLANK ( [Selected Anomaly Score] ),
+			    "—",
+			    FORMAT ( [Selected Anomaly Score], "0.000000" )
+			)
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Anomaly Status' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Severity' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Severity] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Subsystem' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Subsystem] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Predicted Moisture Display' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", FORMAT ( Result, "0.0000" ) & " % H2O" )
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Laboratory Moisture Display' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", FORMAT ( Result, "0.0000" ) & " % H2O" )
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Diagnosis' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Diagnosis] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Possible Causes' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Possible Causes] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Recommended Verification' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Recommended Verification] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Selected Severity Color' =
+			SWITCH (
+			    UPPER ( [Selected Severity] ),
+			    "NORMAL", "#00843D",
+			    "LOW", "#E8A013",
+			    "MEDIUM", "#E8A013",
+			    "HIGH", "#C8102E",
+			    "CRITICAL", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 06 Diagnostics Page
+
+	/// Real model threshold: the One-Class SVM decision boundary. The
+	/// realtime_pipeline flags an observation as anomalous exactly when the
+	/// decision-function score is below zero. Not an invented limit.
+	measure 'Anomaly Threshold' = 0.0
+		formatString: 0.0
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Anomaly Score (Anomalous)' =
+			CALCULATE (
+			    AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Score] ),
+			    KEEPFILTERS ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] = "ANOMALY" )
+			)
+		formatString: 0.000000
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Predicted Moisture (Anomalous)' =
+			CALCULATE (
+			    AVERAGE ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] ),
+			    KEEPFILTERS ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] = "ANOMALY" )
+			)
+		formatString: 0.0000
+		displayFolder: 06 Diagnostics Page
+
+	measure 'Anomaly Count' =
+			CALCULATE (
+			    COUNTROWS ( 'vw_dryer_dashboard_powerbi' ),
+			    'vw_dryer_dashboard_powerbi'[Anomaly Status] = "ANOMALY"
+			)
+		formatString: #,0
+		displayFolder: 06 Diagnostics Page
+
+	/// ============================================================
+	/// 07 Chart Series (explicit measures so legends and table
+	/// headers show clean names instead of "Average of ...")
+	/// ============================================================
+
+	measure 'Predicted Moisture (Model)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] )
+		formatString: 0.0000
+		displayFolder: 07 Chart Series
+
+	measure 'Laboratory Moisture (Lab)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] )
+		formatString: 0.0000
+		displayFolder: 07 Chart Series
+
+	measure 'Anomaly Score (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Score] )
+		formatString: 0.000000
+		displayFolder: 07 Chart Series
+
+	/// ============================================================
+	/// Columns (physical view columns; adjust sourceColumn values if
+	/// verify_powerbi_views.py reports different physical names)
+	/// ============================================================
+
+	column Timestamp
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		summarizeBy: none
+		sourceColumn: Timestamp
+
+	column 'Predicted Moisture'
+		dataType: double
+		formatString: 0.0000
+		summarizeBy: none
+		sourceColumn: Predicted Moisture
+
+	column 'Laboratory Moisture'
+		dataType: double
+		formatString: 0.0000
+		summarizeBy: none
+		sourceColumn: Laboratory Moisture
+
+	column 'Moisture Error'
+		dataType: double
+		formatString: +0.0000;-0.0000;0.0000
+		summarizeBy: none
+		sourceColumn: Moisture Error
+
+	column 'Absolute Moisture Error'
+		dataType: double
+		formatString: 0.0000
+		summarizeBy: none
+		sourceColumn: Absolute Moisture Error
+
+	column 'Anomaly Score'
+		dataType: double
+		formatString: 0.000000
+		summarizeBy: none
+		sourceColumn: Anomaly Score
+
+	column 'Anomaly Status'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Anomaly Status
+
+	column Severity
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Severity
+
+	column Subsystem
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Subsystem
+
+	column Diagnosis
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Diagnosis
+
+	column 'Possible Causes'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Possible Causes
+
+	column 'Recommended Verification'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Recommended Verification
+
+	column 'Dryer Air Temperature'
+		dataType: double
+		formatString: 0.0
+		summarizeBy: none
+		sourceColumn: Dryer Air Temperature
+
+	column 'Cooler Air Temperature'
+		dataType: double
+		formatString: 0.0
+		summarizeBy: none
+		sourceColumn: Cooler Air Temperature
+
+	column 'Air Flow Rate'
+		dataType: double
+		formatString: #,0.0
+		summarizeBy: none
+		sourceColumn: Air Flow Rate
+
+	column 'Wet Product Feed Rate'
+		dataType: double
+		formatString: 0.00
+		summarizeBy: none
+		sourceColumn: Wet Product Feed Rate
+
+	column 'Product Inlet Temperature'
+		dataType: double
+		formatString: 0.0
+		summarizeBy: none
+		sourceColumn: Product Inlet Temperature
+
+	column 'Residence Time'
+		dataType: double
+		formatString: 0.0
+		summarizeBy: none
+		sourceColumn: Residence Time
+
+	column Vacuum
+		dataType: double
+		formatString: 0.0
+		summarizeBy: none
+		sourceColumn: Vacuum
+
+	column 'Steam Pressure'
+		dataType: double
+		formatString: 0.00
+		summarizeBy: none
+		sourceColumn: Steam Pressure
+
+	column 'Fan Speed'
+		dataType: double
+		formatString: #,0
+		summarizeBy: none
+		sourceColumn: Fan Speed
+
+	column 'Product Density'
+		dataType: double
+		formatString: 0.000
+		summarizeBy: none
+		sourceColumn: Product Density
+
+	column 'Final Product Temperature'
+		dataType: double
+		formatString: 0.0
+		summarizeBy: none
+		sourceColumn: Final Product Temperature
+
+	partition vw_dryer_dashboard_powerbi = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database(DB_Server, DB_Database),
+				    Data = Source{[Schema = "public", Item = "vw_dryer_dashboard_powerbi"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table
