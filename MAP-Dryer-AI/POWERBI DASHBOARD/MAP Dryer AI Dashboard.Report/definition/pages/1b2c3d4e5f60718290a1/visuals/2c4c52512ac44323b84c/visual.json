@@ -1,0 +1,64 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "name": "2c4c52512ac44323b84c",
+  "position": {
+    "x": 8,
+    "y": 8,
+    "z": 1,
+    "height": 56,
+    "width": 480,
+    "tabOrder": 101
+  },
+  "visual": {
+    "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Diagnostics & Root Cause",
+                    "textStyle": {
+                      "fontSize": "15pt",
+                      "color": "#212B36",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Filter a window, select an event, inspect ranked abnormal contributors",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#5A6570"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -22,3 +22,9 @@ venv/
 .env
 .DS_Store
 Thumbs.db
+
+# Power BI Desktop local state (never contains report/model source).
+# Credentials live in Power BI's credential store, not in the repository.
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/*.pbix.bak
