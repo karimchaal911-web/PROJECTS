@@ -1,0 +1,37 @@
+{
+  "model_type": "OneClassSVM",
+  "scaler_type": "StandardScaler",
+  "scikit_learn_version": "1.9.0",
+  "feature_count": 16,
+  "feature_order": [
+    "dryer_air_temperature",
+    "cooler_air_temperature",
+    "air_flow_rate",
+    "wet_product_feed_rate",
+    "product_inlet_temperature",
+    "residence_time",
+    "vacuum",
+    "steam_pressure",
+    "fan_speed",
+    "product_density",
+    "final_product_temp",
+    "temperature_drop",
+    "air_product_delta",
+    "air_per_feed",
+    "steam_temp_interaction",
+    "heating_index"
+  ],
+  "scaler_fitted_on": "X_normal_reference",
+  "prediction_mapping": {
+    "1": "normal",
+    "-1": "anomaly"
+  },
+  "decision_score_is_probability": false,
+  "engineered_features": {
+    "temperature_drop": "dryer_air_temperature - final_product_temp",
+    "air_product_delta": "dryer_air_temperature - product_inlet_temperature",
+    "air_per_feed": "air_flow_rate / wet_product_feed_rate",
+    "steam_temp_interaction": "steam_pressure * dryer_air_temperature",
+    "heating_index": "residence_time * dryer_air_temperature"
+  }
+}

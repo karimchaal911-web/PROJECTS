@@ -1,0 +1,14 @@
+{
+  "anomaly_pipeline": {
+    "detector_name": "OneClassSVM",
+    "detector_parameters": {
+      "gamma": "scale",
+      "nu": 0.02
+    }
+  },
+  "moisture_pipeline": {
+    "model_class": "Pipeline",
+    "path": "moisture_pipeline/moisture_pipeline.joblib",
+    "features": null
+  }
+}
