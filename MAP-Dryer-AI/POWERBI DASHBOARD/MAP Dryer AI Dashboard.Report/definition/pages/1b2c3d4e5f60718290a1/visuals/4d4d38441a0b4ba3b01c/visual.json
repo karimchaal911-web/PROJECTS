@@ -11,7 +11,6 @@
   },
   "visual": {
     "visualType": "slicer",
-    "drillFilterOtherVisuals": true,
     "query": {
       "queryState": {
         "Values": {
@@ -28,7 +27,8 @@
                 }
               },
               "queryRef": "vw_dryer_dashboard_powerbi.Anomaly Status",
-              "nativeQueryRef": "Anomaly Status"
+              "nativeQueryRef": "Anomaly Status",
+              "active": true
             }
           ]
         }
@@ -63,6 +63,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

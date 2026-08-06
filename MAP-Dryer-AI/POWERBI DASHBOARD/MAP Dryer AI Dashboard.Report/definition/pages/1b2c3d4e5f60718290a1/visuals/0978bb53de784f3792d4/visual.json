@@ -11,7 +11,6 @@
   },
   "visual": {
     "visualType": "barChart",
-    "drillFilterOtherVisuals": true,
     "query": {
       "queryState": {
         "Category": {
@@ -28,25 +27,8 @@
                 }
               },
               "queryRef": "vw_dryer_contributors_powerbi.Contributor Name",
-              "nativeQueryRef": "Contributor Name"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_dryer_contributors_powerbi"
-                    }
-                  },
-                  "Property": "Contribution Score Value"
-                }
-              },
-              "queryRef": "vw_dryer_contributors_powerbi.Contribution Score Value",
-              "nativeQueryRef": "Contribution Score Value"
+              "nativeQueryRef": "Contributor Name",
+              "active": true
             }
           ]
         },
@@ -65,6 +47,24 @@
               },
               "queryRef": "vw_dryer_contributors_powerbi.Contributor Rank Value",
               "nativeQueryRef": "Contributor Rank Value"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_dryer_contributors_powerbi"
+                    }
+                  },
+                  "Property": "Contribution Score Value"
+                }
+              },
+              "queryRef": "vw_dryer_contributors_powerbi.Contribution Score Value",
+              "nativeQueryRef": "Contribution Score Value"
             }
           ]
         }
@@ -96,20 +96,13 @@
               "solid": {
                 "color": {
                   "expr": {
-                    "FillRule": {
-                      "Input": {
-                        "Measure": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Entity": "vw_dryer_contributors_powerbi"
-                            }
-                          },
-                          "Property": "Contributor Bar Color"
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "vw_dryer_contributors_powerbi"
                         }
                       },
-                      "FillRule": {
-                        "solid": {}
-                      }
+                      "Property": "Contributor Bar Color"
                     }
                   }
                 }
@@ -164,6 +157,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

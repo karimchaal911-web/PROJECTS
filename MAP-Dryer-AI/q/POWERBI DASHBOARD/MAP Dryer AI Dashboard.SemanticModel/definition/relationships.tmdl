@@ -1,3 +1,0 @@
-relationship dashboard-to-contributors
-	fromColumn: vw_dryer_contributors_powerbi.Timestamp
-	toColumn: vw_dryer_dashboard_powerbi.Timestamp

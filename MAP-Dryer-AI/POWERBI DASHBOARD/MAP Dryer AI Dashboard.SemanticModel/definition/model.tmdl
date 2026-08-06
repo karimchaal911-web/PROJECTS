@@ -3,7 +3,10 @@ model Model
 	defaultPowerBIDataSourceVersion: powerBI_V3
 	sourceQueryCulture: en-US
 
-	annotation __PBI_TimeIntelligenceEnabled = 0
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
 
 ref table vw_dryer_dashboard_powerbi
 ref table vw_dryer_contributors_powerbi
+

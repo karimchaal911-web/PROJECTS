@@ -55,20 +55,13 @@
               "solid": {
                 "color": {
                   "expr": {
-                    "FillRule": {
-                      "Input": {
-                        "Measure": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Entity": "vw_dryer_dashboard_powerbi"
-                            }
-                          },
-                          "Property": "Data Freshness Color"
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "vw_dryer_dashboard_powerbi"
                         }
                       },
-                      "FillRule": {
-                        "solid": {}
-                      }
+                      "Property": "Data Freshness Color"
                     }
                   }
                 }

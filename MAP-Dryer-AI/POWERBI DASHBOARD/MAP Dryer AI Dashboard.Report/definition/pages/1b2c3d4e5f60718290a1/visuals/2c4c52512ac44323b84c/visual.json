@@ -11,7 +11,6 @@
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -22,9 +21,9 @@
                   {
                     "value": "Diagnostics & Root Cause",
                     "textStyle": {
+                      "fontWeight": "bold",
                       "fontSize": "15pt",
-                      "color": "#212B36",
-                      "fontWeight": "bold"
+                      "color": "#212b36"
                     }
                   }
                 ]
@@ -35,7 +34,7 @@
                     "value": "Filter a window, select an event, inspect ranked abnormal contributors",
                     "textStyle": {
                       "fontSize": "9pt",
-                      "color": "#5A6570"
+                      "color": "#5a6570"
                     }
                   }
                 ]
@@ -59,6 +58,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

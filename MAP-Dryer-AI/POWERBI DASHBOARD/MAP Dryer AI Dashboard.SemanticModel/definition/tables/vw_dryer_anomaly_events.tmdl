@@ -1,0 +1,323 @@
+/// Operator-facing anomaly events: consecutive anomalous 5-second rows
+/// grouped by the SQL view vw_dryer_anomaly_events (gap tolerance 30 s).
+/// Severity/subsystem/diagnosis come from each event's peak-risk row.
+table vw_dryer_anomaly_events
+	lineageTag: 4490436c-25f7-5336-bdd8-cd1908041938
+
+	measure 'Events Count' = COUNTROWS ( 'vw_dryer_anomaly_events' )
+		formatString: #,0
+		displayFolder: 14 Events (5s)
+		lineageTag: 74c63e6f-5b7b-5c14-a8dc-661ae52420aa
+
+	measure 'Events High Count' = CALCULATE ( COUNTROWS ( 'vw_dryer_anomaly_events' ), 'vw_dryer_anomaly_events'[Severity] = "HIGH" )
+		formatString: #,0
+		displayFolder: 14 Events (5s)
+		lineageTag: fda18c54-25c5-5349-a3d1-6ce81f44c7b9
+
+	measure 'Events Medium Count' = CALCULATE ( COUNTROWS ( 'vw_dryer_anomaly_events' ), 'vw_dryer_anomaly_events'[Severity] = "MEDIUM" )
+		formatString: #,0
+		displayFolder: 14 Events (5s)
+		lineageTag: 559e19a6-6049-5a9e-a828-7129843e2b03
+
+	measure 'Events Low Count' = CALCULATE ( COUNTROWS ( 'vw_dryer_anomaly_events' ), 'vw_dryer_anomaly_events'[Severity] = "LOW" )
+		formatString: #,0
+		displayFolder: 14 Events (5s)
+		lineageTag: 7e536884-5122-5f03-b3f0-c2af5444be3a
+
+	measure 'Events Empty State' = IF ( COALESCE ( [Events Count], 0 ) = 0, "No abnormal events in the selected window.", "" )
+		displayFolder: 14 Events (5s)
+		lineageTag: 0a83fd29-e0ac-5149-93ba-0396edd3704e
+
+	measure 'Selected Event Peak Timestamp' =
+			VAR s = SELECTEDVALUE ( 'vw_dryer_anomaly_events'[Peak Timestamp] )
+			RETURN
+			    IF (
+			        ISBLANK ( s ),
+			        CALCULATE (
+			            MAX ( 'vw_dryer_anomaly_events'[Peak Timestamp] ),
+			            ALLSELECTED ( 'vw_dryer_anomaly_events' )
+			        ),
+			        s
+			    )
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 14 Events (5s)
+		lineageTag: d72bed9f-004b-56bf-999f-d1ad46338f50
+
+	measure 'Event Sel Severity' =
+			VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Severity] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    )
+		displayFolder: 14 Events (5s)
+		lineageTag: ee04f414-d8e8-5ee6-bfe3-075c878c67a6
+
+	measure 'Event Sel Subsystem' =
+			VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Subsystem] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    )
+		displayFolder: 14 Events (5s)
+		lineageTag: d2a88d30-77a7-5744-a80f-d8b68aa454f6
+
+	measure 'Event Sel Diagnosis' =
+			VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Diagnosis] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    )
+		displayFolder: 14 Events (5s)
+		lineageTag: 0308eb2c-0c31-58be-a1f8-1dca7e7b2ec9
+
+	measure 'Event Sel Causes' =
+			VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Possible Causes] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    )
+		displayFolder: 14 Events (5s)
+		lineageTag: 415f9d4f-239f-5ad7-8eaa-9fc2e106e6b6
+
+	measure 'Event Sel Verification' =
+			VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Recommended Verification] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    )
+		displayFolder: 14 Events (5s)
+		lineageTag: c5983ad1-b93a-572f-953d-a5f132c52513
+
+	measure 'Event Sel Time Display' =
+			IF ( ISBLANK ( ( VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Peak Timestamp] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    ) ) ), "No event selected", FORMAT ( ( VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Peak Timestamp] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    ) ), "yyyy-mm-dd hh:nn:ss" ) )
+		displayFolder: 14 Events (5s)
+		lineageTag: 8c86602f-f039-5aa2-85b2-c1fa51b134b0
+
+	measure 'Event Sel Duration Display' =
+			IF ( ISBLANK ( ( VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Duration Min] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    ) ) ), "—", FORMAT ( ( VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Duration Min] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    ) ), "0.0" ) & " min" )
+		displayFolder: 14 Events (5s)
+		lineageTag: 82c66822-b3da-5e09-a5a5-616d75155694
+
+	measure 'Event Sel Peak Risk Display' =
+			IF ( ISBLANK ( ( VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Peak Anomaly Risk] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    ) ) ), "—", FORMAT ( ( VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Peak Anomaly Risk] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    ) ), "0.00" ) )
+		displayFolder: 14 Events (5s)
+		lineageTag: 6c91ca30-a464-5276-9a8f-305ef07d98a6
+
+	measure 'Event Sel Moisture Display' =
+			IF ( ISBLANK ( ( VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Predicted Moisture At Peak] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    ) ) ), "—", FORMAT ( ( VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_anomaly_events'[Predicted Moisture At Peak] ),
+			        REMOVEFILTERS ( 'vw_dryer_anomaly_events' ),
+			        'vw_dryer_anomaly_events'[Peak Timestamp] = t
+			    ) ), "0.00" ) & " % predicted" )
+		displayFolder: 14 Events (5s)
+		lineageTag: 16264e82-11df-5af1-93f3-a9cb4fd6bccd
+
+	measure 'Event Sel Lab Context' =
+			VAR t = [Selected Event Peak Timestamp]
+			VAR labT =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_lab_samples'[Sample Timestamp] ),
+			        REMOVEFILTERS ( 'vw_dryer_lab_samples' ),
+			        'vw_dryer_lab_samples'[Sample Timestamp] <= t
+			    )
+			VAR labV =
+			    CALCULATE (
+			        AVERAGE ( 'vw_dryer_lab_samples'[Laboratory Moisture] ),
+			        REMOVEFILTERS ( 'vw_dryer_lab_samples' ),
+			        'vw_dryer_lab_samples'[Sample Timestamp] = labT
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( labV ),
+			        "No laboratory result before this event",
+			        FORMAT ( labV, "0.00" ) & " % lab at "
+			            & FORMAT ( labT, "hh:nn" )
+			    )
+		displayFolder: 14 Events (5s)
+		lineageTag: 5be449bc-20c2-5cea-b18c-67acfe3553e0
+
+	measure 'Event Sel Severity Pill BG' =
+			SWITCH ( UPPER ( [Event Sel Severity] ),
+			    "HIGH", "#FBE2E3", "MEDIUM", "#FDE7C8",
+			    "LOW", "#FFF0D5", "CRITICAL", "#C83F45", "#E7F4EF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 224aec20-f0a2-5fab-979b-ae7fa46da03b
+
+	measure 'Event Sel Severity Pill FG' =
+			SWITCH ( UPPER ( [Event Sel Severity] ),
+			    "HIGH", "#C83F45", "MEDIUM", "#B26A00", "LOW", "#B26A00",
+			    "CRITICAL", "#FFFFFF", "#087C5B" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 7d8ede81-5650-57b9-889e-c77d275494d2
+
+	measure 'Event Row BG' =
+			SWITCH ( UPPER ( MAX ( 'vw_dryer_anomaly_events'[Severity] ) ),
+			    "HIGH", "#FBE2E3", "MEDIUM", "#FDE7C8",
+			    "LOW", "#FFF0D5", "CRITICAL", "#C83F45", "#FFFFFF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 76f8cb25-d3ff-5bf9-95e4-85d66502bef7
+
+	measure 'Event Row FG' =
+			SWITCH ( UPPER ( MAX ( 'vw_dryer_anomaly_events'[Severity] ) ),
+			    "HIGH", "#C83F45", "MEDIUM", "#B26A00", "LOW", "#B26A00",
+			    "CRITICAL", "#FFFFFF", "#17231F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 8db077a8-badb-5176-a16d-f1c82bf8c356
+
+	column 'Event ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7dd2eb72-d4f2-553d-92c3-3bd967d82ff9
+		summarizeBy: none
+		sourceColumn: Event ID
+
+	column 'Event Start'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 21a4c7c8-448c-50ef-8462-ec1d4e3c6703
+		summarizeBy: none
+		sourceColumn: Event Start
+
+	column 'Event End'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 6934e856-7990-5bb8-9116-d917d665b5ee
+		summarizeBy: none
+		sourceColumn: Event End
+
+	column 'Duration Min'
+		dataType: double
+		formatString: 0.0
+		lineageTag: e1ca87f3-8f32-5caf-bcd8-58193858f084
+		summarizeBy: none
+		sourceColumn: Duration Min
+
+	column 'Rows In Event'
+		dataType: int64
+		formatString: 0
+		lineageTag: ac798a76-7b22-5ddd-b1cc-ba441929946e
+		summarizeBy: none
+		sourceColumn: Rows In Event
+
+	column 'Peak Timestamp'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: a8425924-a2f8-5afa-b61d-33df454ba0e4
+		summarizeBy: none
+		sourceColumn: Peak Timestamp
+
+	column 'Peak Anomaly Score'
+		dataType: double
+		formatString: 0.000000
+		lineageTag: f3bfec99-03d4-583f-b9b4-08cc1f981fce
+		summarizeBy: none
+		sourceColumn: Peak Anomaly Score
+
+	column 'Peak Anomaly Risk'
+		dataType: double
+		formatString: 0.000
+		lineageTag: dd7ddc79-92e7-5883-a91c-18581aa5a4ca
+		summarizeBy: none
+		sourceColumn: Peak Anomaly Risk
+
+	column Severity
+		dataType: string
+		lineageTag: 7341fbf6-b3ca-501d-9083-a51bcab25dd8
+		summarizeBy: none
+		sourceColumn: Severity
+
+	column Subsystem
+		dataType: string
+		lineageTag: 29693cd1-7a12-5f9a-bc88-a6c689218851
+		summarizeBy: none
+		sourceColumn: Subsystem
+
+	column Diagnosis
+		dataType: string
+		lineageTag: 9cb3098f-26d1-5aa2-a472-e6f5e741619e
+		summarizeBy: none
+		sourceColumn: Diagnosis
+
+	column 'Possible Causes'
+		dataType: string
+		lineageTag: 817dcd69-83c5-5074-bb6d-d7544990806c
+		summarizeBy: none
+		sourceColumn: Possible Causes
+
+	column 'Recommended Verification'
+		dataType: string
+		lineageTag: abf5bf67-6dcd-5270-8ae4-283f5282aa8c
+		summarizeBy: none
+		sourceColumn: Recommended Verification
+
+	column 'Predicted Moisture At Peak'
+		dataType: double
+		formatString: 0.0000
+		lineageTag: 56dfdfa4-8839-5035-999a-6198fe2f9a7b
+		summarizeBy: none
+		sourceColumn: Predicted Moisture At Peak
+
+	partition vw_dryer_anomaly_events = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database(DB_Server, DB_Database),
+				    Data = Source{[Schema = "public", Item = "vw_dryer_anomaly_events"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table
