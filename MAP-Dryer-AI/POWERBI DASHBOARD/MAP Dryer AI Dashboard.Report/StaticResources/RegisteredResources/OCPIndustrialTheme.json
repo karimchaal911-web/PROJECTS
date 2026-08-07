@@ -65,14 +65,7 @@
         ],
         "dropShadow": [
           {
-            "show": true,
-            "color": {
-              "solid": {
-                "color": "#1A2B2410"
-              }
-            },
-            "position": "Outer",
-            "preset": "BottomRight"
+            "show": false
           }
         ],
         "outspacePane": [

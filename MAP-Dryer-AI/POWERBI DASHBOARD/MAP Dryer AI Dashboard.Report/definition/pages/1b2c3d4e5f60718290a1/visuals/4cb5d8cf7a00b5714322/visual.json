@@ -50,52 +50,6 @@
               "nativeQueryRef": "Contribution Score Value"
             }
           ]
-        },
-        "Tooltips": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_dryer_contributors_powerbi"
-                    }
-                  },
-                  "Property": "Observed Value"
-                }
-              },
-              "queryRef": "vw_dryer_contributors_powerbi.Observed Value",
-              "nativeQueryRef": "Observed Value"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_dryer_contributors_powerbi"
-                    }
-                  },
-                  "Property": "Deviation Direction"
-                }
-              },
-              "queryRef": "vw_dryer_contributors_powerbi.Deviation Direction",
-              "nativeQueryRef": "Deviation Direction"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_dryer_contributors_powerbi"
-                    }
-                  },
-                  "Property": "Deviation Percent"
-                }
-              },
-              "queryRef": "vw_dryer_contributors_powerbi.Deviation Percent",
-              "nativeQueryRef": "Deviation Percent"
-            }
-          ]
         }
       },
       "sortDefinition": {
@@ -331,6 +285,19 @@
               "expr": {
                 "Literal": {
                   "Value": "16D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

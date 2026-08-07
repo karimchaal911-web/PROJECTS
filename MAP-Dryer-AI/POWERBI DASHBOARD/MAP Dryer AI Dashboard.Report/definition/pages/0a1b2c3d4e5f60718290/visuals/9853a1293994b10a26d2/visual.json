@@ -4,10 +4,10 @@
   "position": {
     "x": 678,
     "y": 632,
-    "z": 5200,
+    "z": 5600,
     "height": 118,
     "width": 172,
-    "tabOrder": 5200
+    "tabOrder": 5600
   },
   "visual": {
     "visualType": "card",
@@ -159,25 +159,20 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#D6E0DC'"
-                    }
-                  }
-                }
-              }
-            },
-            "radius": {
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
               "expr": {
                 "Literal": {
-                  "Value": "12D"
+                  "Value": "false"
                 }
               }
             }

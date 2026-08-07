@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
-  "name": "4787a3d38be68b2bc875",
+  "name": "8bcea4072f6a8b4a2308",
   "position": {
-    "x": 1220,
-    "y": 100,
-    "z": 2300,
-    "height": 36,
-    "width": 348,
-    "tabOrder": 2300
+    "x": 836,
+    "y": 486,
+    "z": 3500,
+    "height": 14,
+    "width": 203,
+    "tabOrder": 3500
   },
   "visual": {
     "visualType": "textbox",
@@ -20,9 +20,9 @@
               {
                 "textRuns": [
                   {
-                    "value": "EXPORT CSV \u2014 open the events table's \u00b7\u00b7\u00b7 menu",
+                    "value": "DRYER AIR TEMP",
                     "textStyle": {
-                      "fontSize": "8pt",
+                      "fontSize": "7pt",
                       "color": "#66756F",
                       "fontWeight": "bold"
                     }

@@ -3,11 +3,11 @@
   "name": "33b30d1646170bb16ed4",
   "position": {
     "x": 126,
-    "y": 754,
-    "z": 4400,
-    "height": 26,
+    "y": 750,
+    "z": 4800,
+    "height": 28,
     "width": 172,
-    "tabOrder": 4400
+    "tabOrder": 4800
   },
   "visual": {
     "visualType": "card",
@@ -98,7 +98,30 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "vw_dryer_dashboard_powerbi"
+                        }
+                      },
+                      "Property": "DAT Card BG"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }
@@ -106,6 +129,19 @@
         }
       ],
       "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
         {
           "properties": {
             "show": {

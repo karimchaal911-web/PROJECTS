@@ -168,10 +168,13 @@ def container_objects(
         }]
     else:
         objs["border"] = [{"properties": {"show": lit("false")}}]
-    if shadow:
-        objs["dropShadow"] = [{
-            "properties": {"show": lit("true")}
-        }]
+    # Shadows are opted IN per visual; everything else explicitly disables
+    # them. A theme-level shadow would draw a grey box around every
+    # transparent layered visual (titles, captions, sparklines) and wreck
+    # the flat template look.
+    objs["dropShadow"] = [{
+        "properties": {"show": lit("true" if shadow else "false")}
+    }]
     return objs
 
 
@@ -265,6 +268,7 @@ def shape(fill: str, radius: int = 16, border_color: str | None = None) -> dict:
             "title": [{"properties": {"show": lit("false")}}],
             "background": [{"properties": {"show": lit("false")}}],
             "border": [{"properties": {"show": lit("false")}}],
+            "dropShadow": [{"properties": {"show": lit("false")}}],
         },
     }
 
@@ -295,6 +299,7 @@ def textbox(runs: list[tuple[str, str, str, bool]],
             "title": [{"properties": {"show": lit("false")}}],
             "background": [{"properties": {"show": lit("false")}}],
             "border": [{"properties": {"show": lit("false")}}],
+            "dropShadow": [{"properties": {"show": lit("false")}}],
         },
     }
 
@@ -491,10 +496,7 @@ def build_theme() -> dict:
                         "radius": 16,
                     }],
                     "dropShadow": [{
-                        "show": True,
-                        "color": {"solid": {"color": "#1A2B2410"}},
-                        "position": "Outer",
-                        "preset": "BottomRight",
+                        "show": False,
                     }],
                     "outspacePane": [{}],
                 }
@@ -656,6 +658,9 @@ def build_page1() -> Page:
         ("strip-temp", "Dryer Temp (Trend)", "DRYER AIR TEMP"),
     ]
     strip_w = 227
+    # A container title inside a 78-px line chart starves the plot area
+    # below its minimum render height and the visual shows only a
+    # placeholder icon — so the label is a textbox overlay instead.
     for index, (key, measure_name, label) in enumerate(strips):
         x = 110 + index * (strip_w + 11)
         page.add(
@@ -663,8 +668,12 @@ def build_page1() -> Page:
             line_chart(
                 (DASH, "Timestamp"), [(DASH, measure_name)],
                 colors={measure_name: TEAL},
-                title=label, legend=False, axes=False,
+                title=None, legend=False, axes=False,
             ),
+        )
+        page.add(
+            key + "-label", x + 12, 486, strip_w - 24, 14,
+            textbox([(label, "7pt", TEXT2, True)]),
         )
 
     # Current operating assessment ---------------------------------------
@@ -795,42 +804,47 @@ def build_page1() -> Page:
         ("var-vac", "VACUUM", "Vacuum"),
     ]
     var_w = 172
+    # Each tile is three vertically CONTIGUOUS segments (value, delta,
+    # sparkline) that all carry the same measure-driven background, so the
+    # whole tile tints as one surface exactly like the reference template.
     for index, (key, label, short) in enumerate(variables):
         x = 126 + index * (var_w + 12)
+        tile_bg = (DASH, f"{short} Card BG")
         page.add(
             key, x, 632, var_w, 118,
             card(DASH, f"{short} Value Display", title=label,
                  value_size=15,
                  value_color_measure=(DASH, f"{short} Card FG"),
-                 background_measure=(DASH, f"{short} Card BG"), radius=12),
+                 background_measure=tile_bg, border=False),
         )
         page.add(
-            key + "-delta", x, 754, var_w, 26,
+            key + "-delta", x, 750, var_w, 28,
             card(DASH, f"{short} Delta Display", value_size=8,
                  value_color_measure=(DASH, f"{short} Card FG"),
-                 background=None, border=False),
+                 background_measure=tile_bg, border=False),
         )
-        page.add(
-            key + "-spark", x, 782, var_w, 74,
-            line_chart(
-                (DASH, "Timestamp"),
-                [(DASH, {
-                    "DAT": "Dryer Temp (Trend)",
-                    "Feed": "Feed Rate (Trend)",
-                    "Steam": "Steam Pressure (Trend)",
-                    "Airflow": "Air Flow (Trend)",
-                    "Vacuum": "Vacuum (Trend)",
-                }[short])],
-                colors={
-                    "Dryer Temp (Trend)": GREEN,
-                    "Feed Rate (Trend)": GREEN,
-                    "Steam Pressure (Trend)": GREEN,
-                    "Air Flow (Trend)": GREEN,
-                    "Vacuum (Trend)": GREEN,
-                },
-                title=None, legend=False, axes=False, transparent=True,
-            ),
+        spark = line_chart(
+            (DASH, "Timestamp"),
+            [(DASH, {
+                "DAT": "Dryer Temp (Trend)",
+                "Feed": "Feed Rate (Trend)",
+                "Steam": "Steam Pressure (Trend)",
+                "Airflow": "Air Flow (Trend)",
+                "Vacuum": "Vacuum (Trend)",
+            }[short])],
+            colors={
+                "Dryer Temp (Trend)": GREEN,
+                "Feed Rate (Trend)": GREEN,
+                "Steam Pressure (Trend)": GREEN,
+                "Air Flow (Trend)": GREEN,
+                "Vacuum (Trend)": GREEN,
+            },
+            title=None, legend=False, axes=False, transparent=True,
         )
+        spark["visualContainerObjects"] = container_objects(
+            title=None, background_measure=tile_bg, border=False,
+        )
+        page.add(key + "-spark", x, 778, var_w, 78, spark)
 
     # Operator guidance ----------------------------------------------------
     page.add("guide-bg", 1064, 572, 520, 312, shape(WHITE, 16, BORDER))
@@ -890,6 +904,9 @@ def slicer(entity: str, prop: str, mode: str = "Dropdown") -> dict:
         },
         "objects": {
             "data": [{"properties": {"mode": lit(f"'{mode}'")}}],
+            # The filter bar carries its own textbox labels; the slicer's
+            # built-in header would duplicate them.
+            "header": [{"properties": {"show": lit("false")}}],
             "general": [{"properties": {}}],
         },
         "visualContainerObjects": container_objects(
@@ -1033,18 +1050,12 @@ def build_page2() -> Page:
                                        "Column", active=True)
                         ]
                     },
+                    # Raw-column tooltips would expand the grouping to one
+                    # bar per contributor ROW (the same variable repeated);
+                    # the category must stay Contributor Name alone.
                     "Y": {
                         "projections": [
                             projection(CONTRIB, "Contribution Score Value")
-                        ]
-                    },
-                    "Tooltips": {
-                        "projections": [
-                            projection(CONTRIB, "Observed Value", "Column"),
-                            projection(CONTRIB, "Deviation Direction",
-                                       "Column"),
-                            projection(CONTRIB, "Deviation Percent",
-                                       "Column"),
                         ]
                     },
                 },

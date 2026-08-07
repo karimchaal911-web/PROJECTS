@@ -4,10 +4,10 @@
   "position": {
     "x": 1080,
     "y": 582,
-    "z": 5900,
+    "z": 6300,
     "height": 24,
     "width": 300,
-    "tabOrder": 5900
+    "tabOrder": 6300
   },
   "visual": {
     "visualType": "textbox",
@@ -62,6 +62,19 @@
         }
       ],
       "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
         {
           "properties": {
             "show": {

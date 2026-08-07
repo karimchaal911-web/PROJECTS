@@ -4,10 +4,10 @@
   "position": {
     "x": 1080,
     "y": 766,
-    "z": 6400,
+    "z": 6800,
     "height": 106,
     "width": 488,
-    "tabOrder": 6400
+    "tabOrder": 6800
   },
   "visual": {
     "visualType": "card",
@@ -108,6 +108,19 @@
         }
       ],
       "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
         {
           "properties": {
             "show": {

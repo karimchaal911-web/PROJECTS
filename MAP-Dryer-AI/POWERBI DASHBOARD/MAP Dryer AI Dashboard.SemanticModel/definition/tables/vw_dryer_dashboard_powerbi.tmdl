@@ -1406,9 +1406,9 @@ table vw_dryer_dashboard_powerbi
 	measure 'Timeline Selected Marker' =
 			VAR t = [Selected Event Peak Timestamp]
 			RETURN
-			    CALCULATE (
-			        AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Risk] ),
-			        'vw_dryer_dashboard_powerbi'[Timestamp] = t
+			    IF (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] ) = t,
+			        AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Risk] )
 			    )
 		formatString: 0.000
 		displayFolder: 12 Trend Series (5s)

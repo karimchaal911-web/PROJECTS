@@ -581,11 +581,15 @@ for trend_name, trend_col in [
     ))
 M.append(measure(
     "Timeline Selected Marker",
+    # Must respect the chart's Timestamp axis context: overriding it with
+    # CALCULATE(Timestamp = t) returns the same value for EVERY axis
+    # point and draws a solid horizontal line across the whole timeline.
+    # Emitting only at the matching axis point yields a single marker.
     f"""VAR t = [Selected Event Peak Timestamp]
 RETURN
-    CALCULATE (
-        AVERAGE ( '{DASH}'[Anomaly Risk] ),
-        '{DASH}'[Timestamp] = t
+    IF (
+        MAX ( '{DASH}'[Timestamp] ) = t,
+        AVERAGE ( '{DASH}'[Anomaly Risk] )
     )""",
     F_TREND, "0.000",
 ))

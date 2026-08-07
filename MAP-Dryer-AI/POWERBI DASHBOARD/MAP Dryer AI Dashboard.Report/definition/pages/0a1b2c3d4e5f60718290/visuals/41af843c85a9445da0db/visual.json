@@ -3,11 +3,11 @@
   "name": "41af843c85a9445da0db",
   "position": {
     "x": 862,
-    "y": 754,
-    "z": 5600,
-    "height": 26,
+    "y": 750,
+    "z": 6000,
+    "height": 28,
     "width": 172,
-    "tabOrder": 5600
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "card",
@@ -98,7 +98,30 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "vw_dryer_dashboard_powerbi"
+                        }
+                      },
+                      "Property": "Vacuum Card BG"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }
@@ -106,6 +129,19 @@
         }
       ],
       "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
         {
           "properties": {
             "show": {

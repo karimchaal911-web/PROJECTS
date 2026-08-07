@@ -3,11 +3,11 @@
   "name": "ec2d47407a05a630d80b",
   "position": {
     "x": 310,
-    "y": 754,
-    "z": 4700,
-    "height": 26,
+    "y": 750,
+    "z": 5100,
+    "height": 28,
     "width": 172,
-    "tabOrder": 4700
+    "tabOrder": 5100
   },
   "visual": {
     "visualType": "card",
@@ -98,7 +98,30 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "vw_dryer_dashboard_powerbi"
+                        }
+                      },
+                      "Property": "Feed Card BG"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }
@@ -106,6 +129,19 @@
         }
       ],
       "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
         {
           "properties": {
             "show": {

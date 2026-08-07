@@ -3,11 +3,11 @@
   "name": "d7db2fad3fce8ec1e0e1",
   "position": {
     "x": 678,
-    "y": 782,
-    "z": 5400,
-    "height": 74,
+    "y": 778,
+    "z": 5800,
+    "height": 78,
     "width": 172,
-    "tabOrder": 5400
+    "tabOrder": 5800
   },
   "visual": {
     "visualType": "lineChart",
@@ -247,7 +247,30 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "vw_dryer_dashboard_powerbi"
+                        }
+                      },
+                      "Property": "Airflow Card BG"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }
@@ -255,6 +278,19 @@
         }
       ],
       "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
         {
           "properties": {
             "show": {
