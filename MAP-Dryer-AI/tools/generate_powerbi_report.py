@@ -616,6 +616,12 @@ def build_page1() -> Page:
     )
 
     # Drying-performance trend -------------------------------------------
+    # Time-window selection (1 h / 8 h / 24 h …) — a relative-time slicer
+    # in the card's top-right corner, where the template shows its pills.
+    page.add(
+        "trend-window", 806, 226, 236, 34,
+        slicer(DASH, "Timestamp", "Relative"),
+    )
     page.add(
         "trend-main", 110, 218, 940, 254,
         line_chart(

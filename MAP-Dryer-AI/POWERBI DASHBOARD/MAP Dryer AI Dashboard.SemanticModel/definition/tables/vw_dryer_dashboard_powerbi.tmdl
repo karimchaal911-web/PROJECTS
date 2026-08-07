@@ -1140,8 +1140,24 @@ table vw_dryer_dashboard_powerbi
 		displayFolder: 10 Risk & Status (5s)
 		lineageTag: a556e7f3-7026-54f2-96a9-f9f3b11bcd14
 
+	measure 'Ingest Age Minutes (Now)' =
+			VAR t =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Inference Timestamp] ),
+			        REMOVEFILTERS ( 'vw_dryer_dashboard_powerbi' )
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( t ),
+			        BLANK (),
+			        DATEDIFF ( t, NOW (), SECOND ) / 60.0
+			    )
+		formatString: 0.0
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: d127fa3d-5816-57c3-9487-533840e2f325
+
 	measure 'Freshness Status' =
-			VAR age = [Data Age Minutes (Now)]
+			VAR age = [Ingest Age Minutes (Now)]
 			RETURN
 			    IF (
 			        ISBLANK ( age ), "NO DATA",
@@ -1154,7 +1170,7 @@ table vw_dryer_dashboard_powerbi
 		displayFolder: 10 Risk & Status (5s)
 		lineageTag: 854741e3-5594-5f5b-8466-0e7bcd527621
 
-	measure 'Freshness Detail Display' = IF ( ISBLANK ( [Latest Timestamp] ), "no data received", "Latest " & FORMAT ( [Latest Timestamp], "yyyy-mm-dd hh:nn:ss" ) & " · age " & FORMAT ( [Data Age Minutes (Now)], "0" ) & " min" )
+	measure 'Freshness Detail Display' = IF ( ISBLANK ( [Latest Timestamp] ), "no data received", "Latest " & FORMAT ( [Latest Timestamp], "yyyy-mm-dd hh:nn:ss" ) & " · ingested " & FORMAT ( [Ingest Age Minutes (Now)], "0" ) & " min ago" )
 		displayFolder: 10 Risk & Status (5s)
 		lineageTag: 5c35c578-07f3-53cb-81ed-f0621b429dd2
 

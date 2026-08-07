@@ -7,20 +7,33 @@ completed model outputs from PostgreSQL over **DirectQuery**.
 POWERBI DASHBOARD/
 ├── MAP Dryer AI Dashboard.pbip            ← open THIS in Power BI Desktop
 ├── MAP Dryer AI Dashboard.SemanticModel/  ← tables, relationship, measures (TMDL)
-├── MAP Dryer AI Dashboard.Report/         ← the two report pages (PBIR)
-├── sql/create_powerbi_views.sql           ← reference DDL, ONLY if a view is missing
+├── MAP Dryer AI Dashboard.Report/         ← the two report pages (PBIR, 1600×900)
+├── sql/bootstrap_base_schema.sql          ← base tables/functions (fresh machine)
+├── sql/upgrade_5s_schema.sql              ← 5-second multi-rate extension
+├── sql/create_powerbi_views.sql           ← legacy reference DDL (pre-5s naming)
+├── preview/                               ← HTML/PNG page previews from live SQL
+├── backup_report_pages_20260806/          ← pages before the template rebuild
 ├── gi.pbix                                ← earlier stub kept for reference
 ├── README.md
 └── IMPLEMENTATION_REPORT.md
 ```
 
+The two report pages are generated from
+`tools/generate_powerbi_report.py` and mirror the reference templates in
+`resources/dashboard_templates/` (dark-green 86-px navigation rail,
+pill-shaped status controls, full-card heatmap coloring). Re-running the
+generator is deterministic; layout previews rendered from the live SQL
+views are produced by `tools/render_dashboard_preview.py` into
+`preview/`. `tools/validate_report_fields.py` checks every visual's field
+references against the semantic model.
+
 ## Division of responsibility
 
 | Layer | Responsibility |
 |---|---|
-| `realtime_pipeline` (Python) | Reads observations, runs the moisture and anomaly pipelines, produces diagnosis/severity/subsystem/guidance, **writes everything into PostgreSQL** every 60 s |
-| PostgreSQL | Stores `dryer_map`, `dryer_model_outputs`, `dryer_abnormal_variables`; exposes `public.vw_dryer_dashboard_powerbi` and `public.vw_dryer_contributors_powerbi` |
-| Power BI (this folder) | **Reads the two views only.** It never loads the joblib models and never executes inference |
+| `realtime_pipeline` (Python) | Reads observations, runs the window-feature moisture model and the process-only anomaly/diagnosis models, **writes everything into PostgreSQL every 5 s** (`realtime_service.py`) |
+| PostgreSQL | Stores `dryer_map`, `dryer_model_outputs`, `dryer_abnormal_variables`; exposes `vw_dryer_dashboard_powerbi`, `vw_dryer_contributors_powerbi`, `vw_dryer_lab_samples`, `vw_dryer_anomaly_events`, `vw_dryer_latest` |
+| Power BI (this folder) | **Reads the views only** over DirectQuery with 60-second automatic page refresh. It never loads the joblib models and never executes inference. Data acquisition (5 s) is deliberately faster than report rendering (60 s); the freshness pill reflects ingest age |
 
 ## Prerequisites
 
@@ -53,7 +66,7 @@ and prints row counts and the latest timestamp.
   `MAP Dryer AI Dashboard.SemanticModel/definition/tables/*.tmdl`
   (one line per column; the model was written so this is the only place a
   physical name appears).
-* **Zero rows** → start `python realtime_pipeline/src/replay_service.py`.
+* **Zero rows** → start `python realtime_pipeline/src/realtime_service.py`.
 
 ## Opening and connecting
 

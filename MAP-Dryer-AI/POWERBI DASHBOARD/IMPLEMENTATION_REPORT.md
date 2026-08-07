@@ -1,5 +1,9 @@
 # Power BI Dashboard — Implementation Report
 
+> **Superseded in part — see “2026-08-07 · 5-second multi-rate upgrade”
+> at the end of this file.** Sections below describe the original
+> Power BI-only implementation of 2026-08-05 and are kept for history.
+
 Date: 2026-08-05 · Scope: Power BI layer only. No model, feature-engineering,
 `realtime_pipeline`, or SQL-ingestion code was modified.
 
@@ -183,3 +187,215 @@ cross-filters; CSV export via the visual menu).
    `dashboard_template_page_2_diagnostics.png`) were not present anywhere on
    this machine; if pixel-level fidelity to them matters, drop them into the
    repo and compare against the built pages.
+
+---
+
+# 2026-08-07 · 5-second multi-rate upgrade — Implementation Report
+
+Scope: end-to-end. Multi-rate data processing, model training, 5-second
+real-time pipeline, PostgreSQL schema, semantic model, template-faithful
+report rebuild, tests, and a live end-to-end demonstration on a local
+PostgreSQL 17.5 instance.
+
+## 1. Data architecture (multi-rate contract)
+
+`src/multirate/` is the single source of truth:
+
+| Module | Responsibility |
+|---|---|
+| `preprocessing.py` | Raw CSV → **process table** (Timestamp + 9 process variables, 5-s grid validated, duplicates removed, gaps reported — never invented; optional backward-only short-gap hold, off by default) and **laboratory table** (one row per real analysis, ~2 h apart) |
+| `alignment.py` | **Dashboard alignment**: backward as-of join adding `Latest Lab *`, `Lab Result Age (min)`, `Lab Sample Available` (display only, never training targets). **Training alignment**: one supervised row per real lab sample with feature window ending at `t_lab − residence_time(asof) − transport_delay` |
+| `window_features.py` | 96 aggregated window features (10 stats × 9 variables + 6 derived physical series × 2 + stability index) — same function for training and inference |
+| `instant_features.py` | 15 per-observation features for the anomaly/diagnosis models (no laboratory values needed) |
+
+Verified on the prototype data: training CSV 241,920 process rows /
+168 lab samples (exactly 2 h spacing, 0 gaps, 0 duplicates); dashboard CSV
+34,560 rows / 24 lab samples.
+
+## 2. Training alignment and model results
+
+`tools/train_5s_models.py` → `models/5s/` (3 quality pipelines, anomaly
+model + scaler, `reference_profile.json` v2, `feature_schema.json`,
+`training_report.json`). 167 supervised rows (first sample skipped —
+insufficient pre-history, reported not fabricated). Chronological
+70/15/15 split (117/25/25), `TimeSeriesSplit(4)` grid search, four
+candidate families benchmarked per target plus persistence and
+training-mean baselines.
+
+Chronological **test-tail** results (25 held-out lab samples):
+
+| Target | Selected | MAE | RMSE | R² | Bias | Max abs err |
+|---|---|---|---|---|---|---|
+| Final Moisture (%H2O) | Elastic Net | 0.0303 | 0.0355 | 0.909 | −0.0008 | 0.072 |
+| Product Density | Gradient Boosting | 0.0030 | 0.0040 | 0.760 | +0.0013 | 0.011 |
+| Final Product Temp | Ridge | 0.1733 | 0.2102 | 0.990 | −0.0069 | 0.503 |
+
+Validation-set floor check (moisture): model RMSE 0.0375 vs persistence
+0.1913 and training-mean 0.1269. Per-sample test residuals are stored in
+`training_report.json` (`test_residuals`) for residual-over-time review.
+
+Anomaly detector: One-Class SVM (nu = 0.02) kept — validation flag rate
+3.98 % vs Isolation Forest 2.02 % benchmark (both recorded); decision
+function calibrated to a 0–1 display risk
+(risk = 1/(1+exp(score/scale)), boundary → 0.5, warning 0.5,
+critical 0.8).
+
+## 3. Real-time inference (5-second service)
+
+`realtime_pipeline/src/realtime_service.py` — incremental resume from
+`MAX("Date"+"Time")`, idempotent SQL upserts keyed on (Date, Time),
+models loaded once, connection reused with bounded reconnect/retry,
+explicit transactions, graceful shutdown, per-cycle latency logging with
+a >5 s warning, stale-data announcement, configurable poll interval /
+replay speed / transport delay. Moisture is predicted on every 5-s row
+from the same residence-time-shifted window features used in training;
+prediction error exists only where a real laboratory value exists
+(enforced by the views, not recomputed against carried-forward values).
+Timestamps are naive plant-local end-to-end (documented; no TZ
+conversion). Model version, feature-schema version, inference timestamp
+and latency are written with every row.
+
+## 4. SQL layer
+
+* `POWERBI DASHBOARD/sql/bootstrap_base_schema.sql` (**new**) — the base
+  tables/functions/compatibility views reconstructed from the pipeline
+  sources, so a fresh machine can run everything
+  (`python realtime_pipeline/src/bootstrap_database.py` applies it plus
+  the 5-s migration).
+* `POWERBI DASHBOARD/sql/upgrade_5s_schema.sql` — extends
+  `dryer_model_outputs` (Anomaly Risk, versions, latency), adds
+  Timestamp expression indexes (plus a partial index for lab as-of
+  lookups), extends `vw_dryer_dashboard_powerbi` in place, and creates
+  `vw_dryer_lab_samples`, `vw_dryer_anomaly_events`, `vw_dryer_latest`.
+* `realtime_pipeline/src/validate_database_state.py` (**new**) — 21
+  read-only invariant checks (duplicates, orphans, no-future-lab as-of,
+  lab-count consistency, latency stats).
+* `realtime_pipeline/src/verify_powerbi_views.py` — updated to the real
+  four-view TMDL contract.
+
+## 5. Report rebuild (template-faithful)
+
+`tools/generate_powerbi_report.py` regenerates both PBIR pages at
+1600×900 against `resources/dashboard_templates/*.png`: dark-green 86-px
+rail with icon tiles, header + LIVE DATA / AUTO 60 SEC / freshness
+pills, six KPI cards with **full-card** measure-driven background and
+text colors, drying-performance trend (predicted line, lab-sample
+markers, dashed target band, anomaly markers, relative time-window
+slicer, four synchronized strips), operating-assessment donut gauge +
+severity pill, five critical-variable tiles (value, Δ, status,
+sparkline, full-card heatmap coloring), operator guidance; page 2:
+filter bar (time/severity/subsystem/status + export note), risk
+timeline with thresholds and event/selected markers, selected-event
+card, ranked-contributor bars colored by variable severity, cause
+analysis with event-signature table, and the full-width events table
+with severity-tinted rows that cross-filters everything. Previous pages
+were backed up to `backup_report_pages_20260806/` before the rewrite.
+
+The old 1280×720 pages and theme are superseded; the theme now carries
+the template palette (#0B3B2E rail, #087C5B green, #1B918E teal,
+#F2A12E amber, #DF5558/#C83F45 reds, #F3F6F4 canvas, #D6E0DC borders,
+16-px radius, subtle shadows, Segoe UI).
+
+Semantic model: `tools/generate_powerbi_semantic.py` (idempotent,
+sentinel-delimited) maintains the 5-s extension — 91 dashboard
+measures + 2 lab + 20 event measures, including latest-value KPIs,
+validated-error semantics ("Awaiting next laboratory result"), risk
+intensity/bands, centralized heatmap color measures, per-variable
+status/colors (bands = training-data quantiles), trend series, and
+selected-event context. Freshness is now judged by **ingest age**
+(`Inference Timestamp` vs NOW) — the honest liveness signal under a
+historical-timestamp replay.
+
+`tools/validate_report_fields.py` (**new**) checks every visual field
+reference against the TMDL (105 visuals, 149 references — all resolve)
+and the 1600×900 canvas.
+
+`tools/render_dashboard_preview.py` (**new**) renders both pages as
+HTML from the **live SQL views** (same geometry, same DAX color logic)
+→ `POWERBI DASHBOARD/preview/*.html` + PNG screenshots for visual
+comparison against the templates.
+
+## 6. Testing
+
+`python -m pytest tests` — **71 passed** (28 pre-existing diagnostic
+tests + 43 new): `tests/test_multirate_preprocessing.py` (schema,
+timestamps, sorting, 5-s grid, duplicates, gap reporting, backward-only
+fill, lab-table counts, structural blanks),
+`tests/test_multirate_alignment.py` (as-of join, lab age monotonicity,
+constancy between samples, no future lab, residence shift, window
+boundaries, no future process data, one row per sample, exact sparse
+targets, skip-not-fabricate), `tests/test_multirate_models.py` (feature
+schema = inference schema, rejection of unsorted/missing/non-finite
+inputs, chronological split, artifact reload + prediction, anomaly
+without lab values, service helpers: prediction with/without history,
+resume semantics, risk calibration).
+
+## 7. End-to-end demonstration (executed 2026-08-07, local PostgreSQL 17.5)
+
+No PostgreSQL existed on this machine, so a local user-mode instance was
+installed (`C:\Users\hp\AppData\Local\MAP_DRYER_PG`, PostgreSQL 17.5,
+port 5432) and the schema was created from scratch with
+`bootstrap_database.py` — proving the repository now runs from a fresh
+environment. Flow exercised: dashboard CSV → multirate preprocessing →
+window/instant features → quality + anomaly inference → diagnosis →
+SQL upserts → DirectQuery views → measures/preview visuals.
+
+Accelerated bulk replay (REPLAY_SPEED=0) of 34,500 rows, then a **real
+5-second smoke test** (REPLAY_SPEED=1, 6 cycles — resumed exactly at row
+34,501, one new timestamp per cycle, max 188 ms), then a final catch-up
+of the remaining 54 rows.
+
+| Metric | Value |
+|---|---|
+| Processed rows | 34,560 / 34,560 (full dashboard CSV) |
+| Laboratory observations | 24 (23 validated — the first sample predates sufficient process history) |
+| Anomalous 5-s rows / grouped events | 811 / 95 |
+| Contributor rows | 2,660 |
+| Inference latency avg / max | 45.4 ms / 219 ms (smoke test avg 138 ms) |
+| Cycles over the 5-s budget | 0 |
+| Duplicate rows (process / outputs) | 0 / 0 |
+| Process rows without model output | 0 |
+| Future lab attached to an earlier row | 0 |
+| Latest process timestamp | 2026-08-06 09:59:55 |
+| Latest laboratory timestamp | 2026-08-06 08:00:00 (age at head: 119.9 min) |
+| Mean validated absolute moisture error | 0.0279 % |
+| View contract | all four views match the TMDL (verify_powerbi_views.py) |
+
+Previews rendered from the live views (values above are visible on them):
+`POWERBI DASHBOARD/preview/preview_page1_overview.{html,png}` and
+`preview_page2_diagnostics.{html,png}`.
+
+## 8. Remaining limitations
+
+1. **Power BI Desktop is not installed here** — the PBIP opens against
+   the local database as-is (`DB_Server=localhost:5432`,
+   `DB_Database=MAP_DRYER`, trust auth on localhost), but actual visual
+   rendering inside Desktop could not be executed on this machine. The
+   HTML/PNG previews are faithful layout/value proxies built from the
+   same views and color rules, not Desktop screenshots. First open in
+   Desktop may re-serialize lineage tags (normal for hand-authored PBIR).
+2. 60-second automatic page refresh is the fastest reliably supported
+   interval in this configuration; the backend deliberately runs at 5 s
+   and the header pill honestly says "AUTO 60 SEC".
+3. The local demo PostgreSQL uses trust authentication on localhost
+   only — fine for the prototype, not for a shared server. Start it with:
+   `& "$env:LOCALAPPDATA\MAP_DRYER_PG\pgsql\bin\pg_ctl.exe" -D "$env:LOCALAPPDATA\MAP_DRYER_PG\data" -l "$env:LOCALAPPDATA\MAP_DRYER_PG\server.log" start`
+4. The relative time-window slicer on Page 1 defaults to the full range;
+   pick 1 h / 8 h / 24 h in its dropdown (PBIR cannot serialize template-
+   style preset pill buttons without bookmarks).
+
+## 9. Commands (fresh environment)
+
+```powershell
+python -m pip install -r requirements.txt
+python -m pip install -r realtime_pipeline/requirements.txt
+python tools/train_5s_models.py                          # models/5s/
+# copy realtime_pipeline/.env.example → .env, fill DB_*
+python realtime_pipeline/src/bootstrap_database.py       # schema + views
+python realtime_pipeline/src/verify_powerbi_views.py     # contract check
+python realtime_pipeline/src/realtime_service.py         # 5-s service
+python realtime_pipeline/src/validate_database_state.py  # invariants
+python tools/validate_report_fields.py                   # PBIR ↔ TMDL
+python tools/render_dashboard_preview.py                 # live previews
+python -m pytest tests                                   # 71 tests
+```

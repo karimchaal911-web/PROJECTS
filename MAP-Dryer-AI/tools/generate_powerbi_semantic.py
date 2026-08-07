@@ -345,9 +345,28 @@ M.append(measure(
 )""",
     F_STATE, "0.0",
 ))
+# Freshness is judged by when the last row ARRIVED (Inference Timestamp,
+# wall clock), not by the process timestamp it carries: the replay emits
+# historical plant timestamps, so process-time age says nothing about
+# whether the pipeline is alive.
+M.append(measure(
+    "Ingest Age Minutes (Now)",
+    f"""VAR t =
+    CALCULATE (
+        MAX ( '{DASH}'[Inference Timestamp] ),
+        REMOVEFILTERS ( '{DASH}' )
+    )
+RETURN
+    IF (
+        ISBLANK ( t ),
+        BLANK (),
+        DATEDIFF ( t, NOW (), SECOND ) / 60.0
+    )""",
+    F_STATE, "0.0",
+))
 M.append(measure(
     "Freshness Status",
-    """VAR age = [Data Age Minutes (Now)]
+    """VAR age = [Ingest Age Minutes (Now)]
 RETURN
     IF (
         ISBLANK ( age ), "NO DATA",
@@ -365,7 +384,8 @@ M.append(measure(
     "Freshness Detail Display",
     'IF ( ISBLANK ( [Latest Timestamp] ), "no data received", '
     '"Latest " & FORMAT ( [Latest Timestamp], "yyyy-mm-dd hh:nn:ss" ) '
-    '& " · age " & FORMAT ( [Data Age Minutes (Now)], "0" ) & " min" )',
+    '& " · ingested " & FORMAT ( [Ingest Age Minutes (Now)], "0" ) '
+    '& " min ago" )',
     F_STATE,
 ))
 M.append(measure("Refresh Pill Label", '"AUTO 60 SEC"', F_STATE))

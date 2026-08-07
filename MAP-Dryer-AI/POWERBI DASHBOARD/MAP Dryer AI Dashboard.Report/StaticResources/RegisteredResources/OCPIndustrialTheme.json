@@ -1,44 +1,41 @@
 {
-  "name": "OCP Industrial",
+  "name": "OCPIndustrialTheme.json",
   "dataColors": [
-    "#00843D",
-    "#40668C",
-    "#C8102E",
-    "#E8A013",
-    "#8A9299",
-    "#2E5E4E",
-    "#8C6E40",
-    "#404A54"
+    "#087C5B",
+    "#1B918E",
+    "#F2A12E",
+    "#DF5558",
+    "#0B3B2E",
+    "#66756F",
+    "#8FBCAD",
+    "#C83F45"
   ],
-  "good": "#00843D",
-  "neutral": "#E8A013",
-  "bad": "#C8102E",
-  "maximum": "#C8102E",
-  "center": "#E8A013",
-  "minimum": "#00843D",
   "background": "#FFFFFF",
-  "foreground": "#212B36",
-  "tableAccent": "#00843D",
+  "foreground": "#17231F",
+  "tableAccent": "#087C5B",
+  "good": "#087C5B",
+  "neutral": "#F2A12E",
+  "bad": "#C83F45",
   "textClasses": {
     "callout": {
-      "fontSize": 20,
-      "fontFace": "Segoe UI Semibold",
-      "color": "#212B36"
+      "fontSize": 22,
+      "fontFace": "Segoe UI",
+      "color": "#17231F"
     },
     "title": {
-      "fontSize": 11,
+      "fontSize": 12,
       "fontFace": "Segoe UI Semibold",
-      "color": "#4A5560"
+      "color": "#17231F"
     },
     "header": {
-      "fontSize": 11,
-      "fontFace": "Segoe UI Semibold",
-      "color": "#212B36"
+      "fontSize": 10,
+      "fontFace": "Segoe UI",
+      "color": "#66756F"
     },
     "label": {
       "fontSize": 9,
       "fontFace": "Segoe UI",
-      "color": "#3A444E"
+      "color": "#66756F"
     }
   },
   "visualStyles": {
@@ -60,30 +57,26 @@
             "show": true,
             "color": {
               "solid": {
-                "color": "#E1E4E0"
+                "color": "#D6E0DC"
               }
             },
-            "radius": 6
+            "radius": 16
           }
         ],
         "dropShadow": [
           {
             "show": true,
-            "preset": "BottomRight",
-            "transparency": 85
-          }
-        ],
-        "title": [
-          {
-            "show": true,
-            "fontColor": {
+            "color": {
               "solid": {
-                "color": "#4A5560"
+                "color": "#1A2B2410"
               }
             },
-            "fontSize": 10,
-            "fontFamily": "Segoe UI Semibold"
+            "position": "Outer",
+            "preset": "BottomRight"
           }
+        ],
+        "outspacePane": [
+          {}
         ]
       }
     },
@@ -93,17 +86,7 @@
           {
             "color": {
               "solid": {
-                "color": "#F4F5F2"
-              }
-            },
-            "transparency": 0
-          }
-        ],
-        "outspace": [
-          {
-            "color": {
-              "solid": {
-                "color": "#E9EBE7"
+                "color": "#F3F6F4"
               }
             },
             "transparency": 0

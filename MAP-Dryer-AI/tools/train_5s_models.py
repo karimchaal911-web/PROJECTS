@@ -68,6 +68,12 @@ TRAINING_CSV = (
 OLD_REFERENCE_PROFILE = (
     PROJECT_ROOT / "models" / "anomaly_pipeline" / "reference_profile.json"
 )
+DIAGNOSTIC_BUNDLE_METADATA = (
+    PROJECT_ROOT
+    / "models"
+    / "diagnosis"
+    / "diagnostic_bundle_metadata.diag_v1.0.json"
+)
 OUTPUT_DIR = PROJECT_ROOT / "models" / "5s"
 
 MODEL_VERSION = "5s_v1.0"
@@ -313,12 +319,26 @@ def robust_statistics(values: np.ndarray) -> dict:
     }
 
 
+def load_old_feature_metadata() -> dict:
+    """Metadata of the 1-minute profile, carried into the 5-second one.
+
+    The standalone reference_profile.json only exists on machines that ran
+    notebook 04; the same profile also ships inside the versioned
+    diagnostic bundle metadata, which is committed to the repository.
+    """
+
+    if OLD_REFERENCE_PROFILE.exists():
+        with OLD_REFERENCE_PROFILE.open("r", encoding="utf-8") as file:
+            return json.load(file)["feature_metadata"]
+    with DIAGNOSTIC_BUNDLE_METADATA.open("r", encoding="utf-8") as file:
+        bundle = json.load(file)
+    return bundle["reference_profile"]["feature_metadata"]
+
+
 def build_reference_profile(
     instant_features: pd.DataFrame, training_rows: int
 ) -> dict:
-    with OLD_REFERENCE_PROFILE.open("r", encoding="utf-8") as file:
-        old_profile = json.load(file)
-    old_metadata = old_profile["feature_metadata"]
+    old_metadata = load_old_feature_metadata()
 
     # Carry metadata over from the 1-minute profile; two engineered
     # features were renamed for clarity and two are new.
@@ -573,7 +593,7 @@ def main() -> None:
         entry = anomaly_report[name]
         print(
             f"  {name:17s} validation flag rate: "
-            f"{entry['flag_rate_validation']:.4f} (target ≈ {ANOMALY_NU})"
+            f"{entry['flag_rate_validation']:.4f} (target ~ {ANOMALY_NU})"
         )
 
     print(f"\nArtifacts written to {OUTPUT_DIR}")

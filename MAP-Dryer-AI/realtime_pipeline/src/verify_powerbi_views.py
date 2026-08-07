@@ -16,28 +16,29 @@ load_dotenv(ENV_FILE)
 
 DASHBOARD_VIEW = "vw_dryer_dashboard_powerbi"
 CONTRIBUTORS_VIEW = "vw_dryer_contributors_powerbi"
+LAB_SAMPLES_VIEW = "vw_dryer_lab_samples"
+EVENTS_VIEW = "vw_dryer_anomaly_events"
 
 
 # The exact column names the Power BI semantic model expects. Each entry maps
 # to a `sourceColumn:` line in
 # "POWERBI DASHBOARD/MAP Dryer AI Dashboard.SemanticModel/definition/tables".
+# Note the historical trailing space in "Air Flow Rate ".
 EXPECTED_COLUMNS: dict[str, list[str]] = {
     DASHBOARD_VIEW: [
         "Timestamp",
-        "Predicted Moisture",
-        "Laboratory Moisture",
-        "Moisture Error",
-        "Absolute Moisture Error",
+        "Predicted Final Moisture",
+        "Final Moisture (%H2O)",
         "Anomaly Score",
-        "Anomaly Status",
+        "Anomaly Detected",
         "Severity",
-        "Subsystem",
-        "Diagnosis",
+        "Likely Subsystem",
+        "Probable Diagnosis",
         "Possible Causes",
         "Recommended Verification",
         "Dryer Air Temperature",
         "Cooler Air Temperature",
-        "Air Flow Rate",
+        "Air Flow Rate ",
         "Wet Product Feed Rate",
         "Product Inlet Temperature",
         "Residence Time",
@@ -45,19 +46,67 @@ EXPECTED_COLUMNS: dict[str, list[str]] = {
         "Steam Pressure",
         "Fan Speed",
         "Product Density",
-        "Final Product Temperature",
+        "Final Product Temp",
+        "Anomaly Risk",
+        "Model Version",
+        "Feature Schema Version",
+        "Inference Timestamp",
+        "Inference Latency Ms",
+        "Latest Lab Sample Timestamp",
+        "Latest Lab Product Density",
+        "Latest Lab Final Product Temp",
+        "Latest Lab Final Moisture",
+        "Lab Result Age Min",
+        "Lab Sample Available",
+        "Is Lab Sample",
+        "Validated Moisture Error",
+        "Validated Absolute Error",
     ],
     CONTRIBUTORS_VIEW: [
         "Timestamp",
-        "Contributor Rank",
-        "Contributor Name",
-        "Observed Value",
-        "Signed Deviation",
-        "Deviation Percent",
-        "Contribution Score",
-        "Deviation Direction",
-        "Variable Severity",
+        "contribution_rank",
+        "feature_name",
+        "observed_value",
+        "signed_deviation",
+        "deviation_percent",
+        "contribution_score",
+        "deviation_direction",
+        "variable_severity",
     ],
+    LAB_SAMPLES_VIEW: [
+        "Sample Timestamp",
+        "Product Density",
+        "Final Product Temp",
+        "Laboratory Moisture",
+        "Predicted Moisture At Sample",
+        "Validated Error",
+        "Validated Absolute Error",
+        "Previous Sample Timestamp",
+    ],
+    EVENTS_VIEW: [
+        "Event ID",
+        "Event Start",
+        "Event End",
+        "Duration Min",
+        "Rows In Event",
+        "Peak Timestamp",
+        "Peak Anomaly Score",
+        "Peak Anomaly Risk",
+        "Severity",
+        "Subsystem",
+        "Diagnosis",
+        "Possible Causes",
+        "Recommended Verification",
+        "Predicted Moisture At Peak",
+    ],
+}
+
+# Views without their own Timestamp column use these for the freshness probe.
+TIMESTAMP_COLUMN: dict[str, str] = {
+    DASHBOARD_VIEW: "Timestamp",
+    CONTRIBUTORS_VIEW: "Timestamp",
+    LAB_SAMPLES_VIEW: "Sample Timestamp",
+    EVENTS_VIEW: "Peak Timestamp",
 }
 
 
@@ -110,8 +159,8 @@ def report_view(cursor: psycopg.Cursor, view_name: str) -> bool:
 
     if not exists:
         print(
-            "MISSING - the view does not exist. Create it with\n"
-            "POWERBI DASHBOARD/sql/create_powerbi_views.sql"
+            "MISSING - the view does not exist. Create the full schema "
+            "with\npython realtime_pipeline/src/bootstrap_database.py"
         )
         return False
 
@@ -137,22 +186,32 @@ def report_view(cursor: psycopg.Cursor, view_name: str) -> bool:
             "to the actual physical name."
         )
 
+    timestamp_column = TIMESTAMP_COLUMN[view_name]
     cursor.execute(
-        f'SELECT COUNT(*), MAX("Timestamp") FROM public."{view_name}";'
-        if "Timestamp" in actual_names
+        f'SELECT COUNT(*), MAX("{timestamp_column}") '
+        f'FROM public."{view_name}";'
+        if timestamp_column in actual_names
         else f'SELECT COUNT(*), NULL FROM public."{view_name}";'
     )
     row_count, latest = cursor.fetchone()
     print(f"\nRows: {row_count:,}")
     print(f"Latest timestamp: {latest or 'NO DATA'}")
 
+    # Contributor and event views are legitimately empty while the process
+    # stays normal; only the dashboard/lab views must contain data.
+    may_be_empty = view_name in (CONTRIBUTORS_VIEW, EVENTS_VIEW)
     if row_count == 0:
         print(
-            "WARNING - the view returns no rows. Start "
-            "realtime_pipeline/src/replay_service.py to populate it."
+            "NOTE - the view returns no rows."
+            + (
+                " That is expected when no anomaly has occurred."
+                if may_be_empty
+                else " Start realtime_pipeline/src/realtime_service.py "
+                "to populate it."
+            )
         )
 
-    return all_match and row_count > 0
+    return all_match and (row_count > 0 or may_be_empty)
 
 
 def main() -> None:
@@ -172,14 +231,21 @@ def main() -> None:
                 print(f"Database: {database_name}")
                 print(f"User: {user_name}")
 
-                dashboard_ok = report_view(cursor, DASHBOARD_VIEW)
-                contributors_ok = report_view(cursor, CONTRIBUTORS_VIEW)
+                results = [
+                    report_view(cursor, view_name)
+                    for view_name in (
+                        DASHBOARD_VIEW,
+                        CONTRIBUTORS_VIEW,
+                        LAB_SAMPLES_VIEW,
+                        EVENTS_VIEW,
+                    )
+                ]
 
         print(f"\n{'=' * 72}")
-        if dashboard_ok and contributors_ok:
+        if all(results):
             print(
-                "RESULT: both views match the Power BI semantic model "
-                "contract and contain data. The .pbip can connect as-is."
+                "RESULT: all four views match the Power BI semantic model "
+                "contract. The .pbip can connect as-is."
             )
         else:
             print(
