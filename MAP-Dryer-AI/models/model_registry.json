@@ -1,0 +1,50 @@
+{
+  "registry_version": "6.0",
+  "active_runtime_compatibility_version": "map_runtime_v6",
+  "active_dataset": {
+    "path": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
+    "version": "map_canonical_5s_user_deterministic_v1.0",
+    "sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124"
+  },
+  "models": [
+    {
+      "model_id": "moisture_soft_sensor_canonical_92d_v6.0",
+      "status": "runtime-demo",
+      "artifact_path": "models\\5s\\quality_moisture_pipeline.joblib",
+      "artifact_sha256": "b525c7b8598e90fb831db30612b70e7b6ded9de36edd0fc99f9b1753a7b00858",
+      "feature_schema": "models\\5s\\feature_schema.json",
+      "feature_schema_version": "moisture_direct_16_v6.0",
+      "feature_count": 16,
+      "source_notebook": "notebooks/03_Model1_SoftSensor.ipynb",
+      "runtime_uses_exact_notebook03_artifact": true,
+      "training_dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+      "model_family": "Ridge",
+      "test_metrics": {
+        "mae": 0.0010686339098063737,
+        "rmse": 0.0014026194681916787,
+        "r2": 0.8245295479034104,
+        "bias": 6.61687920356382e-05,
+        "max_abs_error": 0.005620566312520919,
+        "n": 165
+      },
+      "test_replay": {
+        "path": "data\\processed\\MAP_Dryer_TEST_Replay_5s.csv",
+        "sha256": "cec99e6a984a11440bfa06230b877f6231299bc9213bd5acb77cfe605553b2c2",
+        "rows": 237600,
+        "laboratory_samples": 165,
+        "start_timestamp": "2026-07-03 06:00:00",
+        "end_timestamp": "2026-07-16 23:59:55",
+        "source_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
+        "source_partition": "held-out chronological TEST"
+      }
+    },
+    {
+      "model_id": "anomaly_detector_canonical_92d_v6.0",
+      "status": "runtime-demo",
+      "artifact_path": "models\\5s\\anomaly_model.joblib",
+      "feature_count": 15,
+      "training_dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+      "model_family": "One-Class SVM"
+    }
+  ]
+}

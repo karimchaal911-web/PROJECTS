@@ -1,0 +1,85 @@
+\chapter{Project Context, Problem Statement and Objectives}
+\label{chap:problem}
+
+\section{The decision-latency problem}
+
+The present monitoring context combines rich process visibility with delayed quality confirmation. PCS7 provides the industrial supervision environment, while laboratory analyses supply moisture, density and final product temperature approximately every two hours. Between two analyses, an operator can observe that temperatures, air flow, feed, vacuum or pressure have changed but cannot obtain a new measured moisture value immediately. The last laboratory result remains valid as a historical observation, not as proof of the current condition.
+
+This is an Industrial Engineering problem of information latency and production decision support. The goal is to reduce the time needed to form a reasoned operational interpretation, while maintaining the distinction between measurement, prediction and diagnosis. The proposed solution inserts a digital information layer; it does not alter the process control layer.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[x=0.82cm,y=0.75cm]
+\draw[->,thick,DeepBlue] (0,0)--(14.2,0) node[right,font=\scriptsize]{time};
+\foreach \x in {0,...,14}{\draw[ENSAMTeal] (\x,0.15)--(\x,0.55);}
+\node[anchor=east,font=\small,DeepBlue] at (-.2,.35){process};
+\node[anchor=east,font=\small,DeepBlue] at (-.2,-1){laboratory};
+\foreach \x in {0,6,12}{\draw[very thick,AccentOrange] (\x,-.75)--(\x,-1.25);\fill[AccentOrange] (\x,-1) circle (1.6pt);}
+\draw[<->,thick,ChapterPurple] (0,-1.6)--node[below,font=\small]{approximately two hours}(6,-1.6);
+\node[align=center,font=\scriptsize] at (7,1.05){continuous process availability; ticks show the\\chosen five-second prototype visualization grid};
+\end{tikzpicture}
+\caption{Multi-rate timing problem: fast process stream versus sparse laboratory quality.}
+\source{\projectsource.}
+\label{fig:timing}
+\end{figure}
+
+\section{Project objectives and success criteria}
+
+The project objectives are to:
+\begin{enumerate}[label=\arabic*.]
+\item digitalize supervision of the soluble MAP process;
+\item reduce dependence on delayed laboratory moisture availability through a continuous estimate;
+\item detect abnormal operating conditions as early as possible;
+\item identify the most likely affected subsystem when an anomaly occurs;
+\item provide diagnostic information that supports faster operator decisions;
+\item centralize process KPIs, model outputs, alerts and quality information in Power BI;
+\item demonstrate a near-real-time architecture using Python, PostgreSQL and Power BI; and
+\item create a prototype that could later receive live PCS7/historian data.
+\end{enumerate}
+
+Success is assessed at prototype level through four evidence groups: correct multi-rate data handling; honest chronological model evaluation; complete replay on the chosen five-second demonstration grid with bounded computation time; and a structurally valid dashboard whose field references resolve to the semantic model. A successful prototype is not equivalent to a production acceptance test.
+
+\section{Proposed architecture and responsibility boundary}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=3mm and 9mm]
+\node[data,minimum width=62mm,text width=56mm] (csv)
+  {\textbf{CURRENT PROTOTYPE}\\CSV replay on a chosen five-second grid\\process rows + sparse two-hour lab fields};
+\node[data,dashed,draw=OCPGreen,minimum width=62mm,text width=56mm,right=of csv] (live)
+  {\textbf{FUTURE PLANT INPUT}\\read-only PCS7/historian process data\\+ timestamped laboratory results};
+
+\node[flow,minimum width=110mm,text width=103mm,below=8mm of $(csv.south)!0.5!(live.south)$] (contract)
+  {\textbf{1. Data and multi-rate contract}\\event time, units, chosen replay grid, sparse lab timing, validity and provenance};
+\node[flow,minimum width=110mm,text width=103mm,below=of contract] (py)
+  {\textbf{2. Python analytics}\\validation + residence-aware windows\\feature engineering + moisture inference + novelty diagnosis};
+\node[flow,minimum width=110mm,text width=103mm,below=of py] (pg)
+  {\textbf{3. PostgreSQL integration boundary}\\transactional event records, model/schema versions and dashboard-oriented views};
+\node[flow,minimum width=110mm,text width=103mm,below=of pg] (pbi)
+  {\textbf{4. Power BI decision support}\\five-second prototype refresh target, current state, trends, lab age, risk and verification guidance};
+\node[data,minimum width=110mm,text width=103mm,below=of pbi] (operator)
+  {\textbf{5. Human verification and authority}\\PCS7, laboratory evidence and approved OCP procedures remain authoritative};
+
+\draw[arr] (csv)--(contract);
+\draw[dashedarr] (live)--node[right,font=\scriptsize,align=left]{approval\\required}(contract);
+\draw[arr] (contract)--(py);
+\draw[arr] (py)--(pg);
+\draw[arr] (pg)--(pbi);
+\draw[arr] (pbi)--(operator);
+\node[font=\scriptsize,below=1mm of operator.south] (legend)
+  {\textcolor{DeepBlue}{solid = implemented prototype}\qquad
+   \textcolor{OCPGreen}{dashed = future approved source}};
+\end{tikzpicture}
+\caption{Real-time supervision architecture with explicit multi-rate timing, current/future sources and operator authority.}
+\source{\projectsource.}
+\label{fig:endtoend}
+\end{figure}
+
+Python is responsible for data validation, temporal alignment, features, inference and diagnostic transformation. PostgreSQL provides idempotent persistence and stable analytical views. Power BI performs visualization, filtering and operator navigation; it does not run autonomous control logic. In the demonstration, the left-hand sources in \cref{fig:endtoend} are replaced by the held-out TEST interval of the same canonical CSV used by Notebooks 01--04, and the service loads the moisture artifact selected in Notebook 03 and the anomaly artifacts exported by Notebook 04. A future live interface must pass OCP cybersecurity, data-governance and operating-procedure requirements before the boundary can move.
+
+\begin{engineeringbox}[Five-second interval: exact meaning]
+Process variables are available continuously through the industrial monitoring and control environment. The five-second interval was selected only for the prototype CSV grid, replay pacing and Power BI refresh demonstration so that near-real-time behaviour could be visualized consistently. It is not presented as the native acquisition or measurement frequency of the OCP instrumentation.
+\end{engineeringbox}
+
+\noindent\textbf{\color{AlertAmber}Explicit non-objectives.}
+The project does not connect to live PCS7, actuate valves or drives, execute closed-loop control, certify a safety function, replace the laboratory, or claim production deployment. Its outputs are advisory and require operator verification.

@@ -57,8 +57,10 @@ TEXT = "#17231F"
 TEXT_2 = "#66756F"
 WHITE = "#FFFFFF"
 
-TARGET_BAND_LOW = 0.70   # ≈ p10 of training laboratory moisture (0.673)
-TARGET_BAND_HIGH = 1.10  # ≈ p90 of training laboratory moisture (1.045)
+TARGET_BAND_LOW = 0.07018   # rounded p10 of canonical laboratory moisture
+TARGET_BAND_HIGH = 0.08074  # rounded p90 of canonical laboratory moisture
+MOISTURE_WARNING_LOW = 0.06904   # rounded p05
+MOISTURE_WARNING_HIGH = 0.08188  # rounded p95
 
 DASH = "vw_dryer_dashboard_powerbi"
 LAB = "vw_dryer_lab_samples"
@@ -212,12 +214,12 @@ RETURN
         REMOVEFILTERS ( '{LAB}' ),
         '{LAB}'[Sample Timestamp] = t
     )""",
-    F_LAB, "0.0000",
+    F_LAB, "0.000000",
 ))
 M.append(measure(
     "Lab Last Moisture Display",
     'IF ( ISBLANK ( [Lab Last Moisture] ), "—", '
-    'FORMAT ( [Lab Last Moisture], "0.00" ) & " %" )',
+    'FORMAT ( [Lab Last Moisture], "0.000000" ) & " %" )',
     F_LAB,
 ))
 M.append(measure(
@@ -266,13 +268,13 @@ RETURN
             '{LAB}'[Sample Timestamp] = t
         )
     )""",
-    F_VAL, "0.0000",
+    F_VAL, "0.000000",
 ))
 M.append(measure(
     "Validated Error Display",
     'IF ( ISBLANK ( [Validated Error Latest] ), '
     '"Awaiting next laboratory result", '
-    'FORMAT ( [Validated Error Latest], "0.000" ) & " %" )',
+    'FORMAT ( [Validated Error Latest], "0.000000" ) & " %" )',
     F_VAL,
 ))
 M.append(measure(
@@ -321,12 +323,12 @@ RETURN
             '{DASH}'[Timestamp] = t
         )
     )""",
-    F_STATE, "0.0000",
+    F_STATE, "0.000000",
 ))
 M.append(measure(
     "Predicted Now Display",
     'IF ( ISBLANK ( [Predicted Now] ), "—", '
-    'FORMAT ( [Predicted Now], "0.00" ) & " %" )',
+    'FORMAT ( [Predicted Now], "0.000000" ) & " %" )',
     F_STATE,
 ))
 M.append(measure(
@@ -500,7 +502,7 @@ RETURN
     IF ( ISBLANK ( v ), "{WHITE}",
         IF ( v >= [Target Band Low] && v <= [Target Band High],
             "{GREEN_SURFACE}",
-            IF ( v >= 0.60 && v <= 1.15, "{AMBER_SURFACE}",
+            IF ( v >= {MOISTURE_WARNING_LOW} && v <= {MOISTURE_WARNING_HIGH}, "{AMBER_SURFACE}",
                 "{RED_SURFACE}" ) ) )""",
     F_COLOR,
 ))
@@ -511,7 +513,7 @@ RETURN
     IF ( ISBLANK ( v ), "{WHITE}",
         IF ( v >= [Target Band Low] && v <= [Target Band High],
             "{GREEN_SURFACE}",
-            IF ( v >= 0.60 && v <= 1.15, "{AMBER_SURFACE}",
+            IF ( v >= {MOISTURE_WARNING_LOW} && v <= {MOISTURE_WARNING_HIGH}, "{AMBER_SURFACE}",
                 "{RED_SURFACE}" ) ) )""",
     F_COLOR,
 ))
@@ -525,15 +527,15 @@ M.append(measure(
 M.append(measure("Risk Gauge Remainder", "1 - [Risk Intensity]", F_COLOR, "0.000"))
 
 # --- 12 Trend series ------------------------------------------------------
-M.append(measure("Target Band Low", str(TARGET_BAND_LOW), F_TREND, "0.00"))
-M.append(measure("Target Band High", str(TARGET_BAND_HIGH), F_TREND, "0.00"))
+M.append(measure("Target Band Low", str(TARGET_BAND_LOW), F_TREND, "0.00000"))
+M.append(measure("Target Band High", str(TARGET_BAND_HIGH), F_TREND, "0.00000"))
 M.append(measure(
     "Moisture Lab Markers",
     f"""CALCULATE (
     AVERAGE ( '{DASH}'[Laboratory Moisture] ),
     '{DASH}'[Is Lab Sample] = TRUE ()
 )""",
-    F_TREND, "0.0000",
+    F_TREND, "0.000000",
 ))
 M.append(measure(
     "Risk (Trend)", f"AVERAGE ( '{DASH}'[Anomaly Risk] )", F_TREND, "0.000",

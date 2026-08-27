@@ -1,9 +1,10 @@
-"""Aggregated process-window features for the laboratory quality models.
+"""Optional aggregated process-window features for exploratory analysis.
 
 One feature row summarises the process conditions inside a configurable
 window that ends *before* the laboratory sample time (see
-``alignment.effective_window_end``). The same function serves training and
-real-time inference so the feature schema can never drift.
+``alignment.effective_window_end``). The canonical moisture model instead uses
+the original 16-feature direct-snapshot contract implemented by
+``compute_moisture_features`` below.
 
 Per-variable statistics (for each of the nine process variables):
 
@@ -33,6 +34,8 @@ Plus one rolling stability indicator:
 """
 
 from __future__ import annotations
+
+from collections.abc import Mapping
 
 import numpy as np
 import pandas as pd
@@ -84,6 +87,76 @@ WINDOW_FEATURE_NAMES: list[str] = (
     ]
     + ["process_stability_index"]
 )
+
+# Final Notebook 03 moisture contract. These are the feature names originally
+# defined in the notebook: direct process/laboratory values plus the five
+# engineered indicators. The process values are taken from the final causal
+# row at the residence-adjusted time; density and product temperature are the
+# most recent strictly previous laboratory observations.
+MOISTURE_FEATURE_NAMES: list[str] = [
+    "dryer_air_temperature",
+    "cooler_air_temperature",
+    "air_flow_rate",
+    "wet_product_feed_rate",
+    "product_inlet_temperature",
+    "residence_time",
+    "vacuum",
+    "steam_pressure",
+    "fan_speed",
+    "product_density",
+    "final_product_temp",
+    "temperature_drop",
+    "air_product_delta",
+    "air_per_feed",
+    "steam_temp_interaction",
+    "heating_index",
+]
+
+
+def compute_moisture_features(
+    process_snapshot: Mapping[str, object] | pd.Series,
+    product_density: float,
+    final_product_temp: float,
+) -> dict[str, float]:
+    """Build the notebook's original 16 moisture features.
+
+    ``process_snapshot`` uses the nine plant-facing process column names. The
+    two laboratory inputs must be the latest observations strictly preceding
+    the prediction/target timestamp.
+    """
+
+    direct = {
+        RAW_TO_SNAKE[name]: float(process_snapshot[name])
+        for name in PROCESS_VARIABLES
+    }
+    direct["product_density"] = float(product_density)
+    direct["final_product_temp"] = float(final_product_temp)
+    if not np.isfinite(list(direct.values())).all():
+        raise ValueError("Moisture features contain missing or non-finite values.")
+    if abs(direct["wet_product_feed_rate"]) < 1e-12:
+        raise ValueError("wet_product_feed_rate must be non-zero for air_per_feed.")
+
+    direct.update(
+        {
+            "temperature_drop": (
+                direct["dryer_air_temperature"] - direct["final_product_temp"]
+            ),
+            "air_product_delta": (
+                direct["dryer_air_temperature"]
+                - direct["product_inlet_temperature"]
+            ),
+            "air_per_feed": (
+                direct["air_flow_rate"] / direct["wet_product_feed_rate"]
+            ),
+            "steam_temp_interaction": (
+                direct["steam_pressure"] * direct["dryer_air_temperature"]
+            ),
+            "heating_index": (
+                direct["residence_time"] * direct["dryer_air_temperature"]
+            ),
+        }
+    )
+    return {name: direct[name] for name in MOISTURE_FEATURE_NAMES}
 
 
 def _series_stats(

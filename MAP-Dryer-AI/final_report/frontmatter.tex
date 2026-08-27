@@ -1,0 +1,69 @@
+\begin{titlepage}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[DeepBlue] (current page.north west) rectangle ([xshift=10mm]current page.south west);
+  \fill[ENSAMTeal] ([xshift=5mm,yshift=12mm]current page.south west) circle (2.2mm);
+\end{tikzpicture}
+\centering
+\vspace*{-7mm}
+\begin{minipage}[c][29mm][c]{0.62\textwidth}\centering
+  \includegraphics[width=.96\linewidth,height=21mm,keepaspectratio]{ensam_umi.png}\\[-1mm]
+  {\scriptsize\color{Ink}\textsc{Academic institution}}
+\end{minipage}\hfill
+{\color{ENSAMTeal!45}\vrule width .5pt height 27mm}\hfill
+\begin{minipage}[c][29mm][c]{0.24\textwidth}\centering
+  \includegraphics[width=.80\linewidth,height=26mm,keepaspectratio]{ocp.png}\\[-1mm]
+  {\scriptsize\color{Ink}\textsc{Industrial host}}
+\end{minipage}
+
+\vspace{6mm}
+{\small KINGDOM OF MOROCCO\par}
+{\bfseries MOULAY ISMAIL UNIVERSITY\par}
+{\bfseries NATIONAL SCHOOL OF ARTS AND CRAFTS -- MEKNES\par}
+\vspace{7mm}
+{\color{ENSAMTeal}\rule{0.88\textwidth}{1.2pt}}\par
+\vspace{5mm}
+{\Large\bfseries INTRODUCTORY ENGINEERING INTERNSHIP REPORT\par}
+\vspace{3mm}
+{\small Industrial Engineering Department\par}
+{\small Industrial Engineering -- Operational Excellence\par}
+{\small First Year of the Engineering Cycle\par}
+\vspace{12mm}
+{\color{DeepBlue}\fontsize{20}{25}\selectfont\bfseries
+Digitalization and Design of an Intelligent Supervision Solution for the Soluble MAP Production Process\par}
+\vspace{3mm}
+{\small\sffamily\bfseries\color{OCPGreen}\MakeUppercase{Industrial AI · Process Engineering · Decision Support}\par}
+\vspace{5mm}
+{\color{ENSAMTeal}\rule{0.88\textwidth}{1.2pt}}\par
+\vspace{5mm}
+{\large Internship at OCP Group -- Jorf Lasfar\par}
+{\normalsize \textbf{Internship Period:} 9 July--9 August 2026\par}
+\vfill
+\begin{tabularx}{0.88\textwidth}{@{}Y Y@{}}
+\textbf{Prepared by:} & \textbf{Industrial Supervisor:}\\[1mm]
+Chaal Abdelkarim & Mr Mouad CHERIFI\\
+Industrial Engineering student & OCP Engineer, Soluble MAP Production Manager\\
+\end{tabularx}
+\vfill
+{\bfseries Academic Year: 2025--2026\par}
+\end{titlepage}
+
+\pagenumbering{roman}
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+I would first like to express my sincere gratitude to \textbf{Mr Mouad CHERIFI} for his technical supervision, guidance and support throughout this introductory engineering internship. His availability and explanations made it possible to connect industrial observations with a structured engineering problem.
+
+I also thank the \textbf{OCP Jorf Lasfar teams and personnel} for their welcome, availability and help in understanding the production environment, its operating discipline and its supervision practices. My thanks go to \textbf{ENSAM Meknes and its teaching staff} for the academic and engineering foundation that supported this work.
+
+Finally, I thank \textbf{Doha Hailassi} for guiding me through the company environment. Drawing on her experience and aptitude, she facilitated my integration into the worksite and helped me understand its industrial context.
+
+\clearpage
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+This introductory engineering internship addresses an Industrial Engineering problem at OCP Jorf Lasfar: the information used to assess final soluble monoammonium phosphate (MAP) moisture is delivered by laboratory analysis at an interval of approximately two hours, whereas process conditions evolve continuously. The work therefore investigates a digital supervision architecture focused on the drying stage, where final moisture is strongly influenced and product conformity can be affected rapidly.
+
+The contribution is a decision-support \prototype{} that combines a moisture soft sensor, unsupervised anomaly detection, explainable diagnostic logic and a centralized Power BI dashboard. Plant process variables are available continuously through the industrial monitoring environment. For the software demonstration, they are represented on a deliberately selected five-second replay and visualization grid, while laboratory density, product temperature and moisture remain structurally sparse at their approximately two-hour availability. Python performs preprocessing, residence-time-aware alignment, feature computation and inference; PostgreSQL stores idempotent process and model outputs and exposes dashboard-oriented views; Power BI uses DirectQuery to present process KPIs, predicted and measured moisture, anomaly risk, operational severity, probable subsystem, contributors and verification guidance.
+
+The final demonstration uses one deterministic 92-day synthetic source because sufficient real historical and real-time industrial data were not available. The same chronology feeds exploration, feature engineering, moisture-model selection, anomaly modelling and a held-out TEST replay; the runtime loads the exact artifacts exported by Notebooks 03 and 04, including the governed 16-feature moisture contract. The prototype is grounded in the observed soluble MAP process and PCS7 context, but it is not connected to live PCS7, does not command equipment and has not received industrial-scale validation. Its principal result is therefore a tested technical feasibility demonstration and a structured path toward future validation on OCP data.
+
+\textbf{Keywords:} Industrial Engineering; operational excellence; soluble MAP; soft sensor; anomaly detection; diagnosis; digital supervision; Power BI; PostgreSQL; decision support.
+\clearpage

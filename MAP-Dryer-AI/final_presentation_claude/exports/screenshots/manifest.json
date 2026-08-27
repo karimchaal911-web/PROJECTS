@@ -1,0 +1,324 @@
+{
+  "capturedAt": "2026-08-27T17:27:07.492Z",
+  "width": 1920,
+  "height": 1080,
+  "safe": false,
+  "steps": [
+    {
+      "index": 0,
+      "file": "step-00_scene-01_beat-1.png",
+      "n": "01",
+      "dots": 0,
+      "on": 0,
+      "hero": "INTELLIGENT DIGITALIZATION / OF SOLUBLE MAP PRODUCTION",
+      "eyebrow": ""
+    },
+    {
+      "index": 1,
+      "file": "step-01_scene-02_beat-1.png",
+      "n": "02",
+      "dots": 0,
+      "on": 0,
+      "hero": "PLANT NUTRITION",
+      "eyebrow": ""
+    },
+    {
+      "index": 2,
+      "file": "step-02_scene-03_beat-1.png",
+      "n": "03",
+      "dots": 0,
+      "on": 0,
+      "hero": "ONE CONTINUOUS / COUPLED CHAIN",
+      "eyebrow": "SOLUBLE MAP PRODUCTION — SIMPLIFIED FOR SUPERVISION"
+    },
+    {
+      "index": 3,
+      "file": "step-03_scene-04_beat-1.png",
+      "n": "04",
+      "dots": 3,
+      "on": 1,
+      "hero": "MACHINE",
+      "eyebrow": "ROTARY DRYER — THE STAGE THAT SETS FINAL MOISTURE"
+    },
+    {
+      "index": 4,
+      "file": "step-04_scene-04_beat-2.png",
+      "n": "04",
+      "dots": 3,
+      "on": 2,
+      "hero": "PHYSICS",
+      "eyebrow": "ROTARY DRYER — THE STAGE THAT SETS FINAL MOISTURE"
+    },
+    {
+      "index": 5,
+      "file": "step-05_scene-04_beat-3.png",
+      "n": "04",
+      "dots": 3,
+      "on": 3,
+      "hero": "DATA",
+      "eyebrow": "ROTARY DRYER — THE STAGE THAT SETS FINAL MOISTURE"
+    },
+    {
+      "index": 6,
+      "file": "step-06_scene-05_beat-1.png",
+      "n": "05",
+      "dots": 3,
+      "on": 1,
+      "hero": "TWELVE HOURS / OF PRODUCTION",
+      "eyebrow": "HELD-OUT TEST · 2026-07-05 00:00 → 12:00"
+    },
+    {
+      "index": 7,
+      "file": "step-07_scene-05_beat-2.png",
+      "n": "05",
+      "dots": 3,
+      "on": 2,
+      "hero": "SIX RESULTS.",
+      "eyebrow": "HELD-OUT TEST · 2026-07-05 00:00 → 12:00"
+    },
+    {
+      "index": 8,
+      "file": "step-08_scene-05_beat-3.png",
+      "n": "05",
+      "dots": 3,
+      "on": 3,
+      "hero": "THE PROCESS NEVER STOPS. / LAB VISIBILITY DOES.",
+      "eyebrow": "HELD-OUT TEST · 2026-07-05 00:00 → 12:00"
+    },
+    {
+      "index": 9,
+      "file": "step-09_scene-06_beat-1.png",
+      "n": "06",
+      "dots": 3,
+      "on": 1,
+      "hero": "HOW DO WE SEE / BETWEEN MEASUREMENTS?",
+      "eyebrow": "MOISTURE SOFT SENSOR · 695 ESTIMATES · SAME WINDOW"
+    },
+    {
+      "index": 10,
+      "file": "step-10_scene-06_beat-2.png",
+      "n": "06",
+      "dots": 3,
+      "on": 2,
+      "hero": "PREDICT QUALITY / BETWEEN MEASUREMENTS.",
+      "eyebrow": "MOISTURE SOFT SENSOR · 695 ESTIMATES · SAME WINDOW"
+    },
+    {
+      "index": 11,
+      "file": "step-11_scene-06_beat-3.png",
+      "n": "06",
+      "dots": 3,
+      "on": 3,
+      "hero": "TWO QUESTIONS. / ONE SUPERVISION SYSTEM.",
+      "eyebrow": "MOISTURE SOFT SENSOR · 695 ESTIMATES · SAME WINDOW"
+    },
+    {
+      "index": 12,
+      "file": "step-12_scene-07_beat-1.png",
+      "n": "07",
+      "dots": 3,
+      "on": 1,
+      "hero": "THE PROCESS / BECOMES DATA.",
+      "eyebrow": "FROM PROCESS TO SUPERVISION"
+    },
+    {
+      "index": 13,
+      "file": "step-13_scene-07_beat-2.png",
+      "n": "07",
+      "dots": 3,
+      "on": 2,
+      "hero": "THE SIGNALS / BUILD THE SYSTEM.",
+      "eyebrow": "FROM PROCESS TO SUPERVISION"
+    },
+    {
+      "index": 14,
+      "file": "step-14_scene-07_beat-3.png",
+      "n": "07",
+      "dots": 3,
+      "on": 3,
+      "hero": "ALIGNMENT / IS THE METHOD.",
+      "eyebrow": "FROM PROCESS TO SUPERVISION"
+    },
+    {
+      "index": 15,
+      "file": "step-15_scene-08_beat-1.png",
+      "n": "08",
+      "dots": 4,
+      "on": 1,
+      "hero": "ONE STREAM. / TWO MODELS.",
+      "eyebrow": "ONE INPUT STREAM · TWO QUESTIONS"
+    },
+    {
+      "index": 16,
+      "file": "step-16_scene-08_beat-2.png",
+      "n": "08",
+      "dots": 4,
+      "on": 2,
+      "hero": "WHAT IS THE LIKELY / FINAL MOISTURE NOW?",
+      "eyebrow": "ONE INPUT STREAM · TWO QUESTIONS"
+    },
+    {
+      "index": 17,
+      "file": "step-17_scene-08_beat-3.png",
+      "n": "08",
+      "dots": 4,
+      "on": 3,
+      "hero": "IS THE PROCESS / BEHAVING UNUSUALLY?",
+      "eyebrow": "ONE INPUT STREAM · TWO QUESTIONS"
+    },
+    {
+      "index": 18,
+      "file": "step-18_scene-08_beat-4.png",
+      "n": "08",
+      "dots": 4,
+      "on": 4,
+      "hero": "NOVELTY / IS DISTANCE.",
+      "eyebrow": "ONE INPUT STREAM · TWO QUESTIONS"
+    },
+    {
+      "index": 19,
+      "file": "step-19_scene-09_beat-1.png",
+      "n": "09",
+      "dots": 4,
+      "on": 1,
+      "hero": "165 HELD-OUT / LABORATORY TARGETS.",
+      "eyebrow": "EVIDENCE"
+    },
+    {
+      "index": 20,
+      "file": "step-20_scene-09_beat-2.png",
+      "n": "09",
+      "dots": 4,
+      "on": 2,
+      "hero": "THE SIMPLE MODEL / WON.",
+      "eyebrow": "EVIDENCE"
+    },
+    {
+      "index": 21,
+      "file": "step-21_scene-09_beat-3.png",
+      "n": "09",
+      "dots": 4,
+      "on": 3,
+      "hero": "IT FOUND / THE DISTURBANCE.",
+      "eyebrow": "EVIDENCE"
+    },
+    {
+      "index": 22,
+      "file": "step-22_scene-09_beat-4.png",
+      "n": "09",
+      "dots": 4,
+      "on": 4,
+      "hero": "WHAT THIS / EVIDENCE IS WORTH.",
+      "eyebrow": "EVIDENCE"
+    },
+    {
+      "index": 23,
+      "file": "step-23_scene-10_beat-1.png",
+      "n": "10",
+      "dots": 3,
+      "on": 1,
+      "hero": "THE SAME CHART. / AN OPERATOR’S SCREEN.",
+      "eyebrow": "POWER BI · POSTGRESQL DIRECTQUERY · ~5 s PAGE REFRESH"
+    },
+    {
+      "index": 24,
+      "file": "step-24_scene-10_beat-2.png",
+      "n": "10",
+      "dots": 3,
+      "on": 2,
+      "hero": "OPERATIONS / OVERVIEW.",
+      "eyebrow": "POWER BI · POSTGRESQL DIRECTQUERY · ~5 s PAGE REFRESH"
+    },
+    {
+      "index": 25,
+      "file": "step-25_scene-10_beat-3.png",
+      "n": "10",
+      "dots": 3,
+      "on": 3,
+      "hero": "DIAGNOSTICS / AND ROOT CAUSE.",
+      "eyebrow": "POWER BI · POSTGRESQL DIRECTQUERY · ~5 s PAGE REFRESH"
+    },
+    {
+      "index": 26,
+      "file": "step-26_scene-11_beat-1.png",
+      "n": "11",
+      "dots": 3,
+      "on": 1,
+      "hero": "BEHIND / THE DASHBOARD.",
+      "eyebrow": "END-TO-END RUNTIME"
+    },
+    {
+      "index": 27,
+      "file": "step-27_scene-11_beat-2.png",
+      "n": "11",
+      "dots": 3,
+      "on": 2,
+      "hero": "FIVE VIEWS. / THREE TABLES. / ONE SERVICE.",
+      "eyebrow": "END-TO-END RUNTIME"
+    },
+    {
+      "index": 28,
+      "file": "step-28_scene-11_beat-3.png",
+      "n": "11",
+      "dots": 3,
+      "on": 3,
+      "hero": "THE LOOP / IS CLOSED.",
+      "eyebrow": "END-TO-END RUNTIME"
+    },
+    {
+      "index": 29,
+      "file": "step-29_scene-12_beat-1.png",
+      "n": "12",
+      "dots": 0,
+      "on": 0,
+      "hero": "SENSE. PREDICT. / DETECT. SUPERVISE.",
+      "eyebrow": "OPERATIONAL VALUE"
+    },
+    {
+      "index": 30,
+      "file": "step-30_scene-13_beat-1.png",
+      "n": "13",
+      "dots": 2,
+      "on": 1,
+      "hero": "SOLID / MEANS BUILT.",
+      "eyebrow": "BOUNDARY"
+    },
+    {
+      "index": 31,
+      "file": "step-31_scene-13_beat-2.png",
+      "n": "13",
+      "dots": 2,
+      "on": 2,
+      "hero": "OUTLINED / MEANS NOT YET.",
+      "eyebrow": "BOUNDARY"
+    },
+    {
+      "index": 32,
+      "file": "step-32_scene-14_beat-1.png",
+      "n": "14",
+      "dots": 3,
+      "on": 1,
+      "hero": "THE PHYSICAL PROCESS / NEVER STOPPED.",
+      "eyebrow": ""
+    },
+    {
+      "index": 33,
+      "file": "step-33_scene-14_beat-2.png",
+      "n": "14",
+      "dots": 3,
+      "on": 2,
+      "hero": "FROM PROCESS MONITORING / TO INTELLIGENT / INDUSTRIAL OPERATION.",
+      "eyebrow": ""
+    },
+    {
+      "index": 34,
+      "file": "step-34_scene-14_beat-3.png",
+      "n": "14",
+      "dots": 3,
+      "on": 3,
+      "hero": "",
+      "eyebrow": ""
+    }
+  ],
+  "errors": []
+}

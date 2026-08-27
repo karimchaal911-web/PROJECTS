@@ -1,0 +1,172 @@
+{
+  "notebook": "03_Model1_SoftSensor.ipynb",
+  "created_at": "2026-08-24T14:07:47",
+  "depends_on": "artifacts\\notebook02_feature_handoff.json",
+  "canonical_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
+  "canonical_dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+  "supervised_rows": 1103,
+  "target": "Final Moisture (%H2O)",
+  "target_unit": "percentage points (% H2O)",
+  "feature_count": 16,
+  "feature_names": [
+    "dryer_air_temperature",
+    "cooler_air_temperature",
+    "air_flow_rate",
+    "wet_product_feed_rate",
+    "product_inlet_temperature",
+    "residence_time",
+    "vacuum",
+    "steam_pressure",
+    "fan_speed",
+    "product_density",
+    "final_product_temp",
+    "temperature_drop",
+    "air_product_delta",
+    "air_per_feed",
+    "steam_temp_interaction",
+    "heating_index"
+  ],
+  "split": {
+    "strategy": "chronological TRAIN -> VALIDATION -> TEST",
+    "train": {
+      "rows": 772,
+      "proportion": 0.699909338168631,
+      "start_timestamp": "2026-04-16 02:00:00",
+      "end_timestamp": "2026-06-19 08:00:00"
+    },
+    "validation": {
+      "rows": 166,
+      "proportion": 0.15049864007252947,
+      "start_timestamp": "2026-06-19 10:00:00",
+      "end_timestamp": "2026-07-03 04:00:00"
+    },
+    "test": {
+      "rows": 165,
+      "proportion": 0.14959202175883954,
+      "start_timestamp": "2026-07-03 06:00:00",
+      "end_timestamp": "2026-07-16 22:00:00"
+    },
+    "time_series_cross_validation": {
+      "used": true,
+      "n_splits": 5,
+      "scope": "training segment only"
+    }
+  },
+  "candidate_results": {
+    "Linear Regression": {
+      "best_parameters": {},
+      "time_series_cv_rmse": 0.001457462234945082,
+      "validation": {
+        "mae": 0.0010482058254394646,
+        "rmse": 0.0013670863237048502,
+        "r2": 0.8943156570366703,
+        "bias": -7.518055815973086e-05,
+        "max_abs_error": 0.00562497278109117,
+        "n": 166
+      }
+    },
+    "Ridge": {
+      "best_parameters": {
+        "model__alpha": 10.0
+      },
+      "time_series_cv_rmse": 0.0014050254725318887,
+      "validation": {
+        "mae": 0.0010307685446391374,
+        "rmse": 0.0013565614638236996,
+        "r2": 0.8959366683378396,
+        "bias": -4.2103066746040085e-05,
+        "max_abs_error": 0.005533155646353913,
+        "n": 166
+      }
+    },
+    "Elastic Net": {
+      "best_parameters": {
+        "model__alpha": 0.0001,
+        "model__l1_ratio": 0.5
+      },
+      "time_series_cv_rmse": 0.0013970742462369155,
+      "validation": {
+        "mae": 0.00103676537795909,
+        "rmse": 0.0013624670648386206,
+        "r2": 0.8950286457726699,
+        "bias": -5.48445575084733e-05,
+        "max_abs_error": 0.005311695433068045,
+        "n": 166
+      }
+    },
+    "Random Forest": {
+      "best_parameters": {
+        "model__max_depth": null,
+        "model__min_samples_leaf": 5
+      },
+      "time_series_cv_rmse": 0.0015830971844863061,
+      "validation": {
+        "mae": 0.0011311832501857638,
+        "rmse": 0.0014667943392795767,
+        "r2": 0.878337363139526,
+        "bias": -0.00016728470185953842,
+        "max_abs_error": 0.004864009760204874,
+        "n": 166
+      }
+    },
+    "Gradient Boosting": {
+      "best_parameters": {
+        "model__learning_rate": 0.03,
+        "model__max_depth": 2
+      },
+      "time_series_cv_rmse": 0.0015371756306317356,
+      "validation": {
+        "mae": 0.0011244413234932592,
+        "rmse": 0.0014298853210315753,
+        "r2": 0.8843831347613437,
+        "bias": -0.00010816552453872095,
+        "max_abs_error": 0.0043767829376761686,
+        "n": 166
+      }
+    }
+  },
+  "selected_model": "Ridge",
+  "selected_parameters": {
+    "model__alpha": 10.0
+  },
+  "metrics": {
+    "train": {
+      "mae": 0.0010867258520844579,
+      "rmse": 0.0014141611209757788,
+      "r2": 0.87817259956463,
+      "bias": 4.4042202239825675e-18,
+      "max_abs_error": 0.006092971159527158,
+      "n": 772
+    },
+    "validation": {
+      "mae": 0.0010307685446391374,
+      "rmse": 0.0013565614638236996,
+      "r2": 0.8959366683378396,
+      "bias": -4.2103066746040085e-05,
+      "max_abs_error": 0.005533155646353913,
+      "n": 166
+    },
+    "test": {
+      "mae": 0.0010686339098063737,
+      "rmse": 0.0014026194681916787,
+      "r2": 0.8245295479034104,
+      "bias": 6.61687920356382e-05,
+      "max_abs_error": 0.005620566312520919,
+      "n": 165
+    }
+  },
+  "model_artifact": "models\\5s\\quality_moisture_pipeline.joblib",
+  "model_artifact_sha256": "b525c7b8598e90fb831db30612b70e7b6ded9de36edd0fc99f9b1753a7b00858",
+  "runtime_loads_exact_notebook03_artifact": true,
+  "test_replay": {
+    "path": "data\\processed\\MAP_Dryer_TEST_Replay_5s.csv",
+    "sha256": "cec99e6a984a11440bfa06230b877f6231299bc9213bd5acb77cfe605553b2c2",
+    "rows": 237600,
+    "laboratory_samples": 165,
+    "start_timestamp": "2026-07-03 06:00:00",
+    "end_timestamp": "2026-07-16 23:59:55",
+    "source_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
+    "source_partition": "held-out chronological TEST"
+  },
+  "prototype_limitation": "Synthetic prototype evidence only; industrial qualification requires representative historian and laboratory data."
+}

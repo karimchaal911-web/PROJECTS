@@ -92,7 +92,7 @@ def build_physical_scenarios(
     )
 
     exhaust = _baseline_history(reference_profile, observations)
-    for offset, multiplier in zip(range(observations - 3, observations), [2.0, 3.0, 4.0]):
+    for offset, multiplier in zip(range(observations - 3, observations), [2.5, 3.75, 5.0]):
         exhaust.loc[offset, "vacuum"] -= multiplier * _scale(reference_profile, "vacuum")
         exhaust.loc[offset, "air_flow_rate"] -= 0.75 * multiplier * _scale(reference_profile, "air_flow_rate")
         exhaust.loc[offset, "fan_speed"] -= 0.50 * multiplier * _scale(reference_profile, "fan_speed")

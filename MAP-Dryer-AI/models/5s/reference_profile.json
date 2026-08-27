@@ -1,0 +1,439 @@
+{
+  "profile_version": "reference_profile_5s_v6.0",
+  "training_rows": 1111681,
+  "feature_names": [
+    "dryer_air_temperature",
+    "cooler_air_temperature",
+    "air_flow_rate",
+    "wet_product_feed_rate",
+    "product_inlet_temperature",
+    "residence_time",
+    "vacuum",
+    "steam_pressure",
+    "fan_speed",
+    "air_product_delta",
+    "cooler_delta",
+    "air_per_feed",
+    "steam_per_feed",
+    "thermal_load",
+    "thermal_exposure"
+  ],
+  "statistics": {
+    "dryer_air_temperature": {
+      "median": 176.166504,
+      "q01": 175.47250079999998,
+      "q05": 175.650848,
+      "q25": 175.948105,
+      "q75": 176.412064,
+      "q95": 176.701965,
+      "q99": 176.86097999999998,
+      "iqr": 0.46395899999998846,
+      "mad": 0.2310030000000154,
+      "delta_median": 1.500000001897206e-05,
+      "delta_iqr": 0.01516700000001947,
+      "delta_mad": 0.007583000000039419
+    },
+    "cooler_air_temperature": {
+      "median": 29.523705,
+      "q01": 27.7373196,
+      "q05": 27.932617,
+      "q25": 28.533962,
+      "q75": 30.506416,
+      "q95": 31.124475,
+      "q99": 31.301998400000002,
+      "iqr": 1.9724540000000026,
+      "mad": 0.9856869999999986,
+      "delta_median": 4.000000000559112e-06,
+      "delta_iqr": 0.0060040000000007865,
+      "delta_mad": 0.003001999999998617
+    },
+    "air_flow_rate": {
+      "median": 23938.837891,
+      "q01": 23390.1105468,
+      "q05": 23526.207031,
+      "q25": 23757.525391,
+      "q75": 24125.410156,
+      "q95": 24334.335938,
+      "q99": 24465.003125,
+      "iqr": 367.8847650000025,
+      "mad": 183.91015600000173,
+      "delta_median": 0.0019530000026861671,
+      "delta_iqr": 9.394531999998435,
+      "delta_mad": 4.6972659999955795
+    },
+    "wet_product_feed_rate": {
+      "median": 26.395275,
+      "q01": 24.6768654,
+      "q05": 24.864586,
+      "q25": 25.52976,
+      "q75": 26.669239,
+      "q95": 27.298773,
+      "q99": 27.481382,
+      "iqr": 1.1394790000000015,
+      "mad": 0.6783060000000027,
+      "delta_median": -2.000000000279556e-06,
+      "delta_iqr": 0.004275999999997282,
+      "delta_mad": 0.0021380000000004173
+    },
+    "product_inlet_temperature": {
+      "median": 62.909122,
+      "q01": 62.5079912,
+      "q05": 62.607513,
+      "q25": 62.776299,
+      "q75": 63.046608,
+      "q95": 63.216209,
+      "q99": 63.2999016,
+      "iqr": 0.27030899999999747,
+      "mad": 0.13503299999999996,
+      "delta_median": 6.999999996537554e-06,
+      "delta_iqr": 0.005114999999996428,
+      "delta_mad": 0.002557000000003029
+    },
+    "residence_time": {
+      "median": 24.498476,
+      "q01": 24.272748200000002,
+      "q05": 24.320658,
+      "q25": 24.426449,
+      "q75": 24.633083,
+      "q95": 24.748217,
+      "q99": 24.802738,
+      "iqr": 0.20663399999999754,
+      "mad": 0.10456999999999894,
+      "delta_median": 1.999999998503199e-06,
+      "delta_iqr": 0.003745999999999583,
+      "delta_mad": 0.0018729999999997915
+    },
+    "vacuum": {
+      "median": 48.13623,
+      "q01": 47.5484564,
+      "q05": 47.696846,
+      "q25": 47.951817,
+      "q75": 48.325115,
+      "q95": 48.553394,
+      "q99": 48.691513,
+      "iqr": 0.37329799999999835,
+      "mad": 0.18664899999999562,
+      "delta_median": 0.0,
+      "delta_iqr": 0.014034000000002322,
+      "delta_mad": 0.007018999999999664
+    },
+    "steam_pressure": {
+      "median": 8.287923,
+      "q01": 8.007799,
+      "q05": 8.061568,
+      "q25": 8.158321,
+      "q75": 8.358592,
+      "q95": 8.454442,
+      "q99": 8.502866,
+      "iqr": 0.20027099999999898,
+      "mad": 0.09811499999999995,
+      "delta_median": 0.0,
+      "delta_iqr": 0.003118999999999872,
+      "delta_mad": 0.0015590000000003101
+    },
+    "fan_speed": {
+      "median": 1328.831909,
+      "q01": 1297.4362302,
+      "q05": 1305.022583,
+      "q25": 1315.74231,
+      "q75": 1339.189697,
+      "q95": 1348.842773,
+      "q99": 1356.1499508000002,
+      "iqr": 23.447386999999935,
+      "mad": 11.409057999999959,
+      "delta_median": 0.0,
+      "delta_iqr": 0.3458259999999882,
+      "delta_mad": 0.1729729999999563
+    },
+    "air_product_delta": {
+      "median": 113.26238199999999,
+      "q01": 112.54324640000002,
+      "q05": 112.735985,
+      "q25": 113.03558799999999,
+      "q75": 113.49422099999998,
+      "q95": 113.798889,
+      "q99": 114.0081908,
+      "iqr": 0.45863299999999185,
+      "mad": 0.22933199999998521,
+      "delta_median": 1.100000000064938e-05,
+      "delta_iqr": 0.016008999999986173,
+      "delta_mad": 0.008003999999999678
+    },
+    "cooler_delta": {
+      "median": 146.644265,
+      "q01": 144.617446,
+      "q05": 144.941895,
+      "q25": 145.65359,
+      "q75": 147.637825,
+      "q95": 148.338247,
+      "q99": 148.6866592,
+      "iqr": 1.984234999999984,
+      "mad": 0.9921980000000019,
+      "delta_median": 9.999999974752427e-07,
+      "delta_iqr": 0.016296000000039612,
+      "delta_mad": 0.008148000000034017
+    },
+    "air_per_feed": {
+      "median": 911.2898983604914,
+      "q01": 879.9632479164236,
+      "q05": 886.4109794959862,
+      "q25": 902.1411735748294,
+      "q75": 931.5132555866312,
+      "q95": 949.9759845698919,
+      "q99": 958.7964016619687,
+      "iqr": 29.372082011801808,
+      "mad": 15.376429374270742,
+      "delta_median": 9.931361643111813e-05,
+      "delta_iqr": 0.37308262478691745,
+      "delta_mad": 0.1865409497442556
+    },
+    "steam_per_feed": {
+      "median": 0.3150267494471604,
+      "q01": 0.30806157658406597,
+      "q05": 0.30944595650358664,
+      "q25": 0.31292837572652293,
+      "q75": 0.31981308299928757,
+      "q95": 0.324124467596015,
+      "q99": 0.32581758002844535,
+      "iqr": 0.006884707272764634,
+      "mad": 0.0035927931077467945,
+      "delta_median": 1.646987937697908e-08,
+      "delta_iqr": 0.00011928723096849003,
+      "delta_mad": 5.9639076608053454e-05
+    },
+    "thermal_load": {
+      "median": 1458.3873665607837,
+      "q01": 1412.662234301383,
+      "q05": 1421.98979088905,
+      "q25": 1438.08243680654,
+      "q75": 1472.3945354323798,
+      "q95": 1487.6674046344801,
+      "q99": 1496.8137120845631,
+      "iqr": 34.31209862583978,
+      "mad": 16.528357077825376,
+      "delta_median": 0.00012570296655667335,
+      "delta_iqr": 0.6119952771625208,
+      "delta_mad": 0.30599809246461973
+    },
+    "thermal_exposure": {
+      "median": 4315.300618084326,
+      "q01": 4266.225775038158,
+      "q05": 4276.355275661473,
+      "q25": 4300.032505341435,
+      "q75": 4343.487194668119,
+      "q95": 4368.902683759018,
+      "q99": 4381.071990686858,
+      "iqr": 43.454689326683365,
+      "mad": 22.264346716614455,
+      "delta_median": -9.266848337574629e-05,
+      "delta_iqr": 0.7619675620821909,
+      "delta_mad": 0.38099769320569976
+    }
+  },
+  "feature_metadata": {
+    "dryer_air_temperature": {
+      "unit": "°C",
+      "unit_status": "prototype_unit",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "thermal_system"
+      ],
+      "criticality": "high",
+      "online_available": true,
+      "explanation_group": "dryer_temperature"
+    },
+    "cooler_air_temperature": {
+      "unit": "°C",
+      "unit_status": "prototype_unit",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "cooling_system"
+      ],
+      "criticality": "medium",
+      "online_available": true,
+      "explanation_group": "cooler_temperature"
+    },
+    "air_flow_rate": {
+      "unit": "m³/h",
+      "unit_status": "defined",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "drying_air_exhaust"
+      ],
+      "criticality": "high",
+      "online_available": true,
+      "explanation_group": "air_supply"
+    },
+    "wet_product_feed_rate": {
+      "unit": "m³/h",
+      "unit_status": "defined",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "feed_loading"
+      ],
+      "criticality": "high",
+      "online_available": true,
+      "explanation_group": "feed_loading"
+    },
+    "product_inlet_temperature": {
+      "unit": "°C",
+      "unit_status": "prototype_unit",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "feed_loading",
+        "thermal_system"
+      ],
+      "criticality": "medium",
+      "online_available": true,
+      "explanation_group": "inlet_temperature"
+    },
+    "residence_time": {
+      "unit": "min",
+      "unit_status": "prototype_unit",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "feed_loading"
+      ],
+      "criticality": "medium",
+      "online_available": true,
+      "explanation_group": "residence_time"
+    },
+    "vacuum": {
+      "unit": "mmH2O",
+      "unit_status": "defined",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "drying_air_exhaust"
+      ],
+      "criticality": "high",
+      "online_available": true,
+      "explanation_group": "exhaust_pressure"
+    },
+    "steam_pressure": {
+      "unit": "bar",
+      "unit_status": "defined",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "thermal_system"
+      ],
+      "criticality": "high",
+      "online_available": true,
+      "explanation_group": "steam_supply"
+    },
+    "fan_speed": {
+      "unit": "rpm",
+      "unit_status": "defined",
+      "kind": "raw",
+      "parents": [],
+      "subsystems": [
+        "drying_air_exhaust"
+      ],
+      "criticality": "high",
+      "online_available": true,
+      "explanation_group": "air_supply"
+    },
+    "air_product_delta": {
+      "unit": "Δ°C",
+      "unit_status": "derived",
+      "kind": "engineered",
+      "parents": [
+        "dryer_air_temperature",
+        "product_inlet_temperature"
+      ],
+      "subsystems": [
+        "thermal_system",
+        "feed_loading"
+      ],
+      "criticality": "medium",
+      "online_available": true,
+      "explanation_group": "inlet_temperature"
+    },
+    "cooler_delta": {
+      "unit": "delta degC",
+      "unit_status": "derived",
+      "kind": "engineered",
+      "parents": [
+        "dryer_air_temperature",
+        "cooler_air_temperature"
+      ],
+      "subsystems": [
+        "cooling_system",
+        "thermal_system"
+      ],
+      "criticality": "medium",
+      "online_available": true,
+      "explanation_group": "cooler_temperature"
+    },
+    "air_per_feed": {
+      "unit": "dimensionless ratio",
+      "unit_status": "derived",
+      "kind": "engineered",
+      "parents": [
+        "air_flow_rate",
+        "wet_product_feed_rate"
+      ],
+      "subsystems": [
+        "drying_air_exhaust",
+        "feed_loading"
+      ],
+      "criticality": "high",
+      "online_available": true,
+      "explanation_group": "air_to_feed_balance"
+    },
+    "steam_per_feed": {
+      "unit": "bar/(m3/h)",
+      "unit_status": "derived",
+      "kind": "engineered",
+      "parents": [
+        "steam_pressure",
+        "wet_product_feed_rate"
+      ],
+      "subsystems": [
+        "thermal_system",
+        "feed_loading"
+      ],
+      "criticality": "medium",
+      "online_available": true,
+      "explanation_group": "thermal_energy"
+    },
+    "thermal_load": {
+      "unit": "bar · °C",
+      "unit_status": "derived",
+      "kind": "engineered",
+      "parents": [
+        "steam_pressure",
+        "dryer_air_temperature"
+      ],
+      "subsystems": [
+        "thermal_system"
+      ],
+      "criticality": "medium",
+      "online_available": true,
+      "explanation_group": "thermal_energy"
+    },
+    "thermal_exposure": {
+      "unit": "min · °C",
+      "unit_status": "derived",
+      "kind": "engineered",
+      "parents": [
+        "residence_time",
+        "dryer_air_temperature"
+      ],
+      "subsystems": [
+        "feed_loading",
+        "thermal_system"
+      ],
+      "criticality": "medium",
+      "online_available": true,
+      "explanation_group": "thermal_exposure"
+    }
+  }
+}

@@ -14,12 +14,13 @@
 --      relationships stay valid); new columns are appended at the end,
 --      which PostgreSQL allows through CREATE OR REPLACE VIEW.
 --   4. Creates vw_dryer_lab_samples (actual laboratory samples + validated
---      model performance at each sample) and vw_dryer_anomaly_events
---      (consecutive anomalous rows grouped into operator-facing events).
+--      model performance), a lightweight rolling-eight-hour overview trend,
+--      and vw_dryer_anomaly_events (consecutive anomalous rows grouped into
+--      operator-facing events).
 --   5. Refreshes vw_dryer_latest as the one-row latest joined state.
 --
 -- Laboratory semantics: quality columns in dryer_map are only non-NULL on
--- rows where a real laboratory analysis exists. The "Latest Lab *" columns
+-- rows where a sparse represented laboratory observation exists. The "Latest Lab *" columns
 -- are a backward as-of join for DISPLAY; they are never written back into
 -- process rows and never used as training targets.
 -- ============================================================================
@@ -44,6 +45,13 @@ CREATE INDEX IF NOT EXISTS ix_dryer_map_lab_timestamp
 
 CREATE INDEX IF NOT EXISTS ix_dryer_model_outputs_timestamp
     ON public.dryer_model_outputs ((("Date" + "Time")));
+
+-- Versioned rows are the authoritative 5-second stream. This partial index
+-- makes restart position and latest-state lookups independent of any retained
+-- legacy one-minute rows.
+CREATE INDEX IF NOT EXISTS ix_dryer_model_outputs_canonical_v6_timestamp
+    ON public.dryer_model_outputs ((("Date" + "Time")))
+    WHERE "Model Version" = 'canonical_92d_v6.0';
 
 -- ----------------------------------------------------------------------------
 -- Extended dashboard view. Columns 1-26 are byte-identical to the previous
@@ -117,7 +125,21 @@ LEFT JOIN LATERAL (
       AND (l."Date" + l."Time") <= (d."Date" + d."Time")
     ORDER BY (l."Date" + l."Time") DESC
     LIMIT 1
-) AS lab ON TRUE;
+) AS lab ON TRUE
+WHERE m."Model Version" = 'canonical_92d_v6.0';
+
+-- Contributor evidence must belong to the same active runtime contract as the
+-- dashboard row. Older rows remain auditable in base tables but are not mixed
+-- into the operator-facing semantic model.
+CREATE OR REPLACE VIEW public.vw_dryer_contributors_powerbi AS
+SELECT
+    v.*,
+    (v.event_date + v.event_time)::timestamp AS "Timestamp"
+FROM public.dryer_abnormal_variables AS v
+JOIN public.dryer_model_outputs AS m
+    ON v.event_date = m."Date"
+   AND v.event_time = m."Time"
+WHERE m."Model Version" = 'canonical_92d_v6.0';
 
 -- ----------------------------------------------------------------------------
 -- Actual laboratory samples with validated model performance at each sample.
@@ -141,10 +163,43 @@ SELECT
     LAG(d."Date" + d."Time") OVER (ORDER BY (d."Date" + d."Time"))
                                                            AS "Previous Sample Timestamp"
 FROM public.dryer_map AS d
-LEFT JOIN public.dryer_model_outputs AS m
+JOIN public.dryer_model_outputs AS m
     ON d."Date" = m."Date"
    AND d."Time" = m."Time"
-WHERE d."Final Moisture (%H2O)" IS NOT NULL;
+WHERE d."Final Moisture (%H2O)" IS NOT NULL
+  AND m."Model Version" = 'canonical_92d_v6.0';
+
+-- ----------------------------------------------------------------------------
+-- Lightweight overview trend. This avoids executing the dashboard view's
+-- laboratory as-of lookup for thousands of chart points. The fixed eight-hour
+-- window is anchored to the latest versioned event timestamp, not NOW(), so a
+-- historical replay remains visible and deterministic.
+-- ----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW public.vw_dryer_overview_trends_powerbi AS
+WITH latest AS (
+    SELECT MAX("Date" + "Time") AS latest_timestamp
+    FROM public.dryer_model_outputs
+    WHERE "Model Version" = 'canonical_92d_v6.0'
+)
+SELECT
+    (d."Date" + d."Time")                                  AS "Timestamp",
+    m."Predicted Final Moisture",
+    d."Final Moisture (%H2O)"                              AS "Laboratory Moisture",
+    m."Anomaly Risk",
+    m."Anomaly Detected",
+    d."Dryer Air Temperature",
+    d."Wet Product Feed Rate",
+    d."Steam Pressure",
+    d."Air Flow Rate "                                     AS "Air Flow Rate",
+    d."Vacuum"
+FROM public.dryer_model_outputs AS m
+JOIN public.dryer_map AS d
+    ON d."Date" = m."Date"
+   AND d."Time" = m."Time"
+CROSS JOIN latest
+WHERE m."Model Version" = 'canonical_92d_v6.0'
+  AND (d."Date" + d."Time")
+      > latest.latest_timestamp - INTERVAL '8 hours';
 
 -- ----------------------------------------------------------------------------
 -- Operator-facing anomaly events: consecutive anomalous 5-second rows are
@@ -167,6 +222,7 @@ WITH anomalous AS (
         "Predicted Final Moisture" AS predicted_moisture
     FROM public.dryer_model_outputs
     WHERE "Anomaly Detected" IS TRUE
+      AND "Model Version" = 'canonical_92d_v6.0'
 ),
 flagged AS (
     SELECT

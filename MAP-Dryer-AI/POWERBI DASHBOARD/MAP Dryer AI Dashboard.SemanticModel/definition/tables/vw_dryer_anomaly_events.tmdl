@@ -321,3 +321,4 @@ table vw_dryer_anomaly_events
 				    Data
 
 	annotation PBI_ResultType = Table
+

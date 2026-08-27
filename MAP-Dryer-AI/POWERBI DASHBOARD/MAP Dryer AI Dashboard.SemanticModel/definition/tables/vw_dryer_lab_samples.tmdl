@@ -1,4 +1,4 @@
-/// Actual laboratory samples (one row per real analysis) with the
+/// Sparse represented laboratory observations (one row per declared sample timestamp) with the
 /// validated model prediction at each sample. Populated by the SQL view
 /// vw_dryer_lab_samples; row count equals laboratory analyses, never
 /// process rows.
@@ -11,7 +11,7 @@ table vw_dryer_lab_samples
 		lineageTag: 65868ce3-e8d4-5d0f-bd31-2f649b599735
 
 	measure 'Lab MAE (Window)' = AVERAGE ( 'vw_dryer_lab_samples'[Validated Absolute Error] )
-		formatString: 0.0000
+		formatString: 0.000000
 		displayFolder: 09 Validation (5s)
 		lineageTag: ded8635b-725e-58bf-b833-ae6b243d6bc3
 
@@ -38,36 +38,36 @@ table vw_dryer_lab_samples
 
 	column 'Laboratory Moisture'
 		dataType: double
-		formatString: 0.0000
+		formatString: 0.000000
 		lineageTag: c8e3a0db-535d-5563-9b6a-069d4f91018b
 		summarizeBy: none
 		sourceColumn: Laboratory Moisture
 
 	column 'Predicted Moisture At Sample'
 		dataType: double
-		formatString: 0.0000
+		formatString: 0.000000
 		lineageTag: b26edb24-46a1-5e54-94aa-bae54ce547c7
 		summarizeBy: none
 		sourceColumn: Predicted Moisture At Sample
 
 	column 'Validated Error'
 		dataType: double
-		formatString: +0.0000;-0.0000;0.0000
+		formatString: +0.000000;-0.000000;0.000000
 		lineageTag: cd3a6f3c-b945-5b93-ae38-ea8b9a3fbb9b
 		summarizeBy: none
 		sourceColumn: Validated Error
 
 	column 'Validated Absolute Error'
 		dataType: double
-		formatString: 0.0000
+		formatString: 0.000000
 		lineageTag: a3942e50-f9c5-588c-92e0-91636b69430f
 		summarizeBy: none
 		sourceColumn: Validated Absolute Error
 
 	column 'Previous Sample Timestamp'
 		dataType: dateTime
-		formatString: yyyy-mm-dd hh:nn:ss
 		isHidden
+		formatString: yyyy-mm-dd hh:nn:ss
 		lineageTag: 767c8a03-505d-52e6-a8f5-eb5c2146e5fd
 		summarizeBy: none
 		sourceColumn: Previous Sample Timestamp
@@ -82,3 +82,4 @@ table vw_dryer_lab_samples
 				    Data
 
 	annotation PBI_ResultType = Table
+

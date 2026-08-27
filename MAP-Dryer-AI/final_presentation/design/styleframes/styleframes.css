@@ -1,0 +1,37 @@
+:root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; --green:#017b30; --leaf:#73b72b; --forest:#063d34; --night:#07110e; --cream:#f3f1e5; --ink:#101713; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #161b18; }
+main { display: grid; gap: 48px; padding: 48px; place-items: center; }
+.frame { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--night); color: white; box-shadow: 0 36px 90px #0008; }
+.topline { position: absolute; z-index: 4; top: 48px; left: 72px; right: 72px; display: flex; justify-content: space-between; font: 600 13px/1 Cascadia Mono, Consolas, monospace; letter-spacing: .13em; }
+.photo { width: 100%; height: 100%; object-fit: cover; filter: saturate(.72) contrast(1.08); transform: scale(1.025); }
+.shade { position:absolute; inset:0; background:linear-gradient(90deg, rgba(4,16,12,.96) 0%,rgba(4,16,12,.74) 36%,rgba(4,16,12,.18) 72%),linear-gradient(0deg,rgba(4,16,12,.68),transparent 50%); }
+.title { position:absolute; z-index:3; left:72px; bottom:72px; }
+.title p,.evidence-title p { margin:0 0 28px; color:#a7b3ad; font:600 13px/1 Cascadia Mono,Consolas,monospace; letter-spacing:.13em; }
+.title h1 { margin:0; font-size:128px; line-height:.79; letter-spacing:-.065em; font-weight:400; }
+.title span { display:block; margin-top:36px; font-size:28px; font-weight:300; color:#d9dedb; }
+.signal { position:absolute; z-index:3; right:150px; bottom:74px; width:240px; height:3px; background:linear-gradient(90deg,transparent,var(--leaf)); box-shadow:0 0 22px #73b72b; }
+.frame--gap { background: radial-gradient(circle at 72% 38%, #113329 0, #07110e 42%, #040a08 100%); }
+.frame--gap::before { content:""; position:absolute; right:120px; top:130px; width:610px; height:610px; border-radius:50%; border:52px solid #34423d; box-shadow:inset 0 0 0 2px #9da59f40,0 70px 90px #0008; transform:rotate(-12deg); }
+.frame--gap::after { content:""; position:absolute; right:127px; top:137px; width:596px; height:596px; border-radius:50%; border:1px solid #73b72b99; box-shadow:0 0 34px #017b3038; }
+.statement { position:absolute; left:72px; top:176px; z-index:3; }
+.statement h2 { margin:0; font-size:91px; line-height:.9; font-weight:400; letter-spacing:-.055em; }
+.statement p { margin:28px 0 0; color:#75c437; font-size:31px; letter-spacing:.04em; }
+.timeline { position:absolute; z-index:5; left:74px; right:74px; bottom:138px; height:120px; }
+.continuous { position:absolute; left:0; right:0; top:56px; height:2px; background:linear-gradient(90deg,#017b30,#75c437,#017b30); box-shadow:0 0 18px #73b72b88; }
+.ticks { position:absolute; inset:40px 0 0; background:repeating-linear-gradient(90deg,transparent 0,transparent 18px,#a9b4ae33 19px,#a9b4ae33 20px); mask-image:linear-gradient(90deg,#000,transparent 88%); }
+.lab { position:absolute; top:29px; display:flex; flex-direction:column; align-items:center; gap:12px; font:600 12px/1 Cascadia Mono,Consolas,monospace; letter-spacing:.12em; color:#cdd5d0; }
+.lab i { width:54px; height:54px; border-radius:50%; background:var(--cream); border:6px solid #27312d; box-shadow:0 0 0 1px #fff7,0 12px 26px #0008; }
+.l1 { left:8%; }.l2 { left:49%; }.l3 { left:89%; }
+.qualifier { position:absolute; right:72px; bottom:54px; color:#9facA5; font:500 12px/1 Cascadia Mono,Consolas,monospace; letter-spacing:.12em; }
+.frame--evidence { background:var(--cream); color:var(--ink); }
+.frame--evidence .topline { color:#46504b; }
+.evidence-title { position:absolute; left:72px; top:134px; width:520px; }
+.evidence-title p { color:var(--green); }
+.evidence-title h2 { margin:0; font-size:58px; line-height:.99; font-weight:400; letter-spacing:-.045em; }
+.plot { position:absolute; left:644px; top:126px; width:872px; height:522px; object-fit:contain; mix-blend-mode:multiply; }
+.metrics { position:absolute; left:72px; right:72px; bottom:104px; display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid #78847c66; }
+.metrics div { padding:28px 0 0; display:flex; align-items:baseline; gap:24px; }
+.metrics span { color:#58625c; font:600 13px/1 Cascadia Mono,Consolas,monospace; letter-spacing:.12em; }
+.metrics strong { font-size:54px; font-weight:450; letter-spacing:-.045em; font-variant-numeric:tabular-nums; }
+.footnote { position:absolute; left:72px; bottom:42px; color:#657069; font:500 11px/1 Cascadia Mono,Consolas,monospace; letter-spacing:.1em; }

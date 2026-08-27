@@ -1,5 +1,7 @@
 -- ============================================================================
--- Reference DDL for the two Power BI-ready views.
+-- LEGACY REFERENCE DDL for the pre-five-second Power BI views.
+-- DO NOT run this against the current dashboard database: use
+-- realtime_pipeline/src/apply_sql_migration.py and upgrade_5s_schema.sql.
 --
 -- RUN THIS ONLY IF verify_powerbi_views.py REPORTS THAT A VIEW IS MISSING.
 -- The realtime_pipeline database normally already contains both views; do not

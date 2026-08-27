@@ -1,0 +1,43 @@
+\chapter{Industrial Context and Internship Mission}
+\label{chap:context}
+
+\section{OCP and Jorf Lasfar in project context}
+
+OCP Group operates an integrated phosphate value chain spanning extraction, transformation and plant-nutrition products. For this project, the relevant context is the coordination of material, energy, equipment, quality and logistics rather than corporate history. Jorf Lasfar is an integrated industrial platform combining fertilizer and acid production with utilities, storage and port interfaces \cite{ocpwho,ocpindustrial}. Disturbances can therefore propagate across connected operations, making timely and traceable supervision an Industrial Engineering concern.
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[t]{.48\textwidth}
+  \centering
+  \includegraphics[width=\linewidth,height=4.8cm,keepaspectratio]{jorf_lasfar_industrial_platform.png}
+  \caption{Integrated processing platform.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{.48\textwidth}
+  \centering
+  \includegraphics[width=\linewidth,height=4.8cm,keepaspectratio]{jorf_lasfar_port.png}
+  \caption{Port and logistics interface.}
+\end{subfigure}
+\caption{Jorf Lasfar industrial context.}
+\source{Supplied ENSAM/OCP organization report \cite{orgreport}; contextual images, not evidence of prototype deployment.}
+\label{fig:jorf-context}
+\end{figure}
+
+The internship focuses on the soluble monoammonium phosphate (MAP) installation. Its production sequence includes reactant preparation, neutralization, buffering, crystallization, centrifugal separation, drying, cooling and final handling. The supplied PCS7 screens confirm an established industrial monitoring environment across these stages. They informed process understanding, but the prototype has no live connection to PCS7 and does not reproduce its control logic.
+
+\section{Operational problem and digital relevance}
+
+Process variables are continuously available through the industrial control and monitoring environment, while the relevant laboratory quality results are available approximately every two hours. The last laboratory result is therefore an authoritative historical measurement, but it cannot by itself describe every change occurring before the next sample. The project addresses this information-latency gap by combining a moisture estimate, anomaly awareness and an operator-oriented diagnostic view.
+
+Digitalization is useful here only when provenance remains visible. The dashboard must distinguish a process measurement, a laboratory measurement, a model prediction and a diagnostic hypothesis. It must also show freshness, model/schema version and unavailable states. These requirements prevent a carried-forward result or model output from being mistaken for a new plant measurement.
+
+\section{Internship mission and system boundary}
+
+The mission is to design and demonstrate an intelligent supervision architecture for soluble MAP production, with detailed implementation around dryer moisture and abnormal-operation visibility. Python handles data validation, time alignment, feature construction and inference; PostgreSQL provides traceable persistence; and Power BI brings process, quality and model evidence into one supervision interface.
+
+The internship deliverable is a controlled proof of concept. It does not connect to live PCS7, write to equipment, automate a conformity decision, replace laboratory control or claim industrial-scale accuracy. Production personnel and approved OCP procedures retain authority. A future deployment would additionally require approved historian access, cybersecurity review, tag and clock validation, representative historical data, shadow-mode trials and jointly owned response procedures.
+
+\begin{engineeringbox}[Industrial requirements carried into the design]
+Every displayed value must retain its provenance and timestamp; stale or incomplete data must remain visible; anomaly evidence must lead to a cautious verification prompt; model and feature versions must be traceable; and the analytical layer must remain outside the control loop.
+\end{engineeringbox}
+
+The next chapter develops the physical process basis for these requirements and explains why drying variables, material delay and sparse laboratory moisture must be interpreted together.

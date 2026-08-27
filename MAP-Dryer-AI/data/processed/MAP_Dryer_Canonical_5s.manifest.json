@@ -1,0 +1,125 @@
+{
+  "manifest_version": "4.0",
+  "dataset_name": "MAP_Dryer_Canonical_5s.csv",
+  "dataset_version": "map_canonical_5s_user_deterministic_v1.0",
+  "generator_version": "user-supplied-deterministic",
+  "configuration_path": null,
+  "configuration_sha256": null,
+  "random_seed": null,
+  "source_filename": "MAP_Dryer_Canonical_5s_deterministic.csv",
+  "dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+  "duration_days": 92,
+  "row_count": 1589760,
+  "expected_row_count": 1589760,
+  "start_timestamp": "2026-04-16 00:00:00",
+  "end_timestamp": "2026-07-16 23:59:55",
+  "process_interval_seconds": 5,
+  "laboratory_interval_minutes": 120,
+  "laboratory_observations": 1104,
+  "quality_values_are_sparse": true,
+  "data_source": "synthetic_prototype",
+  "prototype_cadence_statement": "Five seconds is the prototype temporal resolution and replay cadence; it is not evidence of a plant historian acquisition interval.",
+  "timezone_policy": "naive plant-local prototype time",
+  "columns": [
+    "Date",
+    "Time",
+    "Dryer Air Temperature",
+    "Cooler Air Temperature",
+    "Air Flow Rate",
+    "Wet Product Feed Rate",
+    "Product Inlet Temperature",
+    "Residence Time",
+    "Vacuum",
+    "Steam Pressure",
+    "Fan Speed",
+    "Product Density",
+    "Final Product Temp",
+    "Final Moisture (%H2O)",
+    "Operating Regime",
+    "Disturbance State",
+    "Data Source"
+  ],
+  "implemented_relationships": [
+    "fan speed drives airflow, with feed-load compensation",
+    "airflow and fan operation influence pressure/vacuum behaviour",
+    "steam pressure, airflow and feed load influence dryer temperature",
+    "feed load influences drying demand and residence time",
+    "temperature, steam, airflow, feed and residence conditions influence moisture",
+    "dryer and cooler conditions influence final product temperature",
+    "causal first-order inertia and autoregressive noise",
+    "gradual drift and multi-regime operation",
+    "labelled disturbances with ramp, hold and recovery periods"
+  ],
+  "disturbances": [
+    {
+      "id": "feed_surge",
+      "start_timestamp": "2026-04-24 09:00:00",
+      "end_timestamp": "2026-04-24 10:29:55",
+      "duration_minutes": 90,
+      "effects": {
+        "feed": 2.2
+      },
+      "profile": "ramp-hold-recovery"
+    },
+    {
+      "id": "steam_dip",
+      "start_timestamp": "2026-05-05 14:00:00",
+      "end_timestamp": "2026-05-05 15:39:55",
+      "duration_minutes": 100,
+      "effects": {
+        "steam": -0.55
+      },
+      "profile": "ramp-hold-recovery"
+    },
+    {
+      "id": "airflow_restriction",
+      "start_timestamp": "2026-05-17 07:00:00",
+      "end_timestamp": "2026-05-17 08:19:55",
+      "duration_minutes": 80,
+      "effects": {
+        "airflow": -1900.0
+      },
+      "profile": "ramp-hold-recovery"
+    },
+    {
+      "id": "cooling_loss",
+      "start_timestamp": "2026-05-30 17:00:00",
+      "end_timestamp": "2026-05-30 18:59:55",
+      "duration_minutes": 120,
+      "effects": {
+        "cooling": 3.8
+      },
+      "profile": "ramp-hold-recovery"
+    },
+    {
+      "id": "fan_speed_dip",
+      "start_timestamp": "2026-06-12 11:00:00",
+      "end_timestamp": "2026-06-12 12:34:55",
+      "duration_minutes": 95,
+      "effects": {
+        "fan": -115.0
+      },
+      "profile": "ramp-hold-recovery"
+    },
+    {
+      "id": "steam_dip",
+      "start_timestamp": "2026-06-25 06:00:00",
+      "end_timestamp": "2026-06-25 07:49:55",
+      "duration_minutes": 110,
+      "effects": {
+        "steam": -0.48
+      },
+      "profile": "ramp-hold-recovery"
+    },
+    {
+      "id": "airflow_restriction",
+      "start_timestamp": "2026-07-08 15:00:00",
+      "end_timestamp": "2026-07-08 16:44:55",
+      "duration_minutes": 105,
+      "effects": {
+        "airflow": -1750.0
+      },
+      "profile": "ramp-hold-recovery"
+    }
+  ]
+}

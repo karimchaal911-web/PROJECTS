@@ -1,0 +1,52 @@
+{
+  "notebook": "01_Data_Exploration.ipynb",
+  "created_at": "2026-08-24T13:57:26",
+  "canonical_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
+  "canonical_manifest": "data\\processed\\MAP_Dryer_Canonical_5s.manifest.json",
+  "dataset_version": "map_canonical_5s_user_deterministic_v1.0",
+  "dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+  "duration_days": 92.0,
+  "process_rows": 1589760,
+  "process_columns": [
+    "Dryer Air Temperature",
+    "Cooler Air Temperature",
+    "Air Flow Rate",
+    "Wet Product Feed Rate",
+    "Product Inlet Temperature",
+    "Residence Time",
+    "Vacuum",
+    "Steam Pressure",
+    "Fan Speed"
+  ],
+  "start_timestamp": "2026-04-16 00:00:00",
+  "end_timestamp": "2026-07-16 23:59:55",
+  "process_interval_seconds": 5,
+  "process_interval_interpretation": "prototype temporal resolution and replay cadence; not a proven PCS7 historian acquisition interval",
+  "laboratory_samples": 1104,
+  "laboratory_interval_minutes": 120,
+  "quality_columns": [
+    "Product Density",
+    "Final Product Temp",
+    "Final Moisture (%H2O)"
+  ],
+  "checks": {
+    "exact_92_days": true,
+    "exact_expected_rows": true,
+    "unique_monotonic_timestamps": true,
+    "gap_free_5_second_grid": true,
+    "complete_process_values": true,
+    "sparse_quality_rows": true
+  },
+  "implemented_relationships": [
+    "fan speed drives airflow, with feed-load compensation",
+    "airflow and fan operation influence pressure/vacuum behaviour",
+    "steam pressure, airflow and feed load influence dryer temperature",
+    "feed load influences drying demand and residence time",
+    "temperature, steam, airflow, feed and residence conditions influence moisture",
+    "dryer and cooler conditions influence final product temperature",
+    "causal first-order inertia and autoregressive noise",
+    "gradual drift and multi-regime operation",
+    "labelled disturbances with ramp, hold and recovery periods"
+  ],
+  "disturbance_count": 7
+}

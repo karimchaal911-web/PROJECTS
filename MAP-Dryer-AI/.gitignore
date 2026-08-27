@@ -7,16 +7,35 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
+# JavaScript dependencies are restored from package-lock.json.
+**/node_modules/
+
+# Local Codex/browser/build workspaces are not project deliverables.
+/tmp/
+/.codex-trash/
+
 # Keep only the datasets required by the four-notebook pipeline.
 /data/raw/*
 !/data/raw/dryerMAP_prototype_2.xlsx
 /data/processed/*
 !/data/processed/dryerMAP_prototype_deduplicated_2.xlsx
 !/data/processed/dryerMAP_prototype_processed_2.csv
+!/data/processed/MAP_Dryer_Canonical_5s.manifest.json
+
+# The 92-day raw/processed CSV copies and held-out replay remain local
+# heavyweight archival data; the compact canonical manifest stays visible.
 
 # Serialized estimators are reproducible notebook outputs.
 /models/**/*.pkl
 /models/**/*.joblib
+
+# Keep compact active-model metadata visible despite the parent workspace's
+# broad models ignore rule.
+!/models/5s/
+!/models/5s/*.json
+!/models/model_metadata.json
+!/models/model_registry.json
+!/models/prototype_manifest.json
 
 # Local environment files
 .env
@@ -28,3 +47,16 @@ Thumbs.db
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
 **/*.pbix.bak
+
+# --- final_presentation_claude (Claude Opus 5 soutenance build) -------------
+# Build output, dependencies and transient capture frames are reproducible from
+# the sources in final_presentation_claude/web and data_build/.
+final_presentation_claude/web/node_modules/
+final_presentation_claude/web/dist/
+final_presentation_claude/exports/video/frames-*/
+final_presentation_claude/exports/offline_check/
+final_presentation_claude/*.mp4
+
+# Transfer archive is reproducible from final_presentation/ and exceeds the
+# practical size of a normal Git source commit.
+/FINAL_MAP_Soluble_Digitalization_Soutenance_DELIVERY.zip

@@ -1,0 +1,122 @@
+\documentclass[11pt,a4paper,oneside]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage[a4paper,top=21mm,bottom=22mm,left=25mm,right=21mm,headheight=22pt]{geometry}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs,tabularx,array,multirow}
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc,backgrounds}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage[hidelinks]{hyperref}
+\usepackage{cleveref}
+\usepackage{ragged2e}
+\usepackage{setspace}
+
+\definecolor{ENSAMTeal}{HTML}{0D9488}
+\definecolor{DeepBlue}{HTML}{063D34}
+\definecolor{ChapterPurple}{HTML}{063D34}
+\definecolor{OCPGreen}{HTML}{0F766E}
+\definecolor{AccentOrange}{HTML}{D98E04}
+\definecolor{Ink}{HTML}{17231F}
+\definecolor{PaleTeal}{HTML}{E8F3EF}
+\definecolor{PaleBlue}{HTML}{EDF5F2}
+\definecolor{PaleGray}{HTML}{F4F7F5}
+\definecolor{BorderGray}{HTML}{D6E2DD}
+\definecolor{MutedInk}{HTML}{5E706A}
+\definecolor{AlertAmber}{HTML}{D98E04}
+\definecolor{AlertRed}{HTML}{D64545}
+
+\hypersetup{pdftitle={Digitalization and Design of an Intelligent Supervision Solution for the Soluble MAP Production Process},pdfauthor={Chaal Abdelkarim},pdfsubject={Introductory engineering internship report, Industrial Engineering, ENSAM Meknes}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setstretch{1.17}
+\setlist{nosep,leftmargin=5mm,topsep=3pt}
+\captionsetup{font=small,labelfont={bf,color=OCPGreen},textfont={color=Ink},justification=centering,skip=5pt}
+\graphicspath{{figures/}{figures/plots/}{figures/screenshots/}{figures/branding/}{figures/reference/}{figures/process_photos/}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily\color{MutedInk} MAP Dryer intelligent supervision prototype}
+\fancyhead[R]{\small\sffamily\color{MutedInk} ENSAM Meknes}
+\fancyfoot[C]{\small\sffamily\color{MutedInk}\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{BorderGray}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[L]{\small\sffamily\color{MutedInk} MAP Dryer intelligent supervision prototype}\fancyhead[R]{\small\sffamily\color{MutedInk} ENSAM Meknes}\fancyfoot[C]{\small\sffamily\color{MutedInk}\thepage}\renewcommand{\headrulewidth}{0.3pt}}
+
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\color{DeepBlue}}
+  {\filleft\fontsize{12}{14}\selectfont\color{ENSAMTeal}\bfseries CHAPTER \thechapter}
+  {1mm}
+  {\titlerule[1pt]\vspace{2mm}\filright\fontsize{24}{28}\bfseries}
+\titlespacing*{\chapter}{0pt}{-10pt}{13pt}
+\titleformat{\section}{\large\sffamily\bfseries\color{DeepBlue}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\normalsize\sffamily\bfseries\color{OCPGreen}}{\thesubsection}{0.7em}{}
+\titleformat{\subsubsection}{\normalsize\sffamily\bfseries\color{ENSAMTeal}}{\thesubsubsection}{0.7em}{}
+\titlespacing*{\section}{0pt}{9pt}{3pt}
+\titlespacing*{\subsection}{0pt}{7pt}{2pt}
+\renewcommand{\cftchapfont}{\bfseries\color{DeepBlue}}
+\renewcommand{\cftchappagefont}{\bfseries\color{DeepBlue}}
+\renewcommand{\cftfigpresnum}{Figure~}
+\setlength{\cftfignumwidth}{2.35cm}
+\setlength{\cftbeforefigskip}{0pt}
+\renewcommand{\cftfigfont}{\footnotesize}
+\renewcommand{\cftfigpagefont}{\footnotesize\color{DeepBlue}}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcommand{\source}[1]{\par\vspace{-2pt}{\centering\footnotesize\itshape Source: #1\par}}
+\newcommand{\projectsource}{Author's work from the MAP-Dryer-AI repository}
+\newcommand{\prototype}{\textbf{prototype}}
+\newcommand{\code}[1]{\nolinkurl{#1}}
+
+\newtcolorbox{engineeringbox}[1][Engineering interpretation]{colback=PaleTeal,colframe=ENSAMTeal,boxrule=0.7pt,arc=1.5mm,title=#1,fonttitle=\bfseries,coltitle=DeepBlue,left=2.5mm,right=2.5mm,top=1.5mm,bottom=1.5mm}
+\newtcolorbox{decisionbox}[1][Engineering decision]{colback=PaleBlue,colframe=DeepBlue,boxrule=0.7pt,arc=1.5mm,title=#1,fonttitle=\bfseries,coltitle=DeepBlue,left=2.5mm,right=2.5mm,top=1.5mm,bottom=1.5mm}
+\newtcolorbox{limitbox}[1][Scope boundary]{colback=PaleGray,colframe=AlertAmber,boxrule=0.7pt,arc=1.5mm,title=#1,fonttitle=\bfseries,coltitle=Ink,left=2.5mm,right=2.5mm,top=1.5mm,bottom=1.5mm}
+
+\lstdefinestyle{compactcode}{basicstyle=\ttfamily\scriptsize,backgroundcolor=\color{PaleGray},frame=single,rulecolor=\color{BorderGray},breaklines=true,showstringspaces=false,aboveskip=5pt,belowskip=5pt,xleftmargin=2mm,xrightmargin=2mm}
+\lstset{style=compactcode}
+
+\tikzset{
+  flow/.style={rounded corners=2mm,draw=ENSAMTeal,very thick,fill=PaleTeal,minimum height=10mm,align=center,font=\small},
+  data/.style={rounded corners=2mm,draw=DeepBlue,thick,fill=PaleBlue,minimum height=10mm,align=center,font=\small},
+  decision/.style={diamond,aspect=2,draw=DeepBlue,thick,fill=PaleBlue,align=center,font=\scriptsize},
+  arr/.style={-{Stealth[length=2.3mm]},thick,color=DeepBlue},
+  dashedarr/.style={-{Stealth[length=2.3mm]},thick,dashed,color=OCPGreen}
+}
+
+\begin{document}
+\pagenumbering{gobble}
+\input{frontmatter}
+\setcounter{tocdepth}{0}
+\tableofcontents
+\clearpage
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+\clearpage
+\pagenumbering{arabic}
+\input{general_introduction}
+\input{chapters/chapter1}
+\input{chapters/chapter2}
+\input{chapters/chapter3}
+\input{chapters/chapter4}
+\input{chapters/chapter5}
+\input{chapters/chapter6}
+\input{chapters/chapter7}
+\input{chapters/chapter8}
+\input{general_conclusion}
+\input{bibliography/references}
+\end{document}

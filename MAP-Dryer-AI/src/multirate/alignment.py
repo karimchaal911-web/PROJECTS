@@ -152,16 +152,31 @@ def build_training_matrix(
     )
 
     expected_rows = window_minutes * 60.0 / expected_interval_seconds
+    process_timestamps = process_sorted["Timestamp"].to_numpy(
+        dtype="datetime64[ns]"
+    )
 
     feature_rows: list[dict[str, float]] = []
     info_rows: list[dict[str, object]] = []
     skipped: list[tuple[pd.Timestamp, str]] = []
 
     for lab_timestamp in lab_sorted["Sample Timestamp"]:
-        residence = _residence_time_asof(process_sorted, lab_timestamp)
-        if residence is None:
+        lab_time64 = pd.Timestamp(lab_timestamp).to_datetime64()
+        residence_position = int(
+            process_timestamps.searchsorted(lab_time64, side="right") - 1
+        )
+        if residence_position < 0:
             skipped.append(
                 (lab_timestamp, "no process data at or before the sample")
+            )
+            continue
+        residence_value = process_sorted.iloc[residence_position][
+            "Residence Time"
+        ]
+        residence = None if pd.isna(residence_value) else float(residence_value)
+        if residence is None:
+            skipped.append(
+                (lab_timestamp, "residence time missing at or before the sample")
             )
             continue
 
@@ -170,10 +185,20 @@ def build_training_matrix(
         )
         window_start = window_end - pd.Timedelta(minutes=window_minutes)
 
-        in_window = process_sorted.loc[
-            (process_sorted["Timestamp"] > window_start)
-            & (process_sorted["Timestamp"] <= window_end)
-        ]
+        # Binary searches preserve the strict (window_start, window_end]
+        # semantics without rescanning the complete high-frequency table for
+        # every sparse laboratory observation.
+        left = int(
+            process_timestamps.searchsorted(
+                window_start.to_datetime64(), side="right"
+            )
+        )
+        right = int(
+            process_timestamps.searchsorted(
+                window_end.to_datetime64(), side="right"
+            )
+        )
+        in_window = process_sorted.iloc[left:right]
 
         coverage = len(in_window) / expected_rows
         if coverage < min_window_coverage:

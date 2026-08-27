@@ -1,0 +1,56 @@
+\chapter{Technical Traceability Summary}
+
+\section{Principal generated artifacts}
+
+\begin{table}[ht]
+\centering\small
+\caption{Model and integration artifacts required to reproduce the prototype path}
+\begin{tabularx}{\textwidth}{@{}p{0.39\textwidth}Y@{}}
+\toprule
+Artifact & Function \\
+\midrule
+\code{data/processed/MAP\_Dryer\_Canonical\_5s.manifest.json} & Version, hash, cadence, dates, row counts and implemented relationships.\\
+\code{data/processed/MAP\_Dryer\_Lab\_Aligned\_16.csv} & Notebook 02 handoff with 1,103 lab-aligned rows and exactly 16 inputs.\\
+\code{artifacts/notebook03\_model\_evaluation.json} & Audited split, candidates, parameters and moisture metrics used in the report.\\
+\code{artifacts/notebook04\_anomaly\_evaluation.json} & Audited Notebook 04 anomaly training, validation and runtime-artifact provenance.\\
+\code{models/5s/quality\_moisture\_pipeline.joblib} & Selected Notebook 03 Ridge model loaded unchanged by the replay service.\\
+\code{models/5s/quality\_density\_pipeline.joblib} & Retained Gradient Boosting density model.\\
+\code{models/5s/quality\_product\_temp\_pipeline.joblib} & Retained Ridge product-temperature model.\\
+\code{models/5s/anomaly\_model.joblib} / \code{anomaly\_scaler.joblib} & Notebook 04 One-Class SVM novelty artifacts loaded unchanged by the replay service.\\
+\code{models/5s/feature\_schema.json} & Ordered features, timing and model/schema versions.\\
+\code{models/5s/reference\_profile.json} & Robust training reference for real-time contributors.\\
+\code{models/5s/training\_report.json} & Candidate parameters, chronological metrics and residuals.\\
+\code{realtime\_pipeline/src/realtime\_service.py} & Replay, validation, inference, diagnosis and database writes.\\
+\code{POWERBI DASHBOARD/*.pbip} & Power BI project entry point, report and semantic model.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Diagnostic subsystem map}
+
+\begin{table}[ht]
+\centering\small
+\caption{Subsystems and principal raw evidence used in operator-facing diagnosis}
+\begin{tabularx}{\textwidth}{@{}p{0.25\textwidth}p{0.30\textwidth}Y@{}}
+\toprule
+Subsystem & Principal evidence & Example verification direction \\
+\midrule
+Thermal system & Dryer-air temperature, steam pressure & Heater/steam availability, temperature measurement and thermal demand.\\
+Drying air/exhaust & Air flow, fan speed, vacuum & Fan/damper condition, flow measurement and exhaust restriction.\\
+Feed/loading & Wet-product feed, inlet temperature, residence time & Upstream stability, load relative to heat/air, residence calculation.\\
+Cooling system & Cooler-air and final-product temperature & Cooler operation, air supply and thermal carry-over.\\
+Instrumentation & Persistent, stuck or sudden sensor behaviour & Compare independent indication, wiring and transmitter status.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Reproduction commands}
+
+The following minimal commands correspond to the verified repository workflow. They require the documented Python/PostgreSQL environment and do not expose credentials.
+
+\begin{lstlisting}[language=bash]
+python tools/run_canonical_notebooks.py
+python realtime_pipeline/src/bootstrap_database.py
+python realtime_pipeline/src/realtime_service.py
+$env:PYTHONPATH="src"; python -m pytest -q
+\end{lstlisting}

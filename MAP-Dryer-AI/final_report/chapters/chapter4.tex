@@ -1,0 +1,174 @@
+\chapter{Data Acquisition, Preparation and Feature Engineering}
+\label{chap:data}
+
+\section{Data strategy and contracts}
+
+Because a sufficiently large historical industrial dataset was not available, the final implementation uses the supplied deterministic canonical synthetic CSV for development and demonstration. The file spans 16 April--16 July 2026: exactly 92 days and 1,589,760 unique timestamps on a gap-free five-second grid. It carries 1,104 sparse laboratory observations at the configured two-hour cadence. Notebook 01 audits this source, Notebook 02 derives residence-aware supervised rows, Notebook 03 performs moisture-model selection and final evaluation, Notebook 04 exports the anomaly/diagnosis runtime artifacts, and the runtime replays only the held-out chronological TEST interval from the same source. The five-second interval is a prototype representation for replay, recurring inference and visualization, not evidence of native plant acquisition frequency. The supplied filename, dataset version and SHA-256 are recorded in the canonical manifest and propagated into the model artifacts \cite{trainingreport,projectrepo}.
+
+\begin{table}[ht]
+\centering\small
+\caption{Audited canonical data products used by the final implementation}
+\label{tab:datasets}
+\begin{tabularx}{\textwidth}{@{}p{0.25\textwidth}rrrrY@{}}
+\toprule
+Dataset & Rows & Columns & Lab rows & Cadence & Role \\
+\midrule
+Canonical source CSV & 1,589,760 & 17 & 1,104 & \SI{5}{s}; lab \SI{2}{h} & Sole source for exploration, feature engineering, model development and replay.\\
+Aligned laboratory handoff & 1,103 & 18 & 1,103 & \SI{2}{h} & Timestamp, 16 original named inputs and final-moisture target for Notebook 03.\\
+Held-out TEST replay & 237,600 & 18 & 165 & \SI{5}{s}; lab \SI{2}{h} & Derived TEST interval used by the runtime, PostgreSQL and Power BI.\\
+\bottomrule
+\end{tabularx}
+\source{Repository CSV audit performed for this report.}
+\end{table}
+
+The raw prototype schema contains \code{Date}, \code{Time}, nine process variables and three sparse quality variables. Date and time are combined without timezone conversion because the project treats them as plant-local naive timestamps. The preprocessing module separates the single CSV into process and laboratory tables so that the absence of an unscheduled laboratory result is not mistaken for a missing sensor value.
+
+\begin{table}[ht]
+\centering\scriptsize
+\caption{Prototype variable contract and engineering units}
+\label{tab:variables}
+\begin{tabularx}{\textwidth}{@{}p{0.28\textwidth}p{0.15\textwidth}p{0.15\textwidth}Y@{}}
+\toprule
+Variable & Unit & Prototype representation & Engineering interpretation \\
+\midrule
+Dryer / cooler air temperature & \si{\degreeCelsius} & Each replay row & Thermal state and cooling condition.\\
+Air-flow rate & \si{\cubic\metre\per\hour} & Each replay row & Drying-air delivery.\\
+Wet-product feed rate & \si{\cubic\metre\per\hour} & Each replay row & Dryer loading.\\
+Product-inlet temperature & \si{\degreeCelsius} & Each replay row & Incoming material condition.\\
+Residence time & min & Each replay row & Product exposure and alignment shift.\\
+Vacuum & mmH$_2$O & Each replay row & Exhaust/depression state; more negative means stronger depression.\\
+Steam pressure & bar & Each replay row & Thermal-energy supply proxy.\\
+Fan speed & rpm & Each replay row & Air/exhaust equipment state.\\
+Density; final product temperature; final moisture & \si{kg/L}; \si{\degreeCelsius}; \% H$_2$O & approx. \SI{2}{h} & Laboratory reference; never forward-filled as new measurement.\\
+\bottomrule
+\end{tabularx}
+\source{Data dictionary and preprocessing contract \cite{datadictionary,projectrepo}.}
+\end{table}
+
+The corresponding implementation keeps timestamp reconstruction and stream separation explicit:
+
+\begin{lstlisting}[language=Python,caption={Loading and separating the prototype process and laboratory streams.}]
+raw = load_raw_source(source_path)
+raw["Timestamp"] = build_timestamp(raw)
+
+process, audit = build_process_table(
+    raw, expected_interval_seconds=5,
+    short_gap_fill_limit_intervals=0,
+)
+laboratory = build_lab_table(raw)
+
+assert audit.duplicate_timestamps_removed == 0
+assert audit.missing_interval_rows == 0
+\end{lstlisting}
+
+The checks validate the chosen prototype grid; they do not infer the plant historian's native sampling configuration. Laboratory rows are extracted from genuinely populated quality fields, while structural blanks remain blank.
+
+\section{Cleaning and exploratory analysis}
+
+The ingestion contract parses timestamps, coerces expected numeric columns, checks uniqueness and reports gaps rather than silently inventing rows. The audited canonical source contains no duplicates or missing steps on its selected grid, and every process field is populated. The 1,588,656 blank values per quality column are therefore \emph{structural sparsity}, not cleaning defects.
+
+Outlier analysis uses distributions and boxplots to understand the generated operating envelope; unusual points are not deleted automatically because they may carry useful anomaly information. The following plots are generated from the canonical source and its aligned laboratory handoff used by Notebook 03.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=.95\textwidth]{data_distributions.png}
+\caption{Distributions of process and sparse quality variables in the canonical source.}
+\source{Executed Notebook 01 output; Author's work.}
+\label{fig:eda-distributions}
+\end{figure}
+
+Most variables occupy compact, broadly unimodal ranges in this generated dataset, while cooler-air temperature and vacuum show wider or asymmetric shapes. Final moisture is concentrated near the centre of its simulated range with thinner tails, so rare extremes are represented by relatively few rows. These shapes support scale-aware preprocessing and caution against treating the dataset envelope as an approved plant operating range.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=.95\textwidth]{feature_boxplots.png}
+\caption{Feature ranges and potential outliers in the canonical source.}
+\source{Executed Notebook 02 output; Author's work.}
+\label{fig:eda-boxplots}
+\end{figure}
+
+The boxplots show isolated observations for air flow, residence time, vacuum, steam pressure, fan speed and the final-quality fields. They are sparse rather than pervasive, and the plots alone do not distinguish a valid transient from a generated acquisition anomaly. The pipeline therefore retains them for modelling and novelty analysis unless a separate data-quality rule invalidates the observation.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=.88\textwidth]{correlation_matrix.png}
+\caption{Pearson correlation matrix for canonical process and sparse quality variables.}
+\source{Executed Notebook 02 output; Author's work.}
+\label{fig:eda-correlation}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=.80\textwidth]{engineered_features_vs_moisture.png}
+\caption{Selected aligned engineered-feature relationships with final moisture.}
+\source{Executed Notebook 02 output; Author's work.}
+\label{fig:eda-engineered}
+\end{figure}
+
+The generator implements causal inertia, gradual drift, multiple regimes and seven labelled ramp--hold--recovery disturbances. Its audited relationships include the expected strong fan-speed/air-flow association ($r=0.938$), air-flow/vacuum association ($r=0.979$), inverse feed/residence-time association ($r=-0.935$), inverse dryer-temperature/moisture association at laboratory rows ($r=-0.508$), and cooler-temperature/final-product-temperature association ($r=0.909$). These are synthetic correlations designed to make the integration exercise physically coherent; they are not identified plant causal effects or approved operating relationships.
+
+\subsection{Data-quality risks and treatment decisions}
+
+Five categories are separated in the pipeline. A \emph{structural blank} is expected because no lab sample was taken; it remains blank. A \emph{missing process value} prevents the affected instant inference and is reported. A \emph{timestamp gap} is quantified against the chosen five-second prototype grid; it is not hidden by interpolation at ingestion. A \emph{duplicate timestamp} violates the source contract, while a repeated database delivery is handled later by an idempotent upsert. Finally, an \emph{unusual but valid value} is retained for anomaly analysis unless process expertise identifies it as an acquisition error. This classification avoids a single generic ``fill missing values'' step.
+
+Units and semantics are equally important. The moisture field is stored in percentage points: for example, 0.075 means 0.075\% H$_2$O, not a fraction equal to 7.5\%. Vacuum uses the project's signed mmH$_2$O convention, where more negative means stronger depression. Ratios and interactions are explicitly labelled derived rather than pretending to be directly measured instruments. These decisions are recorded in configuration so that Python, PostgreSQL and Power BI use the same interpretation.
+
+The supplied synthetic file provides a clean cadence, but a future historian extract will require additional checks: tag-quality status, frozen values, shutdown periods, grade/campaign identifiers, manual modes, calibration changes and clock alignment with the laboratory information system. Removing these states indiscriminately would bias the model toward stable operation; retaining them without labels could confuse normal operating modes with faults. The data-preparation review must therefore be conducted jointly with process, laboratory and automation stakeholders.
+
+The variables also differ strongly in numerical scale: fan speed and air flow are orders of magnitude larger than pressure or residence time. Standardization is therefore fitted inside each training fold for the SVM and regularized regression paths. All displayed ranges belong only to the supplied synthetic dataset; none is presented as a plant target, alarm or approved normal boundary.
+
+\section{Residence-time-aware alignment}
+
+The most important leakage-control decision is the temporal relationship between a later laboratory sample and the material that passed through the dryer earlier. For a lab result at time $t_{lab}$, the direct process snapshot is selected at
+\begin{equation}
+t_{effective}=t_{lab}-t_{residence}(t_{lab})-t_{transport}.
+\end{equation}
+The final configuration uses the most recent process row at or before $t_{effective}$ and a configurable transport delay set to zero minutes for the generated artifacts \cite{featureschema}. It does not replace the original variables with window means, standard deviations or final-value suffixes. Missing residence time rejects the prediction rather than falling back to a future or arbitrary row.
+
+Binary timestamp searches locate the shifted process row and the strictly previous laboratory input efficiently on the 1.59-million-row source:
+
+\begin{lstlisting}[language=Python,caption={Residence-aware direct-snapshot construction.}]
+effective_time = effective_window_end(
+    lab_timestamp, residence, transport_delay_minutes
+)
+process_row = process_sorted.loc[
+    process_sorted["Timestamp"] <= effective_time
+].iloc[-1]
+previous_lab = lab_sorted.loc[
+    lab_sorted["Sample Timestamp"] < lab_timestamp
+].iloc[-1]
+\end{lstlisting}
+
+Although the optional exploratory feature engine can calculate 103 candidate window quantities, the final Notebook 02 handoff does not use their mean/std/last columns. It retains the original 16 named inputs: nine direct dryer variables; the most recent strictly previous laboratory density and final-product-temperature values; and \code{temperature\_drop}, \code{air\_product\_delta}, \code{air\_per\_feed}, \code{steam\_temp\_interaction} and \code{heating\_index}. The direct process row is selected at the residence-adjusted time, so no future process observation enters the target row. Of 1,104 laboratory observations, 1,103 form supervised rows; the initial timestamp has no strictly previous laboratory input. The split is chronological: 772 TRAIN, 166 VALIDATION and 165 TEST rows. Five expanding folds tune inside TRAIN, VALIDATION selects the model family, and TEST is opened once. Runtime applies the same ordered feature and prior-laboratory rule \cite{trainingreport,timeseriessplit}.
+
+\subsection{Feature families and their intended meaning}
+
+Window statistics remain available for exploratory analysis, but they are not inputs to the final moisture model. Its operating point is represented by the direct process snapshot at the residence-adjusted time, while density and final product temperature use only the latest strictly earlier laboratory result.
+
+The five retained interactions reduce the burden on a linear model. Temperature drop relates dryer air to the last known final product temperature; air/product delta represents the inlet thermal difference; air per feed relates transfer capacity to wet loading; steam-temperature interaction combines thermal supply and dryer-air level; and heating index combines residence time with dryer-air temperature. Each remains a proxy because the dataset lacks complete mass, composition and energy measurements.
+
+Feature construction occurs after causal time alignment and before model fitting. Scaling parameters are learned on training rows only. Candidate selection sees the validation segment, while the test segment remains untouched until the final model is fixed. This ordering prevents three leakage forms: future process or laboratory rows entering a target, validation/test statistics entering preprocessing, and repeated candidate decisions being made on the final test set.
+
+The 16-feature contract relative to 772 training labels is more controlled than the earlier wide prototype, but effective sample size remains a model-risk concern. Regularization, simple candidates and chronological validation reduce but do not eliminate it. For industrial data, feature stability should be examined across campaigns and rolling-origin evaluation should quantify selection variance. A high process-row count does not remove this concern because supervised information still arrives only at lab times.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=6mm and 7mm]
+\node[flow] (under) {Understand\\process + cadence};
+\node[flow,right=of under] (contract) {Validate\\data contract};
+\node[flow,right=of contract] (align) {Causal time\\alignment};
+\node[flow,right=of align] (feat) {Engineer\\physical features};
+\node[flow,below=of feat] (split) {Chronological\\70/15/15 split};
+\node[flow,left=of split] (compare) {Tune + compare\\candidates};
+\node[flow,left=of compare] (persist) {Persist model,\\schema, profile};
+\node[flow,left=of persist] (serve) {Replay, test,\\supervise};
+\draw[arr] (under)--(contract);\draw[arr] (contract)--(align);\draw[arr] (align)--(feat);\draw[arr] (feat)--(split);\draw[arr] (split)--(compare);\draw[arr] (compare)--(persist);\draw[arr] (persist)--(serve);
+\end{tikzpicture}
+\caption{Machine-learning workflow embedded in the engineering development cycle.}
+\source{\projectsource.}
+\label{fig:mlworkflow}
+\end{figure}
+
+\section{Instant features for anomaly monitoring}
+
+At each step of the chosen five-second prototype replay, anomaly inference uses nine process variables plus six instant engineered quantities: air/product temperature difference, cooler difference, air/feed ratio, steam/feed ratio, thermal load and thermal exposure. Protected denominators and required-input checks produce a \code{DATA\_QUALITY} state when needed; standardization and a saved feature schema lock the order and version. This anomaly contract remains process-only. The separate moisture contract uses the latest strictly previous sparse density and product-temperature result and reports prediction unavailable until such a prior result exists.

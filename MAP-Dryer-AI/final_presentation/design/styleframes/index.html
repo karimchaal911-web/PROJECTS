@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MAP Soutenance Styleframes</title>
+    <link rel="stylesheet" href="styleframes.css" />
+  </head>
+  <body>
+    <main>
+      <section class="frame frame--opening" id="opening">
+        <img class="photo" src="../../web/public/assets/plant/drying_section_structure.jpeg" alt="" />
+        <div class="shade"></div>
+        <div class="topline"><span>MAP / DRYER DIGITALIZATION</span><span>01 — OPENING</span></div>
+        <div class="title"><p>OCP · JORF LASFAR</p><h1>SOLUBLE<br />MAP</h1><span>Making a continuous process continuously visible.</span></div>
+        <div class="signal"></div>
+      </section>
+
+      <section class="frame frame--gap" id="gap">
+        <div class="topline"><span>PROCESS VISIBILITY</span><span>04 — THE BLIND INTERVAL</span></div>
+        <div class="statement"><h2>THE PROCESS<br />NEVER STOPS.</h2><p>LAB VISIBILITY DOES.</p></div>
+        <div class="timeline">
+          <div class="continuous"></div>
+          <div class="lab l1"><i></i><span>LAB</span></div>
+          <div class="lab l2"><i></i><span>LAB</span></div>
+          <div class="lab l3"><i></i><span>LAB</span></div>
+          <div class="ticks"></div>
+        </div>
+        <div class="qualifier">PROTOTYPE REPLAY Δt = 5 s · LAB ≈ 2 h</div>
+      </section>
+
+      <section class="frame frame--evidence" id="evidence">
+        <div class="topline"><span>HELD-OUT EVIDENCE</span><span>09 — VALIDATION</span></div>
+        <div class="evidence-title"><p>Evidence before ambition</p><h2>The estimate follows held-out laboratory behavior.</h2></div>
+        <img class="plot" src="../../web/public/assets/evidence/holdout_predictions.png" alt="Held-out actual and predicted moisture plot" />
+        <div class="metrics">
+          <div><span>R²</span><strong>0.8245</strong></div>
+          <div><span>MAE</span><strong>0.001069</strong></div>
+          <div><span>RMSE</span><strong>0.001403</strong></div>
+        </div>
+        <div class="footnote">TEST · 165 LAB SAMPLES · SYNTHETIC PROTOTYPE DATA · UNITS: PERCENTAGE POINTS % H₂O</div>
+      </section>
+    </main>
+    <script>
+      const requested = new URLSearchParams(location.search).get('frame');
+      if (requested) {
+        document.querySelectorAll('.frame').forEach((frame) => {
+          frame.hidden = frame.id !== requested;
+        });
+        document.querySelector('main').style.padding = '0';
+        document.querySelector('main').style.gap = '0';
+      }
+    </script>
+  </body>
+</html>

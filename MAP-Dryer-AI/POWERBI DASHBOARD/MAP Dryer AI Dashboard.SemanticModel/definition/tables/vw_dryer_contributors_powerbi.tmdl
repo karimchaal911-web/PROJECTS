@@ -28,7 +28,7 @@ table vw_dryer_contributors_powerbi
 		lineageTag: 5ad9f95b-adcf-452d-b35e-23e7395fa426
 
 	measure 'Contribution Score Value' = AVERAGE ( 'vw_dryer_contributors_powerbi'[Contribution Score] )
-		formatString: 0.0000
+		formatString: 0.00
 		displayFolder: 07 Chart Series
 		lineageTag: e8e7a8b3-1d46-4272-84d2-09c80d0ecaab
 
@@ -96,6 +96,25 @@ table vw_dryer_contributors_powerbi
 		lineageTag: 34ac22f4-9f59-4c8e-8929-742ea350c48f
 		summarizeBy: none
 		sourceColumn: variable_severity
+
+	column 'Contributor Display Name' =
+			SWITCH (
+			    'vw_dryer_contributors_powerbi'[Contributor Name],
+			    "wet_product_feed_rate", "Wet Product Feed Rate",
+			    "product_inlet_temperature", "Product Inlet Temperature",
+			    "residence_time", "Residence Time",
+			    "cooler_air_temperature", "Cooler Air Temperature",
+			    "dryer_air_temperature", "Dryer Air Temperature",
+			    "steam_pressure", "Steam Pressure",
+			    "air_flow_rate", "Air Flow Rate",
+			    "fan_speed", "Fan Speed",
+			    "vacuum", "Vacuum",
+			    "air_product_delta", "Air-Product Temperature Delta",
+			    "thermal_load", "Thermal Load",
+			    'vw_dryer_contributors_powerbi'[Contributor Name]
+			)
+		dataType: string
+		summarizeBy: none
 
 	partition vw_dryer_contributors_powerbi = m
 		mode: directQuery

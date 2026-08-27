@@ -33,7 +33,7 @@ RAW_SOURCE_COLUMNS = [
     "Final Moisture (%H2O)",
 ]
 
-# Sampled every 5 seconds by the process historian.
+# Represented every 5 seconds in the prototype process grid and replay.
 PROCESS_VARIABLES = [
     "Dryer Air Temperature",
     "Cooler Air Temperature",

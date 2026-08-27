@@ -10,7 +10,7 @@ The 5-second prototype datasets carry two asynchronous streams in one file:
 This package splits the raw file into an explicit process table and an
 explicit laboratory table, aligns them for two different purposes
 (dashboard display via a backward as-of join, model training via
-residence-time-shifted process windows), and centralizes every engineered
+residence-time-shifted process snapshots), and centralizes every engineered
 feature formula used by both training and real-time inference.
 """
 
@@ -38,7 +38,9 @@ from multirate.instant_features import (
     engineer_instant_features,
 )
 from multirate.window_features import (
+    MOISTURE_FEATURE_NAMES,
     WINDOW_FEATURE_NAMES,
+    compute_moisture_features,
     compute_window_features,
 )
 
@@ -52,12 +54,14 @@ __all__ = [
     "TrainingAlignmentResult",
     "INSTANT_ENGINEERED_FEATURES",
     "PROCESS_MODEL_FEATURES",
+    "MOISTURE_FEATURE_NAMES",
     "WINDOW_FEATURE_NAMES",
     "align_lab_for_dashboard",
     "build_lab_table",
     "build_process_table",
     "build_timestamp",
     "build_training_matrix",
+    "compute_moisture_features",
     "compute_window_features",
     "effective_window_end",
     "engineer_instant_features",

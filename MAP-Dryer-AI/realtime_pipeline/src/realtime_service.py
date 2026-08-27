@@ -1,14 +1,14 @@
-"""5-second incremental real-time service for the MAP dryer prototype.
+"""5-second held-out TEST replay service for the MAP dryer prototype.
 
-Replays the 5-second dashboard CSV as if it were the plant historian:
+Replays the canonical dataset's chronological TEST partition:
 
 * one new observation per cycle, resumed **incrementally** from the latest
   ``Timestamp`` already present in PostgreSQL (idempotent upserts — a
   retried row can never duplicate);
 * the anomaly model and diagnosis run on every 5-second row from
   process-only instant features (no laboratory values needed);
-* the quality model predicts Final Moisture on every row from a rolling
-  process-window whose end is shifted back by the dryer residence time
+* the quality model predicts Final Moisture from the direct process row
+  shifted back by the dryer residence time and the most recent prior lab
   plus a configurable transport delay — exactly the alignment used in
   training (``multirate.alignment``);
 * prediction error is validated only when a row carries a real laboratory
@@ -25,7 +25,9 @@ is performed anywhere.
 
 Configuration (``realtime_pipeline/.env``):
 
-    SOURCE_CSV_5S           source CSV (default: the copied dashboard file)
+    SOURCE_CSV_5S           canonical 5-second CSV or held-out TEST replay
+    SOURCE_PARTITION_5S     ``held_out_test`` to replay only the TEST partition
+    REPLAY_START_TIMESTAMP  first TEST timestamp when using the canonical CSV
     POLL_INTERVAL_SECONDS   cycle budget, default 5
     REPLAY_SPEED            pacing divisor: 1 = real time, 60 = 60x faster,
                             0 = as fast as possible (bulk catch-up)
@@ -68,11 +70,14 @@ for entry in (str(PROJECT_ROOT), str(PROJECT_ROOT / "src")):
 
 from diagnosis_engine import diagnose_event, load_reference_profile  # noqa: E402
 from multirate import (  # noqa: E402
+    MOISTURE_FEATURE_NAMES,
     PROCESS_VARIABLES,
     QUALITY_VARIABLES,
+    RAW_SOURCE_COLUMNS,
     build_lab_table,
     build_process_table,
-    compute_window_features,
+    build_timestamp,
+    compute_moisture_features,
     engineer_instant_features,
     load_raw_source,
 )
@@ -124,6 +129,8 @@ DB_RETRY_BACKOFF_SECONDS = 2.0
 @dataclass
 class ServiceConfig:
     source_csv: Path
+    source_partition: str
+    replay_start_timestamp: pd.Timestamp | None
     poll_interval_seconds: float
     replay_speed: float
     max_cycles: int
@@ -153,6 +160,10 @@ class Artifacts:
     @property
     def window_minutes(self) -> float:
         return float(self.feature_schema["quality_window_minutes"])
+
+    @property
+    def moisture_feature_names(self) -> list[str]:
+        return list(self.feature_schema["moisture_model_features"])
 
     @property
     def risk_scale(self) -> float:
@@ -194,9 +205,9 @@ def require_env(name: str) -> str:
 def load_config() -> ServiceConfig:
     source_default = str(
         PROJECT_ROOT
-        / "resources"
-        / "prototype_data"
-        / "MAP_Dryer_5s_Dashboard_Original_Columns.csv"
+        / "data"
+        / "processed"
+        / "MAP_Dryer_TEST_Replay_5s.csv"
     )
     source_csv = Path(os.getenv("SOURCE_CSV_5S", source_default).strip())
     if not source_csv.is_absolute():
@@ -208,8 +219,21 @@ def load_config() -> ServiceConfig:
     if not models_dir.is_absolute():
         models_dir = PIPELINE_ROOT / models_dir
 
+    source_partition = os.getenv("SOURCE_PARTITION_5S", "dashboard").strip().lower()
+    replay_start_raw = os.getenv("REPLAY_START_TIMESTAMP", "").strip()
+    replay_start_timestamp = (
+        pd.Timestamp(replay_start_raw) if replay_start_raw else None
+    )
+    if source_partition == "held_out_test" and replay_start_timestamp is None:
+        raise RuntimeError(
+            "REPLAY_START_TIMESTAMP is required when "
+            "SOURCE_PARTITION_5S=held_out_test."
+        )
+
     return ServiceConfig(
         source_csv=source_csv.resolve(),
+        source_partition=source_partition,
+        replay_start_timestamp=replay_start_timestamp,
         poll_interval_seconds=_env_float("POLL_INTERVAL_SECONDS", 5.0, 0.1),
         replay_speed=_env_float("REPLAY_SPEED", 1.0, 0.0),
         max_cycles=int(_env_float("MAX_CYCLES", 0.0)),
@@ -243,8 +267,21 @@ def load_artifacts(models_dir: Path) -> Artifacts:
             "tools/train_5s_models.py before serving."
         )
 
+    if feature_schema.get("moisture_model_features") != MOISTURE_FEATURE_NAMES:
+        raise RuntimeError(
+            "Saved moisture feature schema does not match the final "
+            "16-feature Notebook 03 contract."
+        )
+
+    moisture_pipeline = _load("quality_moisture_pipeline.joblib")
+    if list(getattr(moisture_pipeline, "feature_names_in_", [])) != MOISTURE_FEATURE_NAMES:
+        raise RuntimeError(
+            "The exported Notebook 03 model input order does not match the "
+            "runtime moisture feature contract."
+        )
+
     return Artifacts(
-        moisture_pipeline=_load("quality_moisture_pipeline.joblib"),
+        moisture_pipeline=moisture_pipeline,
         anomaly_model=_load("anomaly_model.joblib"),
         anomaly_scaler=_load("anomaly_scaler.joblib"),
         reference_profile=load_reference_profile(
@@ -295,44 +332,56 @@ def predict_moisture(
     artifacts: Artifacts,
     transport_delay_minutes: float,
 ) -> QualityPrediction:
-    """Window-feature moisture prediction with the training alignment.
+    """Direct-feature moisture prediction with the training alignment.
 
     The window ends at ``now − residence_time − transport_delay`` so the
-    prediction describes the product reaching the sampling point now.
+    prediction describes the product reaching the sampling point now. The
+    two laboratory inputs are taken from the most recent strictly earlier
+    laboratory row.
     """
 
     residence = nullable_float(buffer["Residence Time"].iloc[-1])
     if residence is None:
         return QualityPrediction(None, "residence time missing", 0)
 
-    window_minutes = artifacts.window_minutes
     window_end = effective_window_end(
         row_timestamp, residence, transport_delay_minutes
     )
-    window_start = window_end - pd.Timedelta(minutes=window_minutes)
-
-    in_window = buffer.loc[
-        (buffer["Timestamp"] > window_start)
-        & (buffer["Timestamp"] <= window_end)
-    ]
-
-    expected_rows = window_minutes * 60.0 / 5.0
-    if len(in_window) < 0.8 * expected_rows:
+    process_history = buffer.loc[buffer["Timestamp"] <= window_end]
+    if process_history.empty:
         return QualityPrediction(
             None,
-            f"insufficient process history ({len(in_window)}/"
-            f"{int(expected_rows)} rows in the aligned window)",
-            len(in_window),
+            "no process row is available at the residence-adjusted time",
+            0,
         )
 
-    features = compute_window_features(
-        in_window[["Timestamp", *PROCESS_VARIABLES]]
+    prior_lab = buffer.loc[
+        (buffer["Timestamp"] < row_timestamp)
+        & buffer["Product Density"].notna()
+        & buffer["Final Product Temp"].notna()
+    ]
+    if prior_lab.empty:
+        return QualityPrediction(
+            None,
+            "no strictly previous laboratory density/temperature is available",
+            1,
+        )
+
+    process_snapshot = process_history.iloc[-1]
+    previous_lab = prior_lab.iloc[-1]
+    features = compute_moisture_features(
+        process_snapshot,
+        product_density=float(previous_lab["Product Density"]),
+        final_product_temp=float(previous_lab["Final Product Temp"]),
     )
-    frame = pd.DataFrame([features], columns=WINDOW_FEATURE_NAMES)
+    frame = pd.DataFrame(
+        [{name: features[name] for name in artifacts.moisture_feature_names}],
+        columns=artifacts.moisture_feature_names,
+    )
     predicted = float(artifacts.moisture_pipeline.predict(frame)[0])
     if not math.isfinite(predicted):
-        return QualityPrediction(None, "non-finite prediction", len(in_window))
-    return QualityPrediction(predicted, None, len(in_window))
+        return QualityPrediction(None, "non-finite prediction", 1)
+    return QualityPrediction(predicted, None, 1)
 
 
 @dataclass
@@ -557,8 +606,48 @@ def persist_with_retry(
     return connection
 
 
+def _load_partition_with_history(
+    source_path: Path,
+    replay_start: pd.Timestamp,
+    history_minutes: float = 180.0,
+) -> pd.DataFrame:
+    """Read only TEST plus its prehistory from the canonical CSV.
+
+    Pre-TEST rows seed the in-memory residence/laboratory buffer. They are
+    never replayed or written to PostgreSQL.
+    """
+
+    history_start = replay_start - pd.Timedelta(minutes=history_minutes)
+    selected_chunks: list[pd.DataFrame] = []
+    for chunk in pd.read_csv(
+        source_path,
+        encoding="utf-8-sig",
+        chunksize=200_000,
+    ):
+        chunk.columns = [str(column).strip() for column in chunk.columns]
+        missing = [column for column in RAW_SOURCE_COLUMNS if column not in chunk]
+        if missing:
+            raise ValueError(f"Source CSV is missing required columns: {missing}")
+        timestamps = build_timestamp(chunk)
+        keep = timestamps >= history_start
+        if keep.any():
+            selected_chunks.append(chunk.loc[keep, RAW_SOURCE_COLUMNS].copy())
+
+    if not selected_chunks:
+        raise RuntimeError(
+            f"No source rows exist at or after warm-up start {history_start}."
+        )
+    return pd.concat(selected_chunks, ignore_index=True)
+
+
 def load_source(config: ServiceConfig) -> pd.DataFrame:
-    raw = load_raw_source(config.source_csv)
+    if config.source_partition == "held_out_test":
+        assert config.replay_start_timestamp is not None
+        raw = _load_partition_with_history(
+            config.source_csv, config.replay_start_timestamp
+        )
+    else:
+        raw = load_raw_source(config.source_csv)
     process, report = build_process_table(raw)
     lab = build_lab_table(raw)
 
@@ -600,6 +689,9 @@ def main() -> None:
         )
     )
     print(f"Transport delay:  {config.transport_delay_minutes:g} min")
+    print(f"Source partition: {config.source_partition}")
+    if config.replay_start_timestamp is not None:
+        print(f"Replay begins:    {config.replay_start_timestamp}")
     print("Timestamps:       naive plant-local time (documented, no TZ)")
 
     artifacts = load_artifacts(config.models_dir)
@@ -628,13 +720,20 @@ def main() -> None:
 
     if config.replay_from_start:
         print(
-            "REPLAY_FROM_START=true: replaying the whole CSV; existing "
+            "REPLAY_FROM_START=true: replaying the configured partition; existing "
             "rows at the same timestamps are overwritten by upsert."
         )
         latest_processed = None
 
     if latest_processed is None:
-        next_position = 0
+        if config.replay_start_timestamp is None:
+            next_position = 0
+        else:
+            next_position = int(
+                source["Timestamp"].searchsorted(
+                    config.replay_start_timestamp, side="left"
+                )
+            )
     else:
         latest_processed = pd.Timestamp(latest_processed)
         next_position = int(
@@ -645,16 +744,22 @@ def main() -> None:
         f"(source position {next_position:,}/{len(source):,})\n"
     )
 
-    # Rolling history for window features: residence (~25 min) + window
-    # (30 min) + margin. Seeded from already-processed source rows so a
-    # restart keeps predicting immediately.
-    buffer_minutes = (
-        artifacts.window_minutes + config.transport_delay_minutes + 45.0
+    # Keep enough history for residence alignment and the preceding two-hour
+    # laboratory observation. Seed from already-processed source rows so a
+    # restart can resume without fabricating laboratory values.
+    buffer_minutes = max(
+        180.0,
+        artifacts.window_minutes + config.transport_delay_minutes + 45.0,
     )
     buffer_rows = int(buffer_minutes * 60 / 5)
     buffer = source.iloc[max(0, next_position - buffer_rows):next_position][
-        ["Timestamp", *PROCESS_VARIABLES]
+        ["Timestamp", *PROCESS_VARIABLES, *QUALITY_VARIABLES]
     ].copy()
+    if config.replay_start_timestamp is not None:
+        print(
+            f"Warm-up history:  {len(buffer):,} rows loaded in memory only; "
+            "none will be written to PostgreSQL.\n"
+        )
 
     cycles = 0
     latencies: list[float] = []
@@ -693,7 +798,7 @@ def main() -> None:
             buffer = pd.concat(
                 [
                     buffer,
-                    source_row[["Timestamp", *PROCESS_VARIABLES]]
+                    source_row[["Timestamp", *PROCESS_VARIABLES, *QUALITY_VARIABLES]]
                     .to_frame()
                     .T,
                 ],

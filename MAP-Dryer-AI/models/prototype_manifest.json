@@ -1,0 +1,39 @@
+{
+  "prototype_manifest_version": "6.0",
+  "classification": "engineering prototype / proof of concept",
+  "dataset": {
+    "path": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
+    "version": "map_canonical_5s_user_deterministic_v1.0",
+    "sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124"
+  },
+  "feature_schema": {
+    "path": "models\\5s\\feature_schema.json",
+    "sha256": "25306163a66404a59cc06560a34f864845e9cb315ca67c03d9c1fefb409318f7",
+    "version": "moisture_direct_16_v6.0",
+    "feature_count": 16
+  },
+  "training_report": {
+    "path": "models\\5s\\training_report.json",
+    "sha256": "5339b6714841bae564774a67d18a094f2600b5dc60057751f7b838e070d424f6"
+  },
+  "model_registry": {
+    "path": "models\\model_registry.json",
+    "sha256": "8b20b879cfaf1aa0ff5293f92ba4022ba350095572c44e7c9ed97f86fa81754a"
+  },
+  "runtime_compatibility_version": "map_runtime_v6",
+  "dashboard_contract": {
+    "mode": "PostgreSQL DirectQuery",
+    "prototype_refresh_seconds": 5,
+    "data_source_label": "PROTOTYPE / HELD-OUT TEST REPLAY",
+    "replay": {
+      "path": "data\\processed\\MAP_Dryer_TEST_Replay_5s.csv",
+      "sha256": "cec99e6a984a11440bfa06230b877f6231299bc9213bd5acb77cfe605553b2c2",
+      "rows": 237600,
+      "laboratory_samples": 165,
+      "start_timestamp": "2026-07-03 06:00:00",
+      "end_timestamp": "2026-07-16 23:59:55",
+      "source_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
+      "source_partition": "held-out chronological TEST"
+    }
+  }
+}

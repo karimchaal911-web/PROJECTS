@@ -1,0 +1,53 @@
+\clearpage
+\begingroup
+\footnotesize
+\setlength{\itemsep}{0.5pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\bibitem{ocprole} OCP Group, ``Our Role in the World,'' official website, accessed 8 Aug. 2026. [Online]. Available: \url{https://www.ocpgroup.ma/en/who-we-are/our-role-world}
+
+\bibitem{ocpwho} OCP Group, ``Who We Are,'' official website, accessed 8 Aug. 2026. [Online]. Available: \url{https://www.ocpgroup.ma/en/who-we-are}
+
+\bibitem{ocpindustrial} OCP Group, ``Industrial Operations,'' official website, accessed 8 Aug. 2026. [Online]. Available: \url{https://www.ocpgroup.ma/en/what-we-do/industrial-operations}
+
+\bibitem{orgreport} Anonymous student author, \emph{Internship Report} [title translated from French], supplied ENSAM/OCP report (DOCX), contextual reference consulted during project preparation, undated.
+
+\bibitem{souilmi} K. Souilmi, \emph{Creation of a ProcessBook for Soluble MAP Training} [title translated from French], internship report, OCP Group / ENSAM, academic year 2018--2019, supplied PDF, 40 pp.
+
+\bibitem{fieldnotes} C. Abdelkarim, ``Internship field observations on soluble MAP production and PCS7 supervision,'' personal notes, OCP Jorf Lasfar, July--August 2026. Notes consulted as source material; images are not reproduced.
+
+\bibitem{projectrepo} C. Abdelkarim, \emph{MAP-Dryer-AI repository: five-second multi-rate supervision prototype}, source code and README, local project revision audited 24 Aug. 2026.
+
+\bibitem{datadictionary} MAP-Dryer-AI, ``Data dictionary and subsystem feature metadata,'' \code{config/data\_dictionary.yaml} and \code{config/feature\_metadata.yaml}, audited 8 Aug. 2026.
+
+\bibitem{featureschema} MAP-Dryer-AI, ``Governed runtime feature schema,'' \code{models/5s/feature\_schema.json}, version \code{moisture\_direct\_16\_v6.0}, generated 24 Aug. 2026.
+
+\bibitem{trainingreport} MAP-Dryer-AI, ``Canonical 92-day model training report,'' \code{models/5s/training\_report.json}, model version \code{canonical\_92d\_v6.0}, generated 24 Aug. 2026.
+
+\bibitem{moisturenotebook} MAP-Dryer-AI, ``Notebook 03: Model 1---Soft Sensor for Final Moisture,'' \code{notebooks/03\_Model1\_SoftSensor.ipynb} and \code{artifacts/notebook03\_model\_evaluation.json}, executed and audited 24 Aug. 2026: Ridge, $\alpha=10$, chronological TEST $R^2=0.824530$ ($n=165$).
+
+\bibitem{anomalynotebook} MAP-Dryer-AI, ``Notebook 04: Model 2---Anomaly Detection and Diagnosis,'' \code{notebooks/04\_Model2\_AnomalyDetection\&Diagnosis.ipynb} and \code{artifacts/notebook04\_anomaly\_evaluation.json}, executed and audited 24 Aug. 2026: 15-feature One-Class SVM runtime export with 5.925\% validation flag rate.
+
+\bibitem{diagnosisconfig} MAP-Dryer-AI, ``Diagnostic rules, thresholds, feature and subsystem metadata,'' versioned YAML configuration and \code{realtime\_pipeline/src/diagnosis\_engine.py}, audited 8 Aug. 2026.
+
+\bibitem{sqlschema} MAP-Dryer-AI, ``PostgreSQL base schema and five-second upgrade,'' \code{POWERBI DASHBOARD/sql/bootstrap\_base\_schema.sql} and \code{upgrade\_5s\_schema.sql}, audited 8 Aug. 2026.
+
+\bibitem{runtimelog} MAP-Dryer-AI, ``Bounded held-out TEST replay log,'' \code{artifacts/realtime\_90s\_stdout.log}, 1,500 source rows, 24 Aug. 2026.
+
+\bibitem{testrecord} MAP-Dryer-AI, ``Final canonical implementation validation record,'' \code{artifacts/FINAL\_VALIDATION\_2026-08-24.md}: 33 tests and 8 subtests passed, 24 Aug. 2026.
+
+\bibitem{pbivalidation} MAP-Dryer-AI, ``Live PostgreSQL/Power BI physical-contract validation,'' \code{realtime\_pipeline/src/verify\_powerbi\_views.py}, five of five views passed, 24 Aug. 2026.
+
+\bibitem{timeseriessplit} scikit-learn developers, ``TimeSeriesSplit,'' official scikit-learn documentation, accessed 8 Aug. 2026. [Online]. Available: \url{https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html}
+
+\bibitem{oneclasssvm} scikit-learn developers, ``OneClassSVM,'' official scikit-learn documentation, accessed 8 Aug. 2026. [Online]. Available: \url{https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html}
+
+\bibitem{powerbiautorefresh} Microsoft, ``Automatic page refresh in Power BI,'' Microsoft Learn, accessed 8 Aug. 2026. [Online]. Available: \url{https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-automatic-page-refresh}
+
+\bibitem{postgresdocs} PostgreSQL Global Development Group, ``PostgreSQL Documentation,'' official documentation, accessed 8 Aug. 2026. [Online]. Available: \url{https://www.postgresql.org/docs/}
+
+\end{thebibliography}
+\endgroup
