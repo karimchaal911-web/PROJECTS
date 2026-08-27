@@ -4,10 +4,10 @@
   "position": {
     "x": 358,
     "y": 86,
-    "z": 1500,
+    "z": 1600,
     "height": 118,
     "width": 234,
-    "tabOrder": 1500
+    "tabOrder": 1600
   },
   "visual": {
     "visualType": "card",
@@ -87,7 +87,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'LATEST LAB MOISTURE'"
+                  "Value": "'LABORATORY MOISTURE'"
                 }
               }
             },
@@ -96,7 +96,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -163,7 +163,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E2DD'"
+                      "Value": "'#D6E0DC'"
                     }
                   }
                 }
@@ -172,7 +172,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "16D"
                 }
               }
             }

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
   "name": "096aff05b088964ab8c7",
   "position": {
     "x": 1216,
@@ -11,6 +11,7 @@
   },
   "visual": {
     "visualType": "tableEx",
+    "drillFilterOtherVisuals": true,
     "query": {
       "queryState": {
         "Values": {
@@ -23,11 +24,11 @@
                       "Entity": "vw_dryer_contributors_powerbi"
                     }
                   },
-                  "Property": "Contributor Display Name"
+                  "Property": "Contributor Name"
                 }
               },
-              "queryRef": "vw_dryer_contributors_powerbi.Contributor Display Name",
-              "nativeQueryRef": "Contributor Display Name"
+              "queryRef": "vw_dryer_contributors_powerbi.Contributor Name",
+              "nativeQueryRef": "Contributor Name"
             },
             {
               "field": {
@@ -70,12 +71,13 @@
                     "Entity": "vw_dryer_contributors_powerbi"
                   }
                 },
-                "Property": "Deviation Direction"
+                "Property": "Deviation Percent"
               }
             },
-            "direction": "Ascending"
+            "direction": "Descending"
           }
-        ]
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -123,7 +125,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -156,7 +158,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -211,7 +213,6 @@
           }
         }
       ]
-    },
-    "drillFilterOtherVisuals": true
+    }
   }
 }

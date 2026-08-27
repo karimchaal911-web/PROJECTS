@@ -1,16 +1,17 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
   "name": "29a944b7754a10df7809",
   "position": {
-    "x": 109.72906403940887,
-    "y": 166.25615763546799,
+    "x": 110,
+    "y": 156,
     "z": 2400,
-    "height": 289.28571428571428,
-    "width": 939.90147783251223,
+    "height": 300,
+    "width": 940,
     "tabOrder": 2400
   },
   "visual": {
     "visualType": "lineChart",
+    "drillFilterOtherVisuals": true,
     "query": {
       "queryState": {
         "Category": {
@@ -294,7 +295,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#0F766E'"
+                      "Value": "'#087C5B'"
                     }
                   }
                 }
@@ -312,7 +313,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D64545'"
+                      "Value": "'#DF5558'"
                     }
                   }
                 }
@@ -348,7 +349,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D98E04'"
+                      "Value": "'#F2A12E'"
                     }
                   }
                 }
@@ -366,7 +367,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D64545'"
+                      "Value": "'#C83F45'"
                     }
                   }
                 }
@@ -400,7 +401,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -438,7 +439,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -494,7 +495,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'ANOMALY RISK TIMELINE — WARNING 0.50 · CRITICAL 0.80'"
+                  "Value": "'ANOMALY SCORE TIMELINE \u2014 CALIBRATED RISK, EVENT MARKERS AND SEVERITY THRESHOLDS'"
                 }
               }
             },
@@ -503,7 +504,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -565,7 +566,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E2DD'"
+                      "Value": "'#D6E0DC'"
                     }
                   }
                 }
@@ -574,7 +575,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "16D"
                 }
               }
             }
@@ -594,7 +595,6 @@
           }
         }
       ]
-    },
-    "drillFilterOtherVisuals": true
+    }
   }
 }

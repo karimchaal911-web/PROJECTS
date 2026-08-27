@@ -1,16 +1,17 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
   "name": "cf895fbbf098e3d17ca9",
   "position": {
-    "x": 109.72906403940887,
-    "y": 56.52709359605911,
+    "x": 110,
+    "y": 56,
     "z": 1000,
-    "height": 29.926108374384235,
-    "width": 874.50738916256159,
+    "height": 22,
+    "width": 860,
     "tabOrder": 1000
   },
   "visual": {
     "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -19,10 +20,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Replay / Refresh: 5 s · moisture prediction, stability and anomaly supervision",
+                    "value": "Real-time moisture prediction, process stability and anomaly supervision",
                     "textStyle": {
                       "fontSize": "10pt",
-                      "color": "#5e706a"
+                      "color": "#66756F"
                     }
                   }
                 ]
@@ -85,7 +86,6 @@
           }
         }
       ]
-    },
-    "drillFilterOtherVisuals": true
+    }
   }
 }

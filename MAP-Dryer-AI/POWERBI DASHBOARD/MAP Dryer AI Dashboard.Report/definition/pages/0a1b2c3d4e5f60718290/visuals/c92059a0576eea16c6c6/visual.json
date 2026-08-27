@@ -1,16 +1,17 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
   "name": "c92059a0576eea16c6c6",
   "position": {
-    "x": 109.72906403940887,
-    "y": 15.517241379310343,
+    "x": 110,
+    "y": 16,
     "z": 900,
-    "height": 41.009852216748769,
-    "width": 861.20689655172407,
+    "height": 40,
+    "width": 860,
     "tabOrder": 900
   },
   "visual": {
     "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -19,11 +20,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Soluble MAP Dryer — Operations Overview",
+                    "value": "Soluble MAP Dryer \u2014 Operations Overview",
                     "textStyle": {
-                      "fontWeight": "bold",
                       "fontSize": "20pt",
-                      "color": "#17231f"
+                      "color": "#17231F",
+                      "fontWeight": "bold"
                     }
                   }
                 ]
@@ -86,7 +87,6 @@
           }
         }
       ]
-    },
-    "drillFilterOtherVisuals": true
+    }
   }
 }

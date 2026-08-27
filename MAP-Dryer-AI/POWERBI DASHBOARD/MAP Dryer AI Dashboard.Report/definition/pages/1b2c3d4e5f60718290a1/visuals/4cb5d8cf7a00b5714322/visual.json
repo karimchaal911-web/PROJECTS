@@ -24,11 +24,11 @@
                       "Entity": "vw_dryer_contributors_powerbi"
                     }
                   },
-                  "Property": "Contributor Display Name"
+                  "Property": "Contributor Name"
                 }
               },
-              "queryRef": "vw_dryer_contributors_powerbi.Contributor Display Name",
-              "nativeQueryRef": "Contributor Display Name",
+              "queryRef": "vw_dryer_contributors_powerbi.Contributor Name",
+              "nativeQueryRef": "Contributor Name",
               "active": true
             }
           ]
@@ -116,7 +116,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -204,7 +204,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'TOP ABNORMAL PROCESS CONTRIBUTORS'"
+                  "Value": "'RANKED ABNORMAL CONTRIBUTORS \u2014 NORMALIZED DEVIATION OF THE SELECTED EVENT (DIAGNOSTIC EVIDENCE, NOT CONFIRMED CAUSALITY)'"
                 }
               }
             },
@@ -213,7 +213,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -275,7 +275,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E2DD'"
+                      "Value": "'#D6E0DC'"
                     }
                   }
                 }
@@ -284,7 +284,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "16D"
                 }
               }
             }

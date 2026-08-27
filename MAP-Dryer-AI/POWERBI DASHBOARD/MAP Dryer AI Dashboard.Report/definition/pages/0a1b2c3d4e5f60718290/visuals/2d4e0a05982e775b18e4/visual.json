@@ -4,10 +4,10 @@
   "position": {
     "x": 1102,
     "y": 86,
-    "z": 1800,
+    "z": 2100,
     "height": 118,
     "width": 234,
-    "tabOrder": 1800
+    "tabOrder": 2100
   },
   "visual": {
     "visualType": "card",
@@ -24,11 +24,11 @@
                       "Entity": "vw_dryer_dashboard_powerbi"
                     }
                   },
-                  "Property": "Latest Anomaly Status"
+                  "Property": "Operating Status"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Latest Anomaly Status",
-              "nativeQueryRef": "Latest Anomaly Status"
+              "queryRef": "vw_dryer_dashboard_powerbi.Operating Status",
+              "nativeQueryRef": "Operating Status"
             }
           ]
         }
@@ -68,7 +68,7 @@
                           "Entity": "vw_dryer_dashboard_powerbi"
                         }
                       },
-                      "Property": "Severity FG (Latest)"
+                      "Property": "Status FG (Latest)"
                     }
                   }
                 }
@@ -92,7 +92,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'PROCESS STATUS'"
+                  "Value": "'OPERATING STATUS'"
                 }
               }
             },
@@ -101,7 +101,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -137,7 +137,7 @@
                           "Entity": "vw_dryer_dashboard_powerbi"
                         }
                       },
-                      "Property": "Severity BG (Latest)"
+                      "Property": "Status BG (Latest)"
                     }
                   }
                 }
@@ -168,7 +168,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E2DD'"
+                      "Value": "'#D6E0DC'"
                     }
                   }
                 }
@@ -177,7 +177,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "16D"
                 }
               }
             }

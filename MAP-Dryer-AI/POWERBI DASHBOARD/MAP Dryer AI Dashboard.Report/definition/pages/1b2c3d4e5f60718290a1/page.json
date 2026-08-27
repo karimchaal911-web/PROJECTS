@@ -14,7 +14,7 @@
               "color": {
                 "expr": {
                   "Literal": {
-                    "Value": "'#F4F7F5'"
+                    "Value": "'#F3F6F4'"
                   }
                 }
               }
@@ -43,14 +43,14 @@
           "refreshType": {
             "expr": {
               "Literal": {
-                "Value": "'APR'"
+                "Value": "1D"
               }
             }
           },
           "duration": {
             "expr": {
               "Literal": {
-                "Value": "'PT2S'"
+                "Value": "60D"
               }
             }
           }

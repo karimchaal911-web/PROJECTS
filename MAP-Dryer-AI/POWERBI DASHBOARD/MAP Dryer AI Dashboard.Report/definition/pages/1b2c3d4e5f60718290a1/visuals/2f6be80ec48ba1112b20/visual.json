@@ -20,7 +20,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "▦",
+                    "value": "\u25a6",
                     "textStyle": {
                       "fontSize": "12pt",
                       "color": "#9DBFB4"

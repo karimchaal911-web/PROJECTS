@@ -1,16 +1,17 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
   "name": "dd070f434f7206608d2c",
   "position": {
-    "x": 1079.5566502463055,
-    "y": 581.89655172413791,
-    "z": 4000,
-    "height": 33.251231527093594,
-    "width": 300.3694581280788,
-    "tabOrder": 4000
+    "x": 1080,
+    "y": 582,
+    "z": 6300,
+    "height": 24,
+    "width": 300,
+    "tabOrder": 6300
   },
   "visual": {
     "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -21,9 +22,9 @@
                   {
                     "value": "Operator guidance",
                     "textStyle": {
-                      "fontWeight": "bold",
                       "fontSize": "12pt",
-                      "color": "#17231f"
+                      "color": "#17231F",
+                      "fontWeight": "bold"
                     }
                   }
                 ]
@@ -86,7 +87,6 @@
           }
         }
       ]
-    },
-    "drillFilterOtherVisuals": true
+    }
   }
 }

@@ -87,7 +87,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'PREDICTED FINAL MOISTURE'"
+                  "Value": "'PREDICTED MOISTURE'"
                 }
               }
             },
@@ -96,7 +96,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -163,7 +163,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E2DD'"
+                      "Value": "'#D6E0DC'"
                     }
                   }
                 }
@@ -172,7 +172,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "16D"
                 }
               }
             }

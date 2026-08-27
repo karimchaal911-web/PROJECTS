@@ -1,9 +1,7 @@
 # MAP Dryer AI — Power BI Dashboard
 
-Two-page Power BI engineering-prototype report for the soluble MAP fertilizer
-dryer, reading synthetic replay/model outputs from PostgreSQL over
-**DirectQuery**. A visible `PROTOTYPE / REPLAY` indicator prevents the dashboard
-from being mistaken for a live plant historian or production control system.
+Two-page Power BI report for the OCP soluble MAP fertilizer dryer, reading
+completed model outputs from PostgreSQL over **DirectQuery**.
 
 ```
 POWERBI DASHBOARD/
@@ -13,24 +11,29 @@ POWERBI DASHBOARD/
 ├── sql/bootstrap_base_schema.sql          ← base tables/functions (fresh machine)
 ├── sql/upgrade_5s_schema.sql              ← 5-second multi-rate extension
 ├── sql/create_powerbi_views.sql           ← legacy reference DDL (pre-5s naming)
-├── preview/                               ← canonical PNG page previews
+├── preview/                               ← HTML/PNG page previews from live SQL
+├── backup_report_pages_20260806/          ← pages before the template rebuild
+├── gi.pbix                                ← earlier stub kept for reference
 ├── README.md
 └── IMPLEMENTATION_REPORT.md
 ```
 
-The two final report pages are stored directly in the canonical PBIP project.
-Their one-time template inputs and page-generation utility were removed during
-archival cleanup. `tools/render_dashboard_preview.py` produces layout previews,
-and `tools/validate_report_fields.py` checks every visual's field references
-against the semantic model.
+The two report pages are generated from
+`tools/generate_powerbi_report.py` and mirror the reference templates in
+`resources/dashboard_templates/` (dark-green 86-px navigation rail,
+pill-shaped status controls, full-card heatmap coloring). Re-running the
+generator is deterministic; layout previews rendered from the live SQL
+views are produced by `tools/render_dashboard_preview.py` into
+`preview/`. `tools/validate_report_fields.py` checks every visual's field
+references against the semantic model.
 
 ## Division of responsibility
 
 | Layer | Responsibility |
 |---|---|
-| `realtime_pipeline` (Python) | Replays the canonical dashboard partition on the selected prototype cadence, runs the final 16-feature moisture model and process-only anomaly/diagnosis models, and writes outputs to PostgreSQL (`realtime_service.py`) |
-| PostgreSQL | Stores `dryer_map`, `dryer_model_outputs`, `dryer_abnormal_variables`; exposes the KPI, contributor, lab, event, lightweight eight-hour trend, and latest-state views |
-| Power BI (this folder) | **Reads the views only** over DirectQuery with 5-second automatic page refresh. It never loads the joblib models and never executes inference; the freshness pill reflects wall-clock inference arrival age |
+| `realtime_pipeline` (Python) | Reads observations, runs the window-feature moisture model and the process-only anomaly/diagnosis models, **writes everything into PostgreSQL every 5 s** (`realtime_service.py`) |
+| PostgreSQL | Stores `dryer_map`, `dryer_model_outputs`, `dryer_abnormal_variables`; exposes `vw_dryer_dashboard_powerbi`, `vw_dryer_contributors_powerbi`, `vw_dryer_lab_samples`, `vw_dryer_anomaly_events`, `vw_dryer_latest` |
+| Power BI (this folder) | **Reads the views only** over DirectQuery with 60-second automatic page refresh. It never loads the joblib models and never executes inference. Data acquisition (5 s) is deliberately faster than report rendering (60 s); the freshness pill reflects ingest age |
 
 ## Prerequisites
 
@@ -53,13 +56,12 @@ From the repository root, with the `realtime_pipeline` virtual environment:
 python realtime_pipeline/src/verify_powerbi_views.py
 ```
 
-This connects using `realtime_pipeline/.env`, confirms all five semantic views exist,
+This connects using `realtime_pipeline/.env`, confirms both views exist,
 lists their physical columns against the names the semantic model expects,
 and prints row counts and the latest timestamp.
 
-* **View missing** → run `python realtime_pipeline/src/apply_sql_migration.py`,
-  then re-run the verification. `create_powerbi_views.sql` is legacy reference
-  DDL and must not replace the current five-second views.
+* **View missing** → run `sql/create_powerbi_views.sql` (for example in psql
+  or pgAdmin), then re-run the verification.
 * **Column name differs** → edit the matching `sourceColumn:` line in
   `MAP Dryer AI Dashboard.SemanticModel/definition/tables/*.tmdl`
   (one line per column; the model was written so this is the only place a
@@ -74,7 +76,7 @@ and prints row counts and the latest timestamp.
    change *only* the parameters: *Transform data → Edit parameters* →
    `DB_Server` (format `host:port`) and `DB_Database`.
 3. On first refresh Desktop asks for credentials. Choose **Database**
-   authentication, enter the configured read-only Power BI user and its password.
+   authentication, user `postgres`, and enter the PostgreSQL password.
    **Credentials are stored in Power BI Desktop's encrypted credential store
    on your machine — never in this repository.** Nothing in this folder
    contains the password; do not add it to any committed file.
@@ -83,26 +85,25 @@ and prints row counts and the latest timestamp.
    accepts the connection (`listen_addresses` in `postgresql.conf` and a
    `pg_hba.conf` entry for your client address).
 
-Encryption note: the Python configuration exposes `DB_SSLMODE`; local demos may
-use a permissive local mode, while deployment should use encrypted and verified
-connections where available. TLS has not been qualified by this prototype.
+Encryption note: local development servers usually have SSL disabled; if
+Desktop shows an encryption warning, choose the unencrypted connection for
+`localhost` only.
 
-## Refresh behavior (five-second cadence)
+## Refresh behavior (60-second cadence)
 
 * The model is **pure DirectQuery** — every visual query goes to PostgreSQL,
   so a refresh always returns whatever `realtime_pipeline` last inserted.
-* Both pages carry an **automatic page refresh** configuration of **5 s**,
-  matching `POLL_INTERVAL_SECONDS=5`. To confirm in Desktop: click the page
-  canvas → *Format page → Page refresh* → On, Auto page refresh, 5 seconds.
+* Both pages carry an **automatic page refresh** configuration of **60 s**
+  (matching `REPLAY_INTERVAL_SECONDS=60`). To confirm in Desktop: click the
+  page canvas → *Format page → Page refresh* → On, Auto page refresh,
+  1 minute. Desktop honors this while the report is open.
 * **Manual validation:** *Home → Refresh* (or F5 on the page) after the
   replay service has inserted a new row; the “LAST DATABASE UPDATE” card and
-  the latest event/inference timestamp and trend charts must advance by five
-  seconds.
-* Freshness is computed from `Inference Timestamp`, so a historical event-time
-  replay reports the wall-clock replay/ingest health: **LIVE** (≤2 min),
-  **DELAYED** (≤10 min), **STALE**, or **NO DATA**.
-  This data-status label is separate from process status and never means that
-  the dashboard is connected to a live plant historian.
+  the trend charts must advance by one minute.
+* The header “FEED STATUS” card computes freshness from the latest SQL
+  timestamp: **LIVE** (≤ 3 min, green), **STALE · n min** (amber ≤ 10 min,
+  red beyond), **NO DATA** (gray) — so operators can tell a healthy feed from
+  a stale one regardless of refresh cadence.
 
 ### Publishing to the Power BI Service (optional)
 
@@ -111,18 +112,20 @@ connections where available. TLS has not been qualified by this prototype.
   **on-premises data gateway** installed on a machine that can reach the
   database, with a PostgreSQL data source mapped to the same server/database
   and credentials entered in the gateway configuration.
-* A five-second interval in the Service requires DirectQuery (met) and a
-  dedicated Fabric/Premium/PPU capacity whose administrator permits that
-  minimum. Shared/Pro capacity enforces a 30-minute minimum; this is a service
-  capacity limit, not a report defect.
+* **Automatic page refresh at 60 s in the Service requires DirectQuery (met)
+  and a workspace on Premium/Fabric capacity**; capacity admins can cap the
+  minimum interval. On shared (Pro) capacity the minimum automatic page
+  refresh interval is 30 minutes — a true 60-second cadence in the Service is
+  only available on capacity. This is a Power BI licensing limitation, not a
+  defect of this report.
 
 ## Report contents
 
-**Page 1 — Operations Overview**: header with prototype/replay identity, latest
-DB timestamp and data freshness; six KPI cards (predicted moisture, laboratory
+**Page 1 — Operations Overview**: header with latest DB timestamp + live/stale
+indicator + connection label; six KPI cards (predicted moisture, laboratory
 moisture, absolute error, anomaly score, anomaly status, severity); moisture
-rolling eight-hour trend (dense predictions vs sparse laboratory results,
-anomalous points overlaid in red); current diagnosis context; five process-variable cards
+trend (dense model predictions vs sparse laboratory results, anomalous points
+overlaid in red); current operating assessment; seven process-variable cards
 with engineering units; operator guidance (diagnosis, possible causes,
 recommended verification) with an explicit decision-support disclaimer.
 
@@ -144,15 +147,12 @@ limits). Color is never the only indicator — every state is also shown as text
 ## Known limitations
 
 * Laboratory moisture is sparse; its KPI card shows the **latest non-blank**
-  represented laboratory result, which can be older than the latest prediction.
-* Five seconds is the replay/inference/visualization choice, not a claim about
-  native plant instrumentation or historian sampling.
+  laboratory result, which can be older than the latest prediction.
 * Severity/status vocabularies are those written by `realtime_pipeline`:
   NORMAL, LOW, MEDIUM, HIGH, DATA_QUALITY, UNCLASSIFIED.
-* The moisture band is a documented training-reference band (rounded p10–p90),
-  not an approved product specification or control limit.
+* No moisture target band is drawn: no approved specification limit exists in
+  the repository configuration, and inventing one was explicitly out of scope.
 * DirectQuery disables some DAX/modeling conveniences (no calculated tables);
   all measures were written DirectQuery-safe.
-* `replay_service.py` is a guarded legacy one-minute compatibility path. The
-  supported dashboard writer is `realtime_service.py`; the SQL semantic views
-  exclude unversioned legacy rows without deleting them.
+* `gi.pbix` is the earlier single-page stub; it is superseded by the `.pbip`
+  project but left untouched.

@@ -20,10 +20,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Select an event row to investigate its evidence",
+                    "value": "EXPORT CSV \u2014 open the events table's \u00b7\u00b7\u00b7 menu",
                     "textStyle": {
                       "fontSize": "8pt",
-                      "color": "#5E706A",
+                      "color": "#66756F",
                       "fontWeight": "bold"
                     }
                   }

@@ -30,9 +30,8 @@ Date: 2026-08-05 · Scope: Power BI layer only. No model, feature-engineering,
 
 ## 2. PostgreSQL values discovered from the repository
 
-The current safe example uses `DB_HOST=localhost`, `DB_PORT=5432`,
-`DB_NAME=MAP_DRYER`, and the least-privilege placeholder
-`DB_USER=map_dryer_app`.
+From `realtime_pipeline/.env.example` (no local `.env` exists on this machine):
+`DB_HOST=localhost`, `DB_PORT=5432`, `DB_NAME=MAP_DRYER`, `DB_USER=postgres`.
 These are wired into the model as editable parameters `DB_Server`
 (`localhost:5432`) and `DB_Database` (`MAP_DRYER`). The password is **not**
 stored in any created file (checked below).
@@ -184,8 +183,10 @@ cross-filters; CSV export via the visual menu).
 3. First open in Power BI Desktop will prompt for credentials (expected) and
    may re-serialize files (`lineageTag`s, ordering) — a large first diff after
    “Save” is normal for a hand-authored PBIP.
-4. The final PBIP pages and exported preview PNGs are the canonical dashboard
-   assets; temporary build references are not retained in the archive.
+4. The reference layout PNGs (`dashboard_template_page_1_overview.png`,
+   `dashboard_template_page_2_diagnostics.png`) were not present anywhere on
+   this machine; if pixel-level fidelity to them matters, drop them into the
+   repo and compare against the built pages.
 
 ---
 
@@ -202,7 +203,7 @@ PostgreSQL 17.5 instance.
 
 | Module | Responsibility |
 |---|---|
-| `preprocessing.py` | Canonical CSV → **process table** (Timestamp + 9 process variables on the selected 5-s prototype grid, duplicates removed, gaps reported) and **laboratory table** (one row per sparse represented lab timestamp, configured ~2 h apart) |
+| `preprocessing.py` | Raw CSV → **process table** (Timestamp + 9 process variables, 5-s grid validated, duplicates removed, gaps reported — never invented; optional backward-only short-gap hold, off by default) and **laboratory table** (one row per real analysis, ~2 h apart) |
 | `alignment.py` | **Dashboard alignment**: backward as-of join adding `Latest Lab *`, `Lab Result Age (min)`, `Lab Sample Available` (display only, never training targets). **Training alignment**: one supervised row per real lab sample with feature window ending at `t_lab − residence_time(asof) − transport_delay` |
 | `window_features.py` | 96 aggregated window features (10 stats × 9 variables + 6 derived physical series × 2 + stability index) — same function for training and inference |
 | `instant_features.py` | 15 per-observation features for the anomaly/diagnosis models (no laboratory values needed) |
@@ -233,10 +234,9 @@ Validation-set floor check (moisture): model RMSE 0.0375 vs persistence
 0.1913 and training-mean 0.1269. Per-sample test residuals are stored in
 `training_report.json` (`test_residuals`) for residual-over-time review.
 
-Anomaly detector: One-Class SVM (nu = 0.02) selected — normal validation
-false-positive rate 1.90% and governed injected-scenario detection 97.99%,
-versus Isolation Forest at 0.69% and 23.98%, respectively; the decision
-function is mapped to a 0–1 display risk
+Anomaly detector: One-Class SVM (nu = 0.02) kept — validation flag rate
+3.98 % vs Isolation Forest 2.02 % benchmark (both recorded); decision
+function calibrated to a 0–1 display risk
 (risk = 1/(1+exp(score/scale)), boundary → 0.5, warning 0.5,
 critical 0.8).
 
@@ -249,7 +249,7 @@ explicit transactions, graceful shutdown, per-cycle latency logging with
 a >5 s warning, stale-data announcement, configurable poll interval /
 replay speed / transport delay. Moisture is predicted on every 5-s row
 from the same residence-time-shifted window features used in training;
-prediction error exists only where a sparse represented laboratory value exists
+prediction error exists only where a real laboratory value exists
 (enforced by the views, not recomputed against carried-forward values).
 Timestamps are naive plant-local end-to-end (documented; no TZ
 conversion). Model version, feature-schema version, inference timestamp
@@ -273,11 +273,23 @@ and latency are written with every row.
 * `realtime_pipeline/src/verify_powerbi_views.py` — updated to the real
   four-view TMDL contract.
 
-## 5. Final report pages
+## 5. Report rebuild (template-faithful)
 
-The two canonical 1600×900 PBIR pages are stored directly in the final
-dashboard project. Temporary template images, the one-time page-generation
-utility and the superseded page backup were removed for archival clarity.
+`tools/generate_powerbi_report.py` regenerates both PBIR pages at
+1600×900 against `resources/dashboard_templates/*.png`: dark-green 86-px
+rail with icon tiles, header + LIVE DATA / AUTO 60 SEC / freshness
+pills, six KPI cards with **full-card** measure-driven background and
+text colors, drying-performance trend (predicted line, lab-sample
+markers, dashed target band, anomaly markers, relative time-window
+slicer, four synchronized strips), operating-assessment donut gauge +
+severity pill, five critical-variable tiles (value, Δ, status,
+sparkline, full-card heatmap coloring), operator guidance; page 2:
+filter bar (time/severity/subsystem/status + export note), risk
+timeline with thresholds and event/selected markers, selected-event
+card, ranked-contributor bars colored by variable severity, cause
+analysis with event-signature table, and the full-width events table
+with severity-tinted rows that cross-filters everything. Previous pages
+were backed up to `backup_report_pages_20260806/` before the rewrite.
 
 The old 1280×720 pages and theme are superseded; the theme now carries
 the template palette (#0B3B2E rail, #087C5B green, #1B918E teal,
@@ -321,7 +333,7 @@ resume semantics, risk calibration).
 ## 7. End-to-end demonstration (executed 2026-08-07, local PostgreSQL 17.5)
 
 No PostgreSQL existed on this machine, so a local user-mode instance was
-installed in a local development data directory (PostgreSQL 17.5,
+installed (`C:\Users\hp\AppData\Local\MAP_DRYER_PG`, PostgreSQL 17.5,
 port 5432) and the schema was created from scratch with
 `bootstrap_database.py` — proving the repository now runs from a fresh
 environment. Flow exercised: dashboard CSV → multirate preprocessing →
@@ -337,7 +349,7 @@ of the remaining 54 rows.
 |---|---|
 | Processed rows | 34,560 / 34,560 (full dashboard CSV) |
 | Laboratory observations | 24 (23 validated — the first sample predates sufficient process history) |
-| Anomalous 5-s rows / grouped events | Historical retired-source run; not a current qualification metric |
+| Anomalous 5-s rows / grouped events | 811 / 95 |
 | Contributor rows | 2,660 |
 | Inference latency avg / max | 45.4 ms / 219 ms (smoke test avg 138 ms) |
 | Cycles over the 5-s budget | 0 |

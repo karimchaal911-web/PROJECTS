@@ -1,14 +1,6 @@
-"""Verify live PostgreSQL views against the checked-in Power BI TMDL.
-
-Physical `sourceColumn` names are read directly from the five active semantic
-model tables. This avoids confusing Power BI display names or calculated
-columns with SQL view columns.
-"""
-
 from __future__ import annotations
 
 import os
-import re
 import sys
 from pathlib import Path
 
@@ -16,52 +8,116 @@ import psycopg
 from dotenv import load_dotenv
 
 
-PIPELINE_ROOT = Path(__file__).resolve().parents[1]
-PROJECT_ROOT = PIPELINE_ROOT.parent
-ENV_FILE = PIPELINE_ROOT / ".env"
-TMDL_DIR = (
-    PROJECT_ROOT
-    / "POWERBI DASHBOARD"
-    / "MAP Dryer AI Dashboard.SemanticModel"
-    / "definition"
-    / "tables"
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+ENV_FILE = PROJECT_ROOT / ".env"
+
 load_dotenv(ENV_FILE)
 
-VIEW_CONTRACTS = {
-    "vw_dryer_dashboard_powerbi": {
-        "tmdl": "vw_dryer_dashboard_powerbi.tmdl",
-        "timestamp": "Timestamp",
-        "must_have_rows": True,
-    },
-    "vw_dryer_contributors_powerbi": {
-        "tmdl": "vw_dryer_contributors_powerbi.tmdl",
-        "timestamp": "Timestamp",
-        "must_have_rows": False,
-    },
-    "vw_dryer_lab_samples": {
-        "tmdl": "vw_dryer_lab_samples.tmdl",
-        "timestamp": "Sample Timestamp",
-        "must_have_rows": True,
-    },
-    "vw_dryer_anomaly_events": {
-        "tmdl": "vw_dryer_anomaly_events.tmdl",
-        "timestamp": "Event Start",
-        "must_have_rows": False,
-    },
-    "vw_dryer_overview_trends_powerbi": {
-        "tmdl": "vw_dryer_overview_trends_powerbi.tmdl",
-        "timestamp": "Timestamp",
-        "must_have_rows": True,
-    },
+
+DASHBOARD_VIEW = "vw_dryer_dashboard_powerbi"
+CONTRIBUTORS_VIEW = "vw_dryer_contributors_powerbi"
+LAB_SAMPLES_VIEW = "vw_dryer_lab_samples"
+EVENTS_VIEW = "vw_dryer_anomaly_events"
+
+
+# The exact column names the Power BI semantic model expects. Each entry maps
+# to a `sourceColumn:` line in
+# "POWERBI DASHBOARD/MAP Dryer AI Dashboard.SemanticModel/definition/tables".
+# Note the historical trailing space in "Air Flow Rate ".
+EXPECTED_COLUMNS: dict[str, list[str]] = {
+    DASHBOARD_VIEW: [
+        "Timestamp",
+        "Predicted Final Moisture",
+        "Final Moisture (%H2O)",
+        "Anomaly Score",
+        "Anomaly Detected",
+        "Severity",
+        "Likely Subsystem",
+        "Probable Diagnosis",
+        "Possible Causes",
+        "Recommended Verification",
+        "Dryer Air Temperature",
+        "Cooler Air Temperature",
+        "Air Flow Rate ",
+        "Wet Product Feed Rate",
+        "Product Inlet Temperature",
+        "Residence Time",
+        "Vacuum",
+        "Steam Pressure",
+        "Fan Speed",
+        "Product Density",
+        "Final Product Temp",
+        "Anomaly Risk",
+        "Model Version",
+        "Feature Schema Version",
+        "Inference Timestamp",
+        "Inference Latency Ms",
+        "Latest Lab Sample Timestamp",
+        "Latest Lab Product Density",
+        "Latest Lab Final Product Temp",
+        "Latest Lab Final Moisture",
+        "Lab Result Age Min",
+        "Lab Sample Available",
+        "Is Lab Sample",
+        "Validated Moisture Error",
+        "Validated Absolute Error",
+    ],
+    CONTRIBUTORS_VIEW: [
+        "Timestamp",
+        "contribution_rank",
+        "feature_name",
+        "observed_value",
+        "signed_deviation",
+        "deviation_percent",
+        "contribution_score",
+        "deviation_direction",
+        "variable_severity",
+    ],
+    LAB_SAMPLES_VIEW: [
+        "Sample Timestamp",
+        "Product Density",
+        "Final Product Temp",
+        "Laboratory Moisture",
+        "Predicted Moisture At Sample",
+        "Validated Error",
+        "Validated Absolute Error",
+        "Previous Sample Timestamp",
+    ],
+    EVENTS_VIEW: [
+        "Event ID",
+        "Event Start",
+        "Event End",
+        "Duration Min",
+        "Rows In Event",
+        "Peak Timestamp",
+        "Peak Anomaly Score",
+        "Peak Anomaly Risk",
+        "Severity",
+        "Subsystem",
+        "Diagnosis",
+        "Possible Causes",
+        "Recommended Verification",
+        "Predicted Moisture At Peak",
+    ],
 }
-SOURCE_COLUMN_PATTERN = re.compile(r"^\s*sourceColumn:\s*(.+?)\s*$")
+
+# Views without their own Timestamp column use these for the freshness probe.
+TIMESTAMP_COLUMN: dict[str, str] = {
+    DASHBOARD_VIEW: "Timestamp",
+    CONTRIBUTORS_VIEW: "Timestamp",
+    LAB_SAMPLES_VIEW: "Sample Timestamp",
+    EVENTS_VIEW: "Peak Timestamp",
+}
 
 
 def require_environment_variable(name: str) -> str:
     value = os.getenv(name)
+
     if value is None or not value.strip():
-        raise RuntimeError(f"Missing required environment variable: {name}")
+        raise RuntimeError(
+            f"Missing required environment variable: {name}"
+        )
+
     return value.strip()
 
 
@@ -75,30 +131,16 @@ def build_connection_string() -> str:
     )
 
 
-def expected_source_columns(tmdl_name: str) -> list[str]:
-    path = TMDL_DIR / tmdl_name
-    columns: list[str] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        match = SOURCE_COLUMN_PATTERN.match(line)
-        if not match:
-            continue
-        value = match.group(1)
-        if value.startswith('"') and value.endswith('"'):
-            value = value[1:-1]
-        columns.append(value)
-    if not columns:
-        raise RuntimeError(f"No sourceColumn entries found in {path}")
-    return columns
-
-
 def fetch_view_columns(
-    cursor: psycopg.Cursor, view_name: str
+    cursor: psycopg.Cursor,
+    view_name: str,
 ) -> list[tuple[str, str]]:
     cursor.execute(
         """
         SELECT column_name, data_type
         FROM information_schema.columns
-        WHERE table_schema = 'public' AND table_name = %s
+        WHERE table_schema = 'public'
+          AND table_name = %s
         ORDER BY ordinal_position;
         """,
         (view_name,),
@@ -106,76 +148,117 @@ def fetch_view_columns(
     return [(row[0], row[1]) for row in cursor.fetchall()]
 
 
-def report_view(
-    cursor: psycopg.Cursor,
-    view_name: str,
-    contract: dict[str, object],
-) -> bool:
+def report_view(cursor: psycopg.Cursor, view_name: str) -> bool:
     print(f"\n{'=' * 72}\nVIEW public.{view_name}\n{'=' * 72}")
-    cursor.execute("SELECT to_regclass(%s);", (f"public.{view_name}",))
-    if cursor.fetchone()[0] is None:
-        print("MISSING - apply POWERBI DASHBOARD/sql/upgrade_5s_schema.sql")
+
+    cursor.execute(
+        "SELECT to_regclass(%s);",
+        (f"public.{view_name}",),
+    )
+    exists = cursor.fetchone()[0] is not None
+
+    if not exists:
+        print(
+            "MISSING - the view does not exist. Create the full schema "
+            "with\npython realtime_pipeline/src/bootstrap_database.py"
+        )
         return False
 
     actual = fetch_view_columns(cursor, view_name)
     actual_names = [name for name, _ in actual]
-    expected_names = expected_source_columns(str(contract["tmdl"]))
+    expected_names = EXPECTED_COLUMNS[view_name]
+
+    print(f"{'COLUMN':<32} {'TYPE':<26} STATUS")
+    for name, data_type in actual:
+        status = "MATCH" if name in expected_names else "EXTRA (unused)"
+        print(f"{name!r:<32} {data_type:<26} {status}")
+
     missing = [name for name in expected_names if name not in actual_names]
-    print(f"TMDL physical columns: {len(expected_names)}")
-    print(f"SQL view columns:      {len(actual_names)}")
+    all_match = not missing
+
     if missing:
-        print("MISSING physical sourceColumn values:")
+        print("\nMISSING columns expected by the semantic model:")
         for name in missing:
             print(f"  {name!r}")
-    else:
-        print("Column contract: PASS")
+        print(
+            "\nFix: either extend the view, or edit the matching "
+            "'sourceColumn:' line in the .SemanticModel table TMDL files "
+            "to the actual physical name."
+        )
 
-    timestamp_column = str(contract["timestamp"])
+    timestamp_column = TIMESTAMP_COLUMN[view_name]
     cursor.execute(
         f'SELECT COUNT(*), MAX("{timestamp_column}") '
         f'FROM public."{view_name}";'
+        if timestamp_column in actual_names
+        else f'SELECT COUNT(*), NULL FROM public."{view_name}";'
     )
     row_count, latest = cursor.fetchone()
-    print(f"Rows: {row_count:,}")
+    print(f"\nRows: {row_count:,}")
     print(f"Latest timestamp: {latest or 'NO DATA'}")
-    row_requirement = (not bool(contract["must_have_rows"])) or row_count > 0
-    if not row_requirement:
-        print("Row requirement: FAIL (this semantic table must be populated)")
-    elif row_count == 0:
-        print("Row requirement: PASS (empty event/evidence table is allowed)")
-    else:
-        print("Row requirement: PASS")
-    return not missing and row_requirement
+
+    # Contributor and event views are legitimately empty while the process
+    # stays normal; only the dashboard/lab views must contain data.
+    may_be_empty = view_name in (CONTRIBUTORS_VIEW, EVENTS_VIEW)
+    if row_count == 0:
+        print(
+            "NOTE - the view returns no rows."
+            + (
+                " That is expected when no anomaly has occurred."
+                if may_be_empty
+                else " Start realtime_pipeline/src/realtime_service.py "
+                "to populate it."
+            )
+        )
+
+    return all_match and (row_count > 0 or may_be_empty)
 
 
 def main() -> None:
-    with psycopg.connect(build_connection_string(), connect_timeout=10) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT current_database(), current_user;")
-            database_name, user_name = cursor.fetchone()
-            print("PostgreSQL connection: SUCCESS")
-            print(f"Database: {database_name}")
-            print(f"User: {user_name}")
-            outcomes = {
-                view_name: report_view(cursor, view_name, contract)
-                for view_name, contract in VIEW_CONTRACTS.items()
-            }
+    connection_string = build_connection_string()
 
-    print(f"\n{'=' * 72}")
-    if all(outcomes.values()):
-        print(
-            "RESULT: all five PostgreSQL views match the checked-in Power BI "
-            "physical source-column contract."
-        )
-        return
-    print("RESULT: Power BI backend contract FAILED.")
-    sys.exit(2)
-
-
-if __name__ == "__main__":
     try:
-        main()
+        with psycopg.connect(
+            connection_string,
+            connect_timeout=10,
+        ) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT current_database(), current_user;"
+                )
+                database_name, user_name = cursor.fetchone()
+                print("PostgreSQL connection: SUCCESS")
+                print(f"Database: {database_name}")
+                print(f"User: {user_name}")
+
+                results = [
+                    report_view(cursor, view_name)
+                    for view_name in (
+                        DASHBOARD_VIEW,
+                        CONTRIBUTORS_VIEW,
+                        LAB_SAMPLES_VIEW,
+                        EVENTS_VIEW,
+                    )
+                ]
+
+        print(f"\n{'=' * 72}")
+        if all(results):
+            print(
+                "RESULT: all four views match the Power BI semantic model "
+                "contract. The .pbip can connect as-is."
+            )
+        else:
+            print(
+                "RESULT: at least one view is missing, empty, or renamed. "
+                "Resolve the findings above before opening the .pbip."
+            )
+            sys.exit(2)
+
     except psycopg.OperationalError as error:
         print("PostgreSQL connection: FAILED", file=sys.stderr)
         print(error, file=sys.stderr)
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

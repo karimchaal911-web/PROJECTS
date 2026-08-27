@@ -20,10 +20,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Diagnostic evidence only — verify in the field before operational action.",
+                    "value": "Diagnostic evidence only \u2014 verify in the field before operational action.",
                     "textStyle": {
                       "fontSize": "7pt",
-                      "color": "#5E706A"
+                      "color": "#66756F"
                     }
                   }
                 ]

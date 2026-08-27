@@ -1,41 +1,41 @@
 {
   "name": "OCPIndustrialTheme.json",
   "dataColors": [
-    "#0F766E",
-    "#0D9488",
-    "#D98E04",
-    "#D64545",
-    "#063D34",
-    "#5E706A",
+    "#087C5B",
+    "#1B918E",
+    "#F2A12E",
+    "#DF5558",
+    "#0B3B2E",
+    "#66756F",
     "#8FBCAD",
-    "#D64545"
+    "#C83F45"
   ],
   "background": "#FFFFFF",
   "foreground": "#17231F",
-  "tableAccent": "#0F766E",
-  "good": "#0F766E",
-  "neutral": "#D98E04",
-  "bad": "#D64545",
+  "tableAccent": "#087C5B",
+  "good": "#087C5B",
+  "neutral": "#F2A12E",
+  "bad": "#C83F45",
   "textClasses": {
     "callout": {
-      "fontSize": 24,
+      "fontSize": 22,
       "fontFace": "Segoe UI",
       "color": "#17231F"
     },
     "title": {
-      "fontSize": 13,
+      "fontSize": 12,
       "fontFace": "Segoe UI Semibold",
       "color": "#17231F"
     },
     "header": {
       "fontSize": 10,
       "fontFace": "Segoe UI",
-      "color": "#5E706A"
+      "color": "#66756F"
     },
     "label": {
-      "fontSize": 10,
+      "fontSize": 9,
       "fontFace": "Segoe UI",
-      "color": "#5E706A"
+      "color": "#66756F"
     }
   },
   "visualStyles": {
@@ -57,10 +57,10 @@
             "show": true,
             "color": {
               "solid": {
-                "color": "#D6E2DD"
+                "color": "#D6E0DC"
               }
             },
-            "radius": 10
+            "radius": 16
           }
         ],
         "dropShadow": [
@@ -79,7 +79,7 @@
           {
             "color": {
               "solid": {
-                "color": "#F4F7F5"
+                "color": "#F3F6F4"
               }
             },
             "transparency": 0

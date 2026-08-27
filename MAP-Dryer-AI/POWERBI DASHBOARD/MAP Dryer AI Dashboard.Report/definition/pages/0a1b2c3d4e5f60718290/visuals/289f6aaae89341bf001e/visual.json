@@ -1,16 +1,17 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
   "name": "289f6aaae89341bf001e",
   "position": {
-    "x": 1079.5566502463055,
-    "y": 251.60098522167488,
-    "z": 2400,
-    "height": 31.034482758620687,
-    "width": 322.53694581280786,
-    "tabOrder": 2400
+    "x": 1080,
+    "y": 252,
+    "z": 3800,
+    "height": 18,
+    "width": 320,
+    "tabOrder": 3800
   },
   "visual": {
     "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -19,10 +20,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Latest explainable inference and validation context",
+                    "value": "AI inference from the latest process observation",
                     "textStyle": {
                       "fontSize": "8pt",
-                      "color": "#5e706a"
+                      "color": "#66756F"
                     }
                   }
                 ]
@@ -85,7 +86,6 @@
           }
         }
       ]
-    },
-    "drillFilterOtherVisuals": true
+    }
   }
 }

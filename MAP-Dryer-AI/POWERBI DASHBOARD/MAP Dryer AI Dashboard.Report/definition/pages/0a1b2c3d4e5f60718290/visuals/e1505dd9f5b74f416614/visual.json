@@ -3,11 +3,11 @@
   "name": "e1505dd9f5b74f416614",
   "position": {
     "x": 862,
-    "y": 750,
-    "z": 3800,
-    "height": 106,
+    "y": 778,
+    "z": 6100,
+    "height": 78,
     "width": 172,
-    "tabOrder": 3800
+    "tabOrder": 6100
   },
   "visual": {
     "visualType": "lineChart",
@@ -21,13 +21,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_overview_trends_powerbi"
+                      "Entity": "vw_dryer_dashboard_powerbi"
                     }
                   },
                   "Property": "Timestamp"
                 }
               },
-              "queryRef": "vw_dryer_overview_trends_powerbi.Timestamp",
+              "queryRef": "vw_dryer_dashboard_powerbi.Timestamp",
               "nativeQueryRef": "Timestamp",
               "active": true
             }
@@ -40,14 +40,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_overview_trends_powerbi"
+                      "Entity": "vw_dryer_dashboard_powerbi"
                     }
                   },
-                  "Property": "Overview Vacuum"
+                  "Property": "Vacuum (Trend)"
                 }
               },
-              "queryRef": "vw_dryer_overview_trends_powerbi.Overview Vacuum",
-              "nativeQueryRef": "Overview Vacuum"
+              "queryRef": "vw_dryer_dashboard_powerbi.Vacuum (Trend)",
+              "nativeQueryRef": "Vacuum (Trend)"
             }
           ]
         }
@@ -59,7 +59,7 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "vw_dryer_overview_trends_powerbi"
+                    "Entity": "vw_dryer_dashboard_powerbi"
                   }
                 },
                 "Property": "Timestamp"
@@ -127,7 +127,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#0F766E'"
+                      "Value": "'#087C5B'"
                     }
                   }
                 }
@@ -135,7 +135,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_overview_trends_powerbi.Overview Vacuum"
+            "metadata": "vw_dryer_dashboard_powerbi.Vacuum (Trend)"
           }
         }
       ],
@@ -161,7 +161,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
@@ -199,7 +199,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5E706A'"
+                      "Value": "'#66756F'"
                     }
                   }
                 }
