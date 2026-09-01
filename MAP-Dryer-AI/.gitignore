@@ -15,12 +15,15 @@ venv/
 /tmp/
 
 # --- data ---------------------------------------------------------------
-# The 92-day canonical CSV, its raw copy and the held-out replay stay local:
-# together they are roughly 500 MB and are reproducible from the supplied
-# source. The compact manifest and the Notebook 02 handoff stay visible so the
-# modelling notebooks and the runtime contract can be rerun from a clone.
+# The expanded 92-day CSVs (235 MB each) and the held-out replay stay local.
+# The canonical dataset is user-supplied and deterministic - nothing in this
+# repository regenerates it - so it is versioned as an XZ archive instead, and
+# restored by tools/restore_canonical_dataset.py. The compact manifest and the
+# Notebook 02 handoff stay visible so the modelling notebooks and the runtime
+# contract can be rerun from a clone.
 /data/raw/*
 /data/processed/*
+!/data/raw/MAP_Dryer_Canonical_5s_deterministic.csv.xz
 !/data/processed/MAP_Dryer_Canonical_5s.manifest.json
 !/data/processed/MAP_Dryer_Lab_Aligned_16.csv
 
@@ -69,15 +72,15 @@ Thumbs.db
 **/.pbi/cache.abf
 **/*.pbix.bak
 
-# --- final_presentation_claude (soutenance build) -----------------------
+# --- final_presentation (soutenance build) -----------------------
 # Build output, dependencies, video render frames and transient capture
 # rounds are reproducible from web/ and data_build/.
-final_presentation_claude/web/node_modules/
-final_presentation_claude/web/dist/
-final_presentation_claude/exports/video/
-final_presentation_claude/exports/offline_check/
-final_presentation_claude/*.mp4
+final_presentation/web/node_modules/
+final_presentation/web/dist/
+final_presentation/exports/video/
+final_presentation/exports/offline_check/
+final_presentation/*.mp4
 
-# Transfer archive is reproducible from final_presentation_claude/ and exceeds
+# Transfer archive is reproducible from final_presentation/ and exceeds
 # the practical size of a normal Git source commit.
 /FINAL_MAP_Soluble_Digitalization_Soutenance_DELIVERY.zip

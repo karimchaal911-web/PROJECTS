@@ -57,7 +57,7 @@ DASHBOARD_AUDIT = (
 EVIDENCE_DIR = ROOT / "final_report" / "evidence"
 FIGURE_DIR = ROOT / "final_report" / "figures" / "plots"
 SCREENSHOT_DIR = ROOT / "final_report" / "figures" / "screenshots"
-FINAL_DASHBOARD_IMAGE_DIR = ROOT / "final_presentation_claude" / "web" / "public" / "img"
+FINAL_DASHBOARD_IMAGE_DIR = ROOT / "final_presentation" / "web" / "public" / "img"
 METRICS_PATH = EVIDENCE_DIR / "report_enhancement_metrics.json"
 FEATURE_AUDIT_PATH = EVIDENCE_DIR / "feature_unit_audit.csv"
 

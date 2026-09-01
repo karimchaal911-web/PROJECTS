@@ -1,6 +1,6 @@
 """Apply the 5-second schema upgrade to the MAP_DRYER database.
 
-Runs ``POWERBI DASHBOARD/sql/upgrade_5s_schema.sql`` statement by statement
+Runs ``powerbi_dashboard/sql/upgrade_5s_schema.sql`` statement by statement
 inside one transaction, using the same .env credential handling as the
 other pipeline scripts. Idempotent — rerunning is safe.
 """
@@ -18,7 +18,7 @@ PIPELINE_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = PIPELINE_ROOT.parent
 ENV_PATH = PIPELINE_ROOT / ".env"
 MIGRATION_SQL = (
-    PROJECT_ROOT / "POWERBI DASHBOARD" / "sql" / "upgrade_5s_schema.sql"
+    PROJECT_ROOT / "powerbi_dashboard" / "sql" / "upgrade_5s_schema.sql"
 )
 
 load_dotenv(ENV_PATH)

@@ -5,8 +5,8 @@ report queries (DirectQuery), and every color/status rule replicates the
 DAX measures in the semantic model 1:1. Nothing is fabricated: run the
 pipeline first, then this script.
 
-Output:  POWERBI DASHBOARD/preview/preview_page1_overview.html
-         POWERBI DASHBOARD/preview/preview_page2_diagnostics.html
+Output:  powerbi_dashboard/preview/preview_page1_overview.html
+         powerbi_dashboard/preview/preview_page2_diagnostics.html
 
 These are layout previews for visual comparison against
 ``resources/dashboard_templates/*.png`` — the authoritative report is the
@@ -31,7 +31,7 @@ from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(PROJECT_ROOT / "realtime_pipeline" / ".env")
 
-OUT_DIR = PROJECT_ROOT / "POWERBI DASHBOARD" / "preview"
+OUT_DIR = PROJECT_ROOT / "powerbi_dashboard" / "preview"
 
 # Palette — identical to tools/generate_powerbi_report.py and the TMDL
 # color measures.

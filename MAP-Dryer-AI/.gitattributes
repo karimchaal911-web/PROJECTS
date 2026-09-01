@@ -16,6 +16,7 @@ artifacts/*.json                    -text
 data/processed/*.manifest.json      -text
 
 # Serialised estimators and captured media are binary.
+*.xz      binary
 *.joblib  binary
 *.pkl     binary
 *.pbix    binary

@@ -1,0 +1,1679 @@
+/// Main Power BI process view: one row per observation timestamp with process
+/// measurements, model outputs, anomaly metadata and operator guidance.
+/// Written by realtime_pipeline into PostgreSQL; Power BI only reads it.
+table vw_dryer_dashboard_powerbi
+	lineageTag: e7f6bb4d-d16d-4ae9-8da4-c7bafa6ede0e
+
+	/// ============================================================
+	/// 01 Freshness
+	/// ============================================================
+	measure 'Latest Timestamp' = MAX ( 'vw_dryer_latest'[Timestamp] )
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 01 Freshness
+		lineageTag: 0f6c95e2-d8b8-46b7-bbcd-26e53178a5d1
+
+	measure 'Data Freshness Minutes' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    BLANK (),
+			    DATEDIFF ( [Latest Timestamp], NOW (), MINUTE )
+			)
+		formatString: 0
+		displayFolder: 01 Freshness
+		lineageTag: 08c76854-245f-4b62-886c-87ccc01dbb06
+
+	measure 'Data Freshness Label' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    "NO DATA",
+			    IF (
+			        [Data Freshness Minutes] <= 3,
+			        "LIVE",
+			        "STALE · " & [Data Freshness Minutes] & " min"
+			    )
+			)
+		displayFolder: 01 Freshness
+		lineageTag: 70cee28e-afdf-41b4-93c0-fc18e2708c34
+
+	measure 'Data Freshness Color' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    "#8A9299",
+			    IF (
+			        [Data Freshness Minutes] <= 3,
+			        "#00843D",
+			        IF ( [Data Freshness Minutes] <= 10, "#E8A013", "#C8102E" )
+			    )
+			)
+		displayFolder: 01 Freshness
+		lineageTag: 8f9935d3-fb7d-4e54-b3de-1700d0b7723c
+
+	measure 'Refresh Cadence Label' = "DirectQuery · automatic page refresh 5 s"
+		displayFolder: 01 Freshness
+		lineageTag: b63f16dd-8fa0-4806-b08e-33fa114697a8
+
+	measure 'Last Update Display' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    "—",
+			    FORMAT ( [Latest Timestamp], "yyyy-mm-dd hh:nn" )
+			)
+		displayFolder: 01 Freshness
+		lineageTag: fbab48b1-35db-44b6-9716-d209be9896d2
+
+	/// ============================================================
+	/// 02 Latest KPIs
+	/// ============================================================
+	measure 'Latest Predicted Moisture' = MAX ( 'vw_dryer_latest'[Predicted Moisture] )
+		formatString: 0.000000
+		displayFolder: 02 Latest KPIs
+		lineageTag: 4a8b30a1-9888-4f70-897c-792be11d632f
+
+	measure 'Latest Predicted Moisture Display' =
+			IF (
+			    ISBLANK ( [Latest Predicted Moisture] ),
+			    "—",
+			    FORMAT ( [Latest Predicted Moisture], "0.0000" ) & " % H2O"
+			)
+		displayFolder: 02 Latest KPIs
+		lineageTag: 91b1ceb2-d402-40e7-b975-652fe2d85052
+
+	measure 'Latest Laboratory Moisture' = MAX ( 'vw_dryer_latest'[Latest Lab Final Moisture] )
+		formatString: 0.0000
+		displayFolder: 02 Latest KPIs
+		lineageTag: 6d1ad5c1-6726-4f9d-9626-d3e05470faba
+
+	measure 'Latest Laboratory Moisture Timestamp' = MAX ( 'vw_dryer_latest'[Latest Lab Sample Timestamp] )
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 02 Latest KPIs
+		lineageTag: e23734ba-42db-4956-9335-4e86f8a6bcc7
+
+	measure 'Latest Laboratory Moisture Display' =
+			IF (
+			    ISBLANK ( [Latest Laboratory Moisture] ),
+			    "—",
+			    FORMAT ( [Latest Laboratory Moisture], "0.0000" ) & " % H2O"
+			)
+		displayFolder: 02 Latest KPIs
+		lineageTag: 22468c10-3e44-47de-b429-2d37eaf6ae82
+
+	measure 'Latest Moisture Error' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Moisture Error] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: +0.0000;-0.0000;0.0000
+		displayFolder: 02 Latest KPIs
+		lineageTag: c6443a95-5ffc-4351-96e3-bd1b8bc56842
+
+	measure 'Latest Moisture Error Display' =
+			IF (
+			    ISBLANK ( [Latest Moisture Error] ),
+			    "—",
+			    FORMAT ( [Latest Moisture Error], "+0.0000;-0.0000;0.0000" ) & " % H2O"
+			)
+		displayFolder: 02 Latest KPIs
+		lineageTag: a37a3cd1-e0f7-402d-8a45-55aa27f48826
+
+	measure 'Latest Absolute Moisture Error' =
+			VAR LatestTs = [Latest Timestamp]
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Absolute Moisture Error] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = LatestTs
+			    )
+		formatString: 0.0000
+		displayFolder: 02 Latest KPIs
+		lineageTag: 9bcbb071-2bdd-47c3-b34e-beb581cc1bc5
+
+	measure 'Latest Absolute Moisture Error Display' =
+			IF (
+			    ISBLANK ( [Latest Absolute Moisture Error] ),
+			    "—",
+			    FORMAT ( [Latest Absolute Moisture Error], "0.0000" ) & " % H2O"
+			)
+		displayFolder: 02 Latest KPIs
+		lineageTag: 68e3ac26-7784-4763-ad1d-6039287bbbd4
+
+	measure 'Latest Anomaly Score' = MAX ( 'vw_dryer_latest'[Anomaly Score] )
+		formatString: 0.000000
+		displayFolder: 02 Latest KPIs
+		lineageTag: 4cdb5bec-2edc-4b58-9b07-b39960a60a78
+
+	measure 'Latest Anomaly Score Display' =
+			IF (
+			    ISBLANK ( [Latest Anomaly Score] ),
+			    "—",
+			    FORMAT ( [Latest Anomaly Score], "0.000000" )
+			)
+		displayFolder: 02 Latest KPIs
+		lineageTag: ffa52fcf-eb3b-4707-9707-c0d874b5f0da
+
+	measure 'Latest Anomaly Status' =
+			VAR Result = SELECTEDVALUE ( 'vw_dryer_latest'[Anomaly Detected] )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", IF ( Result, "ANOMALY", "NORMAL" ) )
+		displayFolder: 02 Latest KPIs
+		lineageTag: 2c5c1b1a-3369-4b2b-b2d7-c016bd5ecf95
+
+	measure 'Latest Severity' =
+			VAR Result = SELECTEDVALUE ( 'vw_dryer_latest'[Severity] )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 02 Latest KPIs
+		lineageTag: 7f54a6f7-4137-44bc-b70b-ed75e568e5f6
+
+	/// ============================================================
+	/// 03 Diagnosis (latest event, operator guidance)
+	/// ============================================================
+	measure 'Latest Subsystem' =
+			VAR Result = SELECTEDVALUE ( 'vw_dryer_latest'[Subsystem] )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 03 Diagnosis
+		lineageTag: c03133b5-3008-4bcc-80b2-d1314437a772
+
+	measure 'Latest Diagnosis' =
+			VAR Result = SELECTEDVALUE ( 'vw_dryer_latest'[Diagnosis] )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 03 Diagnosis
+		lineageTag: c59e2b1a-c936-4204-a314-dbde4abc2099
+
+	measure 'Latest Possible Causes' =
+			VAR Result = SELECTEDVALUE ( 'vw_dryer_latest'[Possible Causes] )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 03 Diagnosis
+		lineageTag: 6b4b7fe8-68b5-4f0c-94b9-4e1a78e3ebc5
+
+	measure 'Latest Recommended Verification' =
+			VAR Result = SELECTEDVALUE ( 'vw_dryer_latest'[Recommended Verification] )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 03 Diagnosis
+		lineageTag: 9782fe40-370b-496c-872c-7cb3d0eb0726
+
+	/// ============================================================
+	/// 04 Process Variables (latest observation)
+	/// ============================================================
+	measure 'Latest Dryer Air Temperature' = MAX ( 'vw_dryer_latest'[Dryer Air Temperature] )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+		lineageTag: d8c621be-d899-4d8c-9e36-3c30c26649b5
+
+	measure 'Latest Dryer Air Temperature Display' =
+			IF (
+			    ISBLANK ( [Latest Dryer Air Temperature] ),
+			    "—",
+			    FORMAT ( [Latest Dryer Air Temperature], "0.0" ) & " °C"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: d8d6b94b-ec61-466a-8421-1d0107ea56f9
+
+	measure 'Latest Cooler Air Temperature' = MAX ( 'vw_dryer_latest'[Cooler Air Temperature] )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+		lineageTag: b297a6e1-108a-4a13-b322-a7b104f38aae
+
+	measure 'Latest Cooler Air Temperature Display' =
+			IF (
+			    ISBLANK ( [Latest Cooler Air Temperature] ),
+			    "—",
+			    FORMAT ( [Latest Cooler Air Temperature], "0.0" ) & " °C"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: b828eb96-2955-422d-bb42-fc658591ed85
+
+	measure 'Latest Air Flow Rate' = MAX ( 'vw_dryer_latest'[Air Flow Rate] )
+		formatString: #,0
+		displayFolder: 04 Process Variables
+		lineageTag: 8a5bad2c-4bcf-4f25-8064-58f257f37d82
+
+	measure 'Latest Air Flow Rate Display' =
+			IF (
+			    ISBLANK ( [Latest Air Flow Rate] ),
+			    "—",
+			    FORMAT ( [Latest Air Flow Rate], "#,0" ) & " m³/h"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: 60e1e03c-3e06-4b7c-9a43-44e410997832
+
+	measure 'Latest Wet Product Feed Rate' = MAX ( 'vw_dryer_latest'[Wet Product Feed Rate] )
+		formatString: 0.00
+		displayFolder: 04 Process Variables
+		lineageTag: 2fb1ee31-18cd-4e99-8a84-b55e7257748a
+
+	measure 'Latest Wet Product Feed Rate Display' =
+			IF (
+			    ISBLANK ( [Latest Wet Product Feed Rate] ),
+			    "—",
+			    FORMAT ( [Latest Wet Product Feed Rate], "0.00" ) & " m³/h"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: 3eb05fa7-da74-4dfc-ba74-7b4de8881483
+
+	measure 'Latest Product Inlet Temperature' = MAX ( 'vw_dryer_latest'[Product Inlet Temperature] )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+		lineageTag: dd47260c-dac4-4822-86c8-973d4469ae05
+
+	measure 'Latest Product Inlet Temperature Display' =
+			IF (
+			    ISBLANK ( [Latest Product Inlet Temperature] ),
+			    "—",
+			    FORMAT ( [Latest Product Inlet Temperature], "0.0" ) & " °C"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: f8578095-5983-4853-b1bc-8bc4bd8315b0
+
+	measure 'Latest Residence Time' = MAX ( 'vw_dryer_latest'[Residence Time] )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+		lineageTag: b9a2706b-94dd-4d31-8dc5-b9b527263db3
+
+	measure 'Latest Residence Time Display' =
+			IF (
+			    ISBLANK ( [Latest Residence Time] ),
+			    "—",
+			    FORMAT ( [Latest Residence Time], "0.0" ) & " min"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: 2d479183-2407-44fa-81d6-ad746d90e036
+
+	measure 'Latest Vacuum' = MAX ( 'vw_dryer_latest'[Vacuum] )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+		lineageTag: 073c1eb5-f4e4-4967-9597-534e6f51f1b1
+
+	measure 'Latest Vacuum Display' =
+			IF (
+			    ISBLANK ( [Latest Vacuum] ),
+			    "—",
+			    FORMAT ( [Latest Vacuum], "0.0" ) & " mmH2O"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: 948bfc7b-1d86-4730-a381-8f155d0b4644
+
+	measure 'Latest Steam Pressure' = MAX ( 'vw_dryer_latest'[Steam Pressure] )
+		formatString: 0.00
+		displayFolder: 04 Process Variables
+		lineageTag: c25007be-3f5e-4688-9998-a3f581dfce23
+
+	measure 'Latest Steam Pressure Display' =
+			IF (
+			    ISBLANK ( [Latest Steam Pressure] ),
+			    "—",
+			    FORMAT ( [Latest Steam Pressure], "0.00" ) & " bar"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: cb39aa17-ff34-462f-9da9-fb8b55140f9b
+
+	measure 'Latest Fan Speed' = MAX ( 'vw_dryer_latest'[Fan Speed] )
+		formatString: #,0
+		displayFolder: 04 Process Variables
+		lineageTag: 753b8add-ccc5-4f1c-8bd2-6494fd1121a7
+
+	measure 'Latest Fan Speed Display' =
+			IF (
+			    ISBLANK ( [Latest Fan Speed] ),
+			    "—",
+			    FORMAT ( [Latest Fan Speed], "#,0" ) & " rpm"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: 9ecf21a0-453f-41fd-88d1-b93348800855
+
+	measure 'Latest Product Density' = MAX ( 'vw_dryer_latest'[Product Density] )
+		formatString: 0.000
+		displayFolder: 04 Process Variables
+		lineageTag: 665e5041-848e-4a80-b963-e19954b80de1
+
+	measure 'Latest Product Density Display' =
+			IF (
+			    ISBLANK ( [Latest Product Density] ),
+			    "—",
+			    FORMAT ( [Latest Product Density], "0.000" ) & " kg/L"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: e57ff3b3-f4a3-4167-bc7e-7cf7bbbcd9b7
+
+	measure 'Latest Final Product Temperature' = MAX ( 'vw_dryer_latest'[Final Product Temperature] )
+		formatString: 0.0
+		displayFolder: 04 Process Variables
+		lineageTag: 6bb05b32-80d6-40b6-92f5-87f1ee6ce759
+
+	measure 'Latest Final Product Temperature Display' =
+			IF (
+			    ISBLANK ( [Latest Final Product Temperature] ),
+			    "—",
+			    FORMAT ( [Latest Final Product Temperature], "0.0" ) & " °C"
+			)
+		displayFolder: 04 Process Variables
+		lineageTag: da5da0c9-35d0-4d18-a65a-6489c8831d1d
+
+	/// ============================================================
+	/// 05 State Colors (dynamic formatting; hex strings consumed by
+	/// "Field value" conditional formatting on cards and charts)
+	/// ============================================================
+	measure 'Severity Color' =
+			SWITCH (
+			    UPPER ( [Latest Severity] ),
+			    "NORMAL", "#00843D",
+			    "LOW", "#E8A013",
+			    "MEDIUM", "#E8A013",
+			    "HIGH", "#C8102E",
+			    "CRITICAL", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 05 State Colors
+		lineageTag: b7195dbe-44e6-481f-a7ba-81408a4546cc
+
+	measure 'Anomaly Status Color' =
+			SWITCH (
+			    UPPER ( [Latest Anomaly Status] ),
+			    "NORMAL", "#00843D",
+			    "ANOMALY", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 05 State Colors
+		lineageTag: da10d9ec-265d-488f-8d71-3196f95711da
+
+	measure 'Severity Color (Context)' =
+			SWITCH (
+			    UPPER ( SELECTEDVALUE ( 'vw_dryer_dashboard_powerbi'[Severity] ) ),
+			    "NORMAL", "#00843D",
+			    "LOW", "#E8A013",
+			    "MEDIUM", "#E8A013",
+			    "HIGH", "#C8102E",
+			    "CRITICAL", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 05 State Colors
+		lineageTag: d4549f0f-b21f-45ff-91cf-6a3578681d71
+
+	measure 'Anomaly Status Color (Context)' =
+			SWITCH (
+			    UPPER ( SELECTEDVALUE ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] ) ),
+			    "NORMAL", "#00843D",
+			    "ANOMALY", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 05 State Colors
+		lineageTag: 06640233-9945-47d3-b9e7-627a921674cc
+
+	/// ============================================================
+	/// 06 Diagnostics Page (respond to the current filter context:
+	/// with a single selected event they describe that event, else
+	/// the most recent event inside the filtered window)
+	/// ============================================================
+	measure 'Selected Event Timestamp' = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 06 Diagnostics Page
+		lineageTag: b67a99b1-94f6-47e9-b592-a2a2594e4fa1
+
+	measure 'Selected Event Timestamp Display' =
+			IF (
+			    ISBLANK ( [Selected Event Timestamp] ),
+			    "—",
+			    FORMAT ( [Selected Event Timestamp], "yyyy-mm-dd hh:nn" )
+			)
+		displayFolder: 06 Diagnostics Page
+		lineageTag: d5066145-e706-4e61-843e-5328373f8282
+
+	measure 'Selected Anomaly Score' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			RETURN
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Anomaly Score] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+		formatString: 0.000000
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 96bb06fb-ca9d-4030-b241-55287a6b4769
+
+	measure 'Selected Anomaly Score Display' =
+			IF (
+			    ISBLANK ( [Selected Anomaly Score] ),
+			    "—",
+			    FORMAT ( [Selected Anomaly Score], "0.000000" )
+			)
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 70def544-551c-4821-82ac-4d90ec9d0780
+
+	measure 'Selected Anomaly Status' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 449317c5-979f-4d7c-86c5-89055f1a3753
+
+	measure 'Selected Severity' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Severity] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 458e5ece-801d-4830-a663-f1067d1c8d78
+
+	measure 'Selected Subsystem' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Subsystem] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+		lineageTag: dd7b65f2-e127-4ac5-b593-d4ab2729cd87
+
+	measure 'Selected Predicted Moisture Display' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", FORMAT ( Result, "0.0000" ) & " % H2O" )
+		displayFolder: 06 Diagnostics Page
+		lineageTag: dfd8188c-4b78-46b5-9537-29b6a5571de6
+
+	measure 'Selected Laboratory Moisture Display' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", FORMAT ( Result, "0.0000" ) & " % H2O" )
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 0e7a7ab3-d8f2-4581-a8d7-b8959f078129
+
+	measure 'Selected Diagnosis' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Diagnosis] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+		lineageTag: daea2042-da9c-4f24-8f87-ddb81dc4a9ef
+
+	measure 'Selected Possible Causes' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Possible Causes] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 06031e79-4fab-4e4b-9175-4757e81afa5e
+
+	measure 'Selected Recommended Verification' =
+			VAR SelectedTs = MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] )
+			VAR Result =
+			    CALCULATE (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Recommended Verification] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = SelectedTs
+			    )
+			RETURN
+			    IF ( ISBLANK ( Result ), "—", Result )
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 308409be-d61a-4f7f-ab06-f6c9f71ea870
+
+	measure 'Selected Severity Color' =
+			SWITCH (
+			    UPPER ( [Selected Severity] ),
+			    "NORMAL", "#00843D",
+			    "LOW", "#E8A013",
+			    "MEDIUM", "#E8A013",
+			    "HIGH", "#C8102E",
+			    "CRITICAL", "#C8102E",
+			    "#8A9299"
+			)
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 697a40db-e329-446d-b0a0-9b7b771aa241
+
+	/// Real model threshold: the One-Class SVM decision boundary. The
+	/// realtime_pipeline flags an observation as anomalous exactly when the
+	/// decision-function score is below zero. Not an invented limit.
+	measure 'Anomaly Threshold' = 0.0
+		formatString: 0.0
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 93185825-c3bd-444b-b89a-cc55490255ad
+
+	measure 'Anomaly Score (Anomalous)' =
+			CALCULATE (
+			    AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Score] ),
+			    KEEPFILTERS ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] = "ANOMALY" )
+			)
+		formatString: 0.000000
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 4249d9b8-df2a-46ec-8237-7c82e3fa8d31
+
+	measure 'Predicted Moisture (Anomalous)' =
+			CALCULATE (
+			    AVERAGE ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] ),
+			    KEEPFILTERS ( 'vw_dryer_dashboard_powerbi'[Anomaly Status] = "ANOMALY" )
+			)
+		formatString: 0.0000
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 7fe9967c-4c2d-460c-b622-8b4cc6484b1a
+
+	measure 'Anomaly Count' =
+			CALCULATE (
+			    COUNTROWS ( 'vw_dryer_dashboard_powerbi' ),
+			    'vw_dryer_dashboard_powerbi'[Anomaly Status] = "ANOMALY"
+			)
+		formatString: #,0
+		displayFolder: 06 Diagnostics Page
+		lineageTag: bf0815a7-ba55-45e0-92f9-4d326a74fad0
+
+	/// ============================================================
+	/// 07 Chart Series (explicit measures so legends and table
+	/// headers show clean names instead of "Average of ...")
+	/// ============================================================
+	measure 'Predicted Moisture (Model)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] )
+		formatString: 0.0000
+		displayFolder: 07 Chart Series
+		lineageTag: e38e40ef-8cbc-4833-8fd9-50866882a377
+
+	measure 'Laboratory Moisture (Lab)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] )
+		formatString: 0.0000
+		displayFolder: 07 Chart Series
+		lineageTag: 44f804c7-f583-4776-bd0f-339f038a3b7d
+
+	measure 'Anomaly Score (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Score] )
+		formatString: 0.000000
+		displayFolder: 07 Chart Series
+		lineageTag: f8ced9bb-881a-4124-8c05-a18406da0988
+
+	measure 'Lab Last Sample Timestamp' = CALCULATE ( MAX ( 'vw_dryer_lab_samples'[Sample Timestamp] ), REMOVEFILTERS ( 'vw_dryer_lab_samples' ) )
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 08 Lab Context (5s)
+		lineageTag: 63767644-8824-5e22-bb3b-e87f558f6941
+
+	measure 'Lab Last Moisture' =
+			VAR t = [Lab Last Sample Timestamp]
+			RETURN
+			    CALCULATE (
+			        AVERAGE ( 'vw_dryer_lab_samples'[Laboratory Moisture] ),
+			        REMOVEFILTERS ( 'vw_dryer_lab_samples' ),
+			        'vw_dryer_lab_samples'[Sample Timestamp] = t
+			    )
+		formatString: 0.0000
+		displayFolder: 08 Lab Context (5s)
+		lineageTag: 2b0d5a94-adf3-5a71-8635-b30a3a898c2c
+
+	measure 'Lab Last Moisture Display' = IF ( ISBLANK ( [Lab Last Moisture] ), "—", FORMAT ( [Lab Last Moisture], "0.000000" ) & " %" )
+		displayFolder: 08 Lab Context (5s)
+		lineageTag: 4f58bf9b-b747-5b27-8a17-21ac63143c77
+
+	measure 'Lab Result Age Minutes' =
+			IF (
+			    ISBLANK ( [Lab Last Sample Timestamp] ) || ISBLANK ( [Latest Timestamp] ),
+			    BLANK (),
+			    DATEDIFF ( [Lab Last Sample Timestamp], [Latest Timestamp], SECOND ) / 60.0
+			)
+		formatString: 0.0
+		displayFolder: 08 Lab Context (5s)
+		lineageTag: 636ab98b-46f4-523a-a81e-a8b53581b108
+
+	measure 'Lab Age Display' = IF ( ISBLANK ( [Lab Result Age Minutes] ), "no laboratory result", "Lab age " & FORMAT ( [Lab Result Age Minutes], "0" ) & " min" )
+		displayFolder: 08 Lab Context (5s)
+		lineageTag: 448e74f6-dad3-528a-af0a-5d87ed2248b5
+
+	measure 'Lab Sample Time Display' = IF ( ISBLANK ( [Lab Last Sample Timestamp] ), "—", "Sampled " & FORMAT ( [Lab Last Sample Timestamp], "hh:nn" ) & " · " & FORMAT ( [Lab Result Age Minutes], "0" ) & " min ago" )
+		displayFolder: 08 Lab Context (5s)
+		lineageTag: 81360537-cc78-5299-987f-b15c887db106
+
+	measure 'Validated Error Timestamp' =
+			CALCULATE (
+			    MAX ( 'vw_dryer_lab_samples'[Sample Timestamp] ),
+			    REMOVEFILTERS ( 'vw_dryer_lab_samples' ),
+			    NOT ISBLANK ( 'vw_dryer_lab_samples'[Validated Absolute Error] )
+			)
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 09 Validation (5s)
+		lineageTag: 001572da-678b-59c5-bbc6-8512f97f0062
+
+	measure 'Validated Error Latest' =
+			VAR t = [Validated Error Timestamp]
+			RETURN
+			    IF (
+			        ISBLANK ( t ),
+			        BLANK (),
+			        CALCULATE (
+			            AVERAGE ( 'vw_dryer_lab_samples'[Validated Absolute Error] ),
+			            REMOVEFILTERS ( 'vw_dryer_lab_samples' ),
+			            'vw_dryer_lab_samples'[Sample Timestamp] = t
+			        )
+			    )
+		formatString: 0.000000
+		displayFolder: 09 Validation (5s)
+		lineageTag: f00f6676-dcaf-515d-a179-85e37a175630
+
+	measure 'Validated Error Display' = IF ( ISBLANK ( [Validated Error Latest] ), "Awaiting next laboratory result", FORMAT ( [Validated Error Latest], "0.000000" ) & " %" )
+		displayFolder: 09 Validation (5s)
+		lineageTag: 11516aec-cbd5-523f-ad08-a657bab07dab
+
+	measure 'Validated Error Caption' = IF ( ISBLANK ( [Validated Error Latest] ), "No validated comparison yet", "Validated at " & FORMAT ( [Validated Error Timestamp], "hh:nn" ) )
+		displayFolder: 09 Validation (5s)
+		lineageTag: 868ad94f-680e-584e-8f9f-e7aa889cfb2a
+
+	measure 'Latest Anomaly Risk' = MAX ( 'vw_dryer_latest'[Anomaly Risk] )
+		formatString: 0.000
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 6b78267c-fdde-5200-a416-67d33482c6b6
+
+	measure 'Risk Intensity' = COALESCE ( [Latest Anomaly Risk], 0 )
+		formatString: 0.000
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 82d3a01b-71e8-5d95-b8bd-d4eb5a2a27fc
+
+	measure 'Latest Anomaly Risk Display' = FORMAT ( [Risk Intensity], "0.00" )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 28042c3f-bb84-5ff6-8a81-3fd112a56176
+
+	measure 'Predicted Now Timestamp' =
+			IF (
+			    ISBLANK ( MAX ( 'vw_dryer_latest'[Predicted Moisture] ) ),
+			    BLANK (),
+			    MAX ( 'vw_dryer_latest'[Timestamp] )
+			)
+		formatString: yyyy-mm-dd hh:nn:ss
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: d1cf8d88-9537-51e4-be50-2c5a83b5e048
+
+	measure 'Predicted Now' = MAX ( 'vw_dryer_latest'[Predicted Moisture] )
+		formatString: 0.000000
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 38abdeaa-9df7-5e93-b584-cf8685d6a304
+
+	measure 'Predicted Now Display' = IF ( ISBLANK ( [Predicted Now] ), "—", FORMAT ( [Predicted Now], "0.000000" ) & " %" )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 5c8a7f23-e84c-5244-9be1-a57dd7ef7d14
+
+	measure 'Predicted Now Caption' = IF ( ISBLANK ( [Predicted Now Timestamp] ), "No prediction yet", "Updated " & FORMAT ( [Predicted Now Timestamp], "hh:nn:ss" ) )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: ce3ca7d8-8039-59aa-b60d-664261596cf5
+
+	measure 'Data Age Minutes (Now)' =
+			IF (
+			    ISBLANK ( [Latest Timestamp] ),
+			    BLANK (),
+			    DATEDIFF ( [Latest Timestamp], NOW (), SECOND ) / 60.0
+			)
+		formatString: 0.0
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: a556e7f3-7026-54f2-96a9-f9f3b11bcd14
+
+	measure 'Ingest Age Minutes (Now)' =
+			VAR t = MAX ( 'vw_dryer_latest'[Inference Timestamp] )
+			RETURN
+			    IF (
+			        ISBLANK ( t ),
+			        BLANK (),
+			        DATEDIFF ( t, NOW (), SECOND ) / 60.0
+			    )
+		formatString: 0.0
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: d127fa3d-5816-57c3-9487-533840e2f325
+
+	measure 'Freshness Status' =
+			VAR age = [Ingest Age Minutes (Now)]
+			RETURN
+			    IF (
+			        ISBLANK ( age ), "NO DATA",
+			        IF ( age <= 2, "LIVE", IF ( age <= 10, "DELAYED", "STALE" ) )
+			    )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 365984fe-6a14-5b5a-b311-e3bba475231d
+
+	measure 'Freshness Pill Label' = SWITCH ( [Freshness Status], "LIVE", "LIVE DATA", "DELAYED", "DELAYED", "STALE", "STALE", "NO DATA" )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 854741e3-5594-5f5b-8466-0e7bcd527621
+
+	measure 'Freshness Detail Display' = IF ( ISBLANK ( [Latest Timestamp] ), "no data received", "Latest " & FORMAT ( [Latest Timestamp], "yyyy-mm-dd hh:nn:ss" ) & " · ingested " & FORMAT ( [Ingest Age Minutes (Now)], "0" ) & " min ago" )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 5c35c578-07f3-53cb-81ed-f0621b429dd2
+
+	measure 'Refresh Pill Label' = "PROTOTYPE / REPLAY"
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 05844ecd-d80a-56c6-86ec-a30a12e53049
+
+	measure 'Operating Status' =
+			VAR latestStatus = [Latest Anomaly Status]
+			RETURN
+			    IF (
+			        [Freshness Status] = "STALE" || [Freshness Status] = "NO DATA",
+			        "STALE",
+			        IF (
+			            latestStatus = "ANOMALY",
+			            "ANOMALY",
+			            IF ( [Risk Intensity] >= 0.35, "WATCH", "NORMAL" )
+			        )
+			    )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: ede58d09-e918-520d-83a8-18d3320ad7a9
+
+	measure 'Operating Status Caption' = SWITCH ( [Operating Status], "ANOMALY", "Requires verification", "WATCH", "Monitor closely", "STALE", "Data not current", "Stable operation" )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: 6c050685-ea20-5345-b74e-c7dec3981fc5
+
+	measure 'Severity Caption' = IF ( [Operating Status] = "ANOMALY", [Latest Subsystem], "—" )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: d01984ff-55ad-5c9b-9043-411007d40bbb
+
+	measure 'Model Version Display' =
+			VAR v = MAX ( 'vw_dryer_latest'[Model Version] )
+			VAR s = MAX ( 'vw_dryer_latest'[Feature Schema Version] )
+			RETURN
+			    IF ( ISBLANK ( v ), "—", v & " · " & s )
+		displayFolder: 10 Risk & Status (5s)
+		lineageTag: c04e41fc-303d-59a1-9bd3-e8bf9659d323
+
+	measure 'Risk Band' =
+			VAR r = [Risk Intensity]
+			RETURN
+			    IF ( r < 0.2, 0, IF ( r < 0.35, 1, IF ( r < 0.5, 2,
+			        IF ( r < 0.65, 3, IF ( r < 0.8, 4, 5 ) ) ) ) )
+		formatString: 0
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: c3bf3be1-c18d-5a44-9522-15f16a14f4a3
+
+	measure 'Card BG (Risk)' =
+			SWITCH ( [Risk Band],
+			    0, "#FFFFFF", 1, "#E7F4EF", 2, "#FFF0D5",
+			    3, "#FDE7C8", 4, "#FBE2E3", "#C83F45" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 5db8ac40-bea0-5e62-b48f-1bd762c649a3
+
+	measure 'Card FG (Risk)' = IF ( [Risk Band] >= 5, "#FFFFFF", "#17231F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: c20f16f0-fea6-572f-b733-7ae6b9ff1e5f
+
+	measure 'Status BG (Latest)' =
+			SWITCH ( [Operating Status],
+			    "NORMAL", "#E7F4EF", "WATCH", "#FFF0D5",
+			    "ANOMALY", "#FBE2E3", "STALE", "#E5E9E7", "#FFFFFF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: d715bb58-f18f-533e-9c7b-11e495fe7ccb
+
+	measure 'Status FG (Latest)' =
+			SWITCH ( [Operating Status],
+			    "NORMAL", "#087C5B", "WATCH", "#B26A00",
+			    "ANOMALY", "#C83F45", "STALE", "#66756F", "#17231F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: c09410d2-0edc-511d-9328-fa68a0d32aeb
+
+	measure 'Severity BG (Latest)' =
+			SWITCH ( UPPER ( [Latest Severity] ),
+			    "NORMAL", "#E7F4EF", "LOW", "#FFF0D5",
+			    "MEDIUM", "#FDE7C8", "HIGH", "#FBE2E3",
+			    "CRITICAL", "#C83F45", "DATA_QUALITY", "#E5E9E7", "#FFFFFF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: ca1fc493-292b-5042-b523-2ab1adaff02e
+
+	measure 'Severity FG (Latest)' =
+			SWITCH ( UPPER ( [Latest Severity] ),
+			    "NORMAL", "#087C5B", "LOW", "#B26A00", "MEDIUM", "#B26A00",
+			    "HIGH", "#C83F45", "CRITICAL", "#FFFFFF", "#66756F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 42355f69-0ad0-596a-bf18-f7fa66e4ed2e
+
+	measure 'Freshness Pill BG' =
+			SWITCH ( [Freshness Status],
+			    "LIVE", "#E7F4EF", "DELAYED", "#FFF0D5",
+			    "#FBE2E3" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 44676ea4-2cde-5d33-a72a-08ce78934a7f
+
+	measure 'Freshness Pill FG' =
+			SWITCH ( [Freshness Status],
+			    "LIVE", "#087C5B", "DELAYED", "#B26A00", "#C83F45" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 5453fecc-397e-5f0b-bcdc-a07330b0e7cd
+
+	measure 'Error Card BG' =
+			VAR e = [Validated Error Latest]
+			RETURN
+			    IF ( ISBLANK ( e ), "#FFFFFF",
+			        IF ( e <= 0.05, "#E7F4EF",
+			            IF ( e <= 0.10, "#FFF0D5", "#FBE2E3" ) ) )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 8070da2f-4b4f-541d-a036-20317ad1b302
+
+	measure 'Error Card FG' =
+			VAR e = [Validated Error Latest]
+			RETURN
+			    IF ( ISBLANK ( e ), "#66756F",
+			        IF ( e <= 0.05, "#087C5B",
+			            IF ( e <= 0.10, "#B26A00", "#C83F45" ) ) )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 36691ce5-17ef-5fe8-916d-99acadb7b8a2
+
+	measure 'Predicted Card BG' =
+			VAR v = [Predicted Now]
+			RETURN
+			    IF ( ISBLANK ( v ), "#FFFFFF",
+			        IF ( v >= [Target Band Low] && v <= [Target Band High],
+			            "#E7F4EF",
+			            IF ( v >= 0.06904 && v <= 0.08188, "#FFF0D5",
+			                "#FBE2E3" ) ) )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: da5bcb1b-0410-5a4b-ac63-5f03b54cdd69
+
+	measure 'Lab Card BG' =
+			VAR v = [Lab Last Moisture]
+			RETURN
+			    IF ( ISBLANK ( v ), "#FFFFFF",
+			        IF ( v >= [Target Band Low] && v <= [Target Band High],
+			            "#E7F4EF",
+			            IF ( v >= 0.06904 && v <= 0.08188, "#FFF0D5",
+			                "#FBE2E3" ) ) )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: a4b84c54-017a-5918-85a2-856226012279
+
+	measure 'Risk Gauge Color' =
+			SWITCH ( [Risk Band],
+			    0, "#087C5B", 1, "#087C5B", 2, "#F2A12E", 3, "#F2A12E",
+			    4, "#DF5558", "#C83F45" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 8781a4e4-2785-5a3d-8d5f-670f719d6291
+
+	measure 'Risk Gauge Remainder' = 1 - [Risk Intensity]
+		formatString: 0.000
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 8c4c94d7-e1c0-5978-8593-96ee4b20aaf0
+
+	measure 'Target Band Low' = 0.07018
+		formatString: 0.00000
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: dc3f5455-9362-523a-a764-93e58c593fc6
+
+	measure 'Target Band High' = 0.08074
+		formatString: 0.00000
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: b1b62984-5257-5307-a5b2-128df6c0440a
+
+	measure 'Moisture Lab Markers' =
+			CALCULATE (
+			    AVERAGE ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] ),
+			    'vw_dryer_dashboard_powerbi'[Is Lab Sample] = TRUE ()
+			)
+		formatString: 0.000000
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: c5c332a3-127c-5629-84f6-0bf4b6f83f4a
+
+	measure 'Risk (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Risk] )
+		formatString: 0.000
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: 4c002c85-66e6-5833-ba21-5036f416f776
+
+	measure 'Risk (Anomalous)' =
+			CALCULATE (
+			    AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Risk] ),
+			    'vw_dryer_dashboard_powerbi'[Anomaly Status] = "ANOMALY"
+			)
+		formatString: 0.000
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: 2242b2de-d1ba-5f92-8318-b5b0a51062ec
+
+	measure 'Warning Threshold' = 0.5
+		formatString: 0.0
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: 5005ed43-3850-5442-8018-3faa393d7d10
+
+	measure 'Critical Threshold' = 0.8
+		formatString: 0.0
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: 4b0fc427-9046-5c12-8c7d-f53e92f6008e
+
+	measure 'Steam Pressure (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Steam Pressure] )
+		formatString: 0.00
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: eb8f032f-300b-5a56-9369-ef6fdcb5f46d
+
+	measure 'Air Flow (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Air Flow Rate] )
+		formatString: 0.00
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: 40c615fd-32ae-5400-8c17-bbfe21877fd2
+
+	measure 'Feed Rate (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Wet Product Feed Rate] )
+		formatString: 0.00
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: a1269dc7-b25e-5d10-9c2d-e38b1feab0fd
+
+	measure 'Dryer Temp (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Dryer Air Temperature] )
+		formatString: 0.00
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: a69465a9-f95a-58ec-993a-ef2decc730c4
+
+	measure 'Vacuum (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Vacuum] )
+		formatString: 0.00
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: 8c8c0238-37ca-5f9b-b547-033d678076fb
+
+	measure 'Fan Speed (Trend)' = AVERAGE ( 'vw_dryer_dashboard_powerbi'[Fan Speed] )
+		formatString: 0.00
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: eeac5eba-fb45-598a-a055-502120f372c6
+
+	measure 'Timeline Selected Marker' =
+			VAR t = [Selected Event Peak Timestamp]
+			RETURN
+			    IF (
+			        MAX ( 'vw_dryer_dashboard_powerbi'[Timestamp] ) = t,
+			        AVERAGE ( 'vw_dryer_dashboard_powerbi'[Anomaly Risk] )
+			    )
+		formatString: 0.000
+		displayFolder: 12 Trend Series (5s)
+		lineageTag: c38709ac-c877-5b07-a975-289090df0c5f
+
+	measure 'DAT Status' =
+			VAR v = [Latest Dryer Air Temperature]
+			VAR freshness = [Freshness Status]
+			VAR operating = [Operating Status]
+			RETURN
+			    IF (
+			        ISBLANK ( v ), "NO DATA",
+			        IF (
+			            freshness = "STALE" || freshness = "NO DATA", "STALE",
+			            IF (
+			                operating = "NORMAL", "NORMAL",
+			                IF (
+			                    v >= 166.4639 && v <= 180.9040, "NORMAL",
+			                    IF ( v >= 156.8914 && v <= 196.4670,
+			                        "WATCH", "HIGH" )
+			                )
+			            )
+			        )
+			    )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 397dddc7-dfaf-5936-b548-e9d40f03990a
+
+	measure 'DAT Card BG' =
+			SWITCH ( [DAT Status],
+			    "NORMAL", "#E7F4EF", "WATCH", "#FFF0D5",
+			    "HIGH", "#FBE2E3", "STALE", "#E5E9E7", "#FFFFFF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 71b74687-e00f-5887-b15f-4e1771384d7b
+
+	measure 'DAT Card FG' =
+			SWITCH ( [DAT Status],
+			    "NORMAL", "#087C5B", "WATCH", "#B26A00", "HIGH", "#C83F45",
+			    "STALE", "#66756F",
+			    "#66756F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 0115bacf-2f7b-5371-bbb6-b9fdb9e19dc8
+
+	measure 'DAT Value Display' = IF ( ISBLANK ( [Latest Dryer Air Temperature] ), "—", FORMAT ( [Latest Dryer Air Temperature], "0.0" ) & " °C" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: d07a06ad-69b2-5bd5-8fab-a9392360a7cf
+
+	measure 'DAT Delta 5m' =
+			VAR t = [Latest Timestamp]
+			VAR prev = t - TIME ( 0, 5, 0 )
+			VAR previousValue =
+			    CALCULATE (
+			        AVERAGE ( 'vw_dryer_dashboard_powerbi'[Dryer Air Temperature] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = prev
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( previousValue ),
+			        BLANK (),
+			        [Latest Dryer Air Temperature] - previousValue
+			    )
+		formatString: +0.00;-0.00;0.00
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 00022cf1-1f36-53bf-9abf-46a77b39711f
+
+	measure 'DAT Delta Display' =
+			VAR d = [DAT Delta 5m]
+			VAR deltaText =
+			    IF (
+			        ISBLANK ( d ),
+			        "Δ —",
+			        "Δ " & IF ( d >= 0, "+", "" ) & FORMAT ( d, "0.0" )
+			    )
+			RETURN
+			    deltaText & "   " & [DAT Status]
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: e133960c-830e-5e02-8a7b-43e1e6cd2cdf
+
+	measure 'DAT Stats Tooltip' =
+			"min " & FORMAT ( MIN ( 'vw_dryer_dashboard_powerbi'[Dryer Air Temperature] ), "0.0" )
+			    & " · max " & FORMAT ( MAX ( 'vw_dryer_dashboard_powerbi'[Dryer Air Temperature] ), "0.0" )
+			    & " · mean " & FORMAT ( AVERAGE ( 'vw_dryer_dashboard_powerbi'[Dryer Air Temperature] ), "0.0" )
+			    & " · σ " & FORMAT ( STDEV.P ( 'vw_dryer_dashboard_powerbi'[Dryer Air Temperature] ), "0.0" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 2523781d-5a7d-56c1-94b4-74553eee0bec
+
+	measure 'Feed Status' =
+			VAR v = [Latest Wet Product Feed Rate]
+			VAR freshness = [Freshness Status]
+			VAR operating = [Operating Status]
+			RETURN
+			    IF (
+			        ISBLANK ( v ), "NO DATA",
+			        IF (
+			            freshness = "STALE" || freshness = "NO DATA", "STALE",
+			            IF (
+			                operating = "NORMAL", "NORMAL",
+			                IF (
+			                    v >= 23.9570 && v <= 28.0910, "NORMAL",
+			                    IF ( v >= 20.9770 && v <= 34.0636,
+			                        "WATCH", "HIGH" )
+			                )
+			            )
+			        )
+			    )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: b6c96022-4f6c-503a-b762-e663389fa40d
+
+	measure 'Feed Card BG' =
+			SWITCH ( [Feed Status],
+			    "NORMAL", "#E7F4EF", "WATCH", "#FFF0D5",
+			    "HIGH", "#FBE2E3", "STALE", "#E5E9E7", "#FFFFFF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 6148e4d7-a464-5ac0-87f3-088d1e6db6e8
+
+	measure 'Feed Card FG' =
+			SWITCH ( [Feed Status],
+			    "NORMAL", "#087C5B", "WATCH", "#B26A00", "HIGH", "#C83F45",
+			    "STALE", "#66756F",
+			    "#66756F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 249b5b76-5d1b-5ab7-9ba6-0978f22e288e
+
+	measure 'Feed Value Display' = IF ( ISBLANK ( [Latest Wet Product Feed Rate] ), "—", FORMAT ( [Latest Wet Product Feed Rate], "0.0" ) & " m³/h" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: b3896b43-5195-5078-a063-be57559cf35b
+
+	measure 'Feed Delta 5m' =
+			VAR t = [Latest Timestamp]
+			VAR prev = t - TIME ( 0, 5, 0 )
+			VAR previousValue =
+			    CALCULATE (
+			        AVERAGE ( 'vw_dryer_dashboard_powerbi'[Wet Product Feed Rate] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = prev
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( previousValue ),
+			        BLANK (),
+			        [Latest Wet Product Feed Rate] - previousValue
+			    )
+		formatString: +0.00;-0.00;0.00
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: d257db7e-c2f8-5b3d-acd7-2c43a8458c38
+
+	measure 'Feed Delta Display' =
+			VAR d = [Feed Delta 5m]
+			VAR deltaText =
+			    IF (
+			        ISBLANK ( d ),
+			        "Δ —",
+			        "Δ " & IF ( d >= 0, "+", "" ) & FORMAT ( d, "0.0" )
+			    )
+			RETURN
+			    deltaText & "   " & [Feed Status]
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 7597a31b-2e9c-5c67-90fe-8c7a2873c275
+
+	measure 'Feed Stats Tooltip' =
+			"min " & FORMAT ( MIN ( 'vw_dryer_dashboard_powerbi'[Wet Product Feed Rate] ), "0.0" )
+			    & " · max " & FORMAT ( MAX ( 'vw_dryer_dashboard_powerbi'[Wet Product Feed Rate] ), "0.0" )
+			    & " · mean " & FORMAT ( AVERAGE ( 'vw_dryer_dashboard_powerbi'[Wet Product Feed Rate] ), "0.0" )
+			    & " · σ " & FORMAT ( STDEV.P ( 'vw_dryer_dashboard_powerbi'[Wet Product Feed Rate] ), "0.0" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: b9e05f7f-91ca-5ed8-bb1b-31fe86fc259a
+
+	measure 'Steam Status' =
+			VAR v = [Latest Steam Pressure]
+			VAR freshness = [Freshness Status]
+			VAR operating = [Operating Status]
+			RETURN
+			    IF (
+			        ISBLANK ( v ), "NO DATA",
+			        IF (
+			            freshness = "STALE" || freshness = "NO DATA", "STALE",
+			            IF (
+			                operating = "NORMAL", "NORMAL",
+			                IF (
+			                    v >= 7.9900 && v <= 8.5190, "NORMAL",
+			                    IF ( v >= 6.3430 && v <= 9.6290,
+			                        "WATCH", "HIGH" )
+			                )
+			            )
+			        )
+			    )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: e4d5477d-f804-5209-9ecf-f07fe2817c3f
+
+	measure 'Steam Card BG' =
+			SWITCH ( [Steam Status],
+			    "NORMAL", "#E7F4EF", "WATCH", "#FFF0D5",
+			    "HIGH", "#FBE2E3", "STALE", "#E5E9E7", "#FFFFFF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: da6861e2-d94f-5fd5-856f-214c7657a7a7
+
+	measure 'Steam Card FG' =
+			SWITCH ( [Steam Status],
+			    "NORMAL", "#087C5B", "WATCH", "#B26A00", "HIGH", "#C83F45",
+			    "STALE", "#66756F",
+			    "#66756F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 2eb132c7-1694-5616-b6c1-c0894454ce75
+
+	measure 'Steam Value Display' = IF ( ISBLANK ( [Latest Steam Pressure] ), "—", FORMAT ( [Latest Steam Pressure], "0.00" ) & " bar" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 012618b4-ab3d-5917-bd1b-81ea53b61df7
+
+	measure 'Steam Delta 5m' =
+			VAR t = [Latest Timestamp]
+			VAR prev = t - TIME ( 0, 5, 0 )
+			VAR previousValue =
+			    CALCULATE (
+			        AVERAGE ( 'vw_dryer_dashboard_powerbi'[Steam Pressure] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = prev
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( previousValue ),
+			        BLANK (),
+			        [Latest Steam Pressure] - previousValue
+			    )
+		formatString: +0.00;-0.00;0.00
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 11e74aaf-e62e-50c4-8704-c914d670c746
+
+	measure 'Steam Delta Display' =
+			VAR d = [Steam Delta 5m]
+			VAR deltaText =
+			    IF (
+			        ISBLANK ( d ),
+			        "Δ —",
+			        "Δ " & IF ( d >= 0, "+", "" ) & FORMAT ( d, "0.0" )
+			    )
+			RETURN
+			    deltaText & "   " & [Steam Status]
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: f6ee8dcb-0eec-5f58-831c-8d2542c5596f
+
+	measure 'Steam Stats Tooltip' =
+			"min " & FORMAT ( MIN ( 'vw_dryer_dashboard_powerbi'[Steam Pressure] ), "0.00" )
+			    & " · max " & FORMAT ( MAX ( 'vw_dryer_dashboard_powerbi'[Steam Pressure] ), "0.00" )
+			    & " · mean " & FORMAT ( AVERAGE ( 'vw_dryer_dashboard_powerbi'[Steam Pressure] ), "0.00" )
+			    & " · σ " & FORMAT ( STDEV.P ( 'vw_dryer_dashboard_powerbi'[Steam Pressure] ), "0.00" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: b9fa3efa-e08b-50ea-9ac4-0558aa7913b3
+
+	measure 'Airflow Status' =
+			VAR v = [Latest Air Flow Rate]
+			VAR freshness = [Freshness Status]
+			VAR operating = [Operating Status]
+			RETURN
+			    IF (
+			        ISBLANK ( v ), "NO DATA",
+			        IF (
+			            freshness = "STALE" || freshness = "NO DATA", "STALE",
+			            IF (
+			                operating = "NORMAL", "NORMAL",
+			                IF (
+			                    v >= 22633.7815 && v <= 25130.0026, "NORMAL",
+			                    IF ( v >= 19519.2635 && v <= 25345.5958,
+			                        "WATCH", "HIGH" )
+			                )
+			            )
+			        )
+			    )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 8c367988-d5a7-5d47-99f6-1cbed3a3479e
+
+	measure 'Airflow Card BG' =
+			SWITCH ( [Airflow Status],
+			    "NORMAL", "#E7F4EF", "WATCH", "#FFF0D5",
+			    "HIGH", "#FBE2E3", "STALE", "#E5E9E7", "#FFFFFF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 2b60d6d2-c535-51d7-96cb-06c5ea877fdb
+
+	measure 'Airflow Card FG' =
+			SWITCH ( [Airflow Status],
+			    "NORMAL", "#087C5B", "WATCH", "#B26A00", "HIGH", "#C83F45",
+			    "STALE", "#66756F",
+			    "#66756F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 4e59060f-fd1a-53b9-8198-488d2b80707d
+
+	measure 'Airflow Value Display' = IF ( ISBLANK ( [Latest Air Flow Rate] ), "—", FORMAT ( [Latest Air Flow Rate], "#,0" ) & " m³/h" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: a5c3f502-9fec-55d8-b028-1d42a88f1bda
+
+	measure 'Airflow Delta 5m' =
+			VAR t = [Latest Timestamp]
+			VAR prev = t - TIME ( 0, 5, 0 )
+			VAR previousValue =
+			    CALCULATE (
+			        AVERAGE ( 'vw_dryer_dashboard_powerbi'[Air Flow Rate] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = prev
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( previousValue ),
+			        BLANK (),
+			        [Latest Air Flow Rate] - previousValue
+			    )
+		formatString: +0.00;-0.00;0.00
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 8bea830a-7048-5289-a434-d1e06e124699
+
+	measure 'Airflow Delta Display' =
+			VAR d = [Airflow Delta 5m]
+			VAR deltaText =
+			    IF (
+			        ISBLANK ( d ),
+			        "Δ —",
+			        "Δ " & IF ( d >= 0, "+", "" ) & FORMAT ( d, "0.0" )
+			    )
+			RETURN
+			    deltaText & "   " & [Airflow Status]
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 5a92d9fe-1aec-5da6-8206-af0937081eab
+
+	measure 'Airflow Stats Tooltip' =
+			"min " & FORMAT ( MIN ( 'vw_dryer_dashboard_powerbi'[Air Flow Rate] ), "#,0" )
+			    & " · max " & FORMAT ( MAX ( 'vw_dryer_dashboard_powerbi'[Air Flow Rate] ), "#,0" )
+			    & " · mean " & FORMAT ( AVERAGE ( 'vw_dryer_dashboard_powerbi'[Air Flow Rate] ), "#,0" )
+			    & " · σ " & FORMAT ( STDEV.P ( 'vw_dryer_dashboard_powerbi'[Air Flow Rate] ), "#,0" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: 90f7d7cc-0618-5935-9f81-bf5b1dbb4426
+
+	measure 'Vacuum Status' =
+			VAR v = [Latest Vacuum]
+			VAR freshness = [Freshness Status]
+			VAR operating = [Operating Status]
+			RETURN
+			    IF (
+			        ISBLANK ( v ), "NO DATA",
+			        IF (
+			            freshness = "STALE" || freshness = "NO DATA", "STALE",
+			            IF (
+			                operating = "NORMAL", "NORMAL",
+			                IF (
+			                    v >= 46.2891 && v <= 49.9760, "NORMAL",
+			                    IF ( v >= 44.1563 && v <= 55.0516,
+			                        "WATCH", "HIGH" )
+			                )
+			            )
+			        )
+			    )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: ab4e5a5a-a0b3-595c-bfbf-799c8c23c0dc
+
+	measure 'Vacuum Card BG' =
+			SWITCH ( [Vacuum Status],
+			    "NORMAL", "#E7F4EF", "WATCH", "#FFF0D5",
+			    "HIGH", "#FBE2E3", "STALE", "#E5E9E7", "#FFFFFF" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 53fc4487-4c5a-5142-a689-ebd08b3c1c1c
+
+	measure 'Vacuum Card FG' =
+			SWITCH ( [Vacuum Status],
+			    "NORMAL", "#087C5B", "WATCH", "#B26A00", "HIGH", "#C83F45",
+			    "STALE", "#66756F",
+			    "#66756F" )
+		displayFolder: 11 Heatmap Colors (5s)
+		lineageTag: 7f3f1933-35d0-5434-9c43-a4de9c73b62d
+
+	measure 'Vacuum Value Display' = IF ( ISBLANK ( [Latest Vacuum] ), "—", FORMAT ( [Latest Vacuum], "0.0" ) & " mmH2O" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: b83d58f7-f984-56bb-960f-4adf61547e04
+
+	measure 'Vacuum Delta 5m' =
+			VAR t = [Latest Timestamp]
+			VAR prev = t - TIME ( 0, 5, 0 )
+			VAR previousValue =
+			    CALCULATE (
+			        AVERAGE ( 'vw_dryer_dashboard_powerbi'[Vacuum] ),
+			        'vw_dryer_dashboard_powerbi'[Timestamp] = prev
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( previousValue ),
+			        BLANK (),
+			        [Latest Vacuum] - previousValue
+			    )
+		formatString: +0.00;-0.00;0.00
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: c958ad91-82ae-5baa-8de6-632eec915a80
+
+	measure 'Vacuum Delta Display' =
+			VAR d = [Vacuum Delta 5m]
+			VAR deltaText =
+			    IF (
+			        ISBLANK ( d ),
+			        "Δ —",
+			        "Δ " & IF ( d >= 0, "+", "" ) & FORMAT ( d, "0.0" )
+			    )
+			RETURN
+			    deltaText & "   " & [Vacuum Status]
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: ee17b6d9-10a7-5e8e-94b5-3feaf4dd8c0f
+
+	measure 'Vacuum Stats Tooltip' =
+			"min " & FORMAT ( MIN ( 'vw_dryer_dashboard_powerbi'[Vacuum] ), "0.0" )
+			    & " · max " & FORMAT ( MAX ( 'vw_dryer_dashboard_powerbi'[Vacuum] ), "0.0" )
+			    & " · mean " & FORMAT ( AVERAGE ( 'vw_dryer_dashboard_powerbi'[Vacuum] ), "0.0" )
+			    & " · σ " & FORMAT ( STDEV.P ( 'vw_dryer_dashboard_powerbi'[Vacuum] ), "0.0" )
+		displayFolder: 13 Critical Variables (5s)
+		lineageTag: c96f9f5e-35e9-5828-94cf-db4afd495f8c
+
+	/// ============================================================
+	/// Columns (physical view columns; adjust sourceColumn values if
+	/// verify_powerbi_views.py reports different physical names)
+	/// ============================================================
+	column Timestamp
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 6a19ecc3-dbb6-45ef-8043-3880fefb2b70
+		summarizeBy: none
+		sourceColumn: Timestamp
+
+	column 'Predicted Moisture'
+		dataType: double
+		formatString: 0.000000
+		lineageTag: fa30135a-e058-4742-b766-c47289e65ecc
+		summarizeBy: none
+		sourceColumn: Predicted Final Moisture
+
+	column 'Laboratory Moisture'
+		dataType: double
+		formatString: 0.000000
+		lineageTag: b03affd2-7925-4c85-9d2c-765934f191dd
+		summarizeBy: none
+		sourceColumn: Final Moisture (%H2O)
+
+	/// No physical column for this on the live view; recomputed here from
+	/// Predicted Moisture / Laboratory Moisture (mirrors the CASE expression
+	/// in powerbi_dashboard/sql/create_powerbi_views.sql).
+	column 'Moisture Error' =
+			IF (
+			    ISBLANK ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] ) || ISBLANK ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] ),
+			    BLANK (),
+			    'vw_dryer_dashboard_powerbi'[Predicted Moisture] - 'vw_dryer_dashboard_powerbi'[Laboratory Moisture]
+			)
+		formatString: +0.0000;-0.0000;0.0000
+		lineageTag: 94295641-95c5-40f2-9c30-ab0ed44b6cd8
+		summarizeBy: none
+
+	column 'Absolute Moisture Error' =
+			IF (
+			    ISBLANK ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] ) || ISBLANK ( 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] ),
+			    BLANK (),
+			    ABS ( 'vw_dryer_dashboard_powerbi'[Predicted Moisture] - 'vw_dryer_dashboard_powerbi'[Laboratory Moisture] )
+			)
+		formatString: 0.000000
+		lineageTag: a5161748-bdd4-48ab-adfc-1b125cde9821
+		summarizeBy: none
+
+	column 'Anomaly Score'
+		dataType: double
+		formatString: 0.000000
+		lineageTag: 3a5aef5e-2b10-4581-b29d-2c29aeb3bf8e
+		summarizeBy: none
+		sourceColumn: Anomaly Score
+
+	/// Hidden physical source for 'Anomaly Status' below; the live view
+	/// exposes the raw boolean, not a pre-labeled status string.
+	column 'Anomaly Detected'
+		dataType: boolean
+		isHidden
+		lineageTag: 9d4a71ad-cecd-40a8-a457-6326e3a2add4
+		summarizeBy: none
+		sourceColumn: Anomaly Detected
+
+	column 'Anomaly Status' =
+			IF (
+			    ISBLANK ( 'vw_dryer_dashboard_powerbi'[Anomaly Detected] ), "UNCLASSIFIED",
+			    IF ( 'vw_dryer_dashboard_powerbi'[Anomaly Detected], "ANOMALY", "NORMAL" )
+			)
+		lineageTag: 92974da0-9e17-4851-acca-2d0b5f1d8408
+		summarizeBy: none
+
+	column Severity
+		dataType: string
+		lineageTag: 303ff478-6ac1-4bdf-9c85-3f65fb5b8c43
+		summarizeBy: none
+		sourceColumn: Severity
+
+	column Subsystem
+		dataType: string
+		lineageTag: 12adc5c3-4d2c-4ab4-b144-edf1f2ac00ae
+		summarizeBy: none
+		sourceColumn: Likely Subsystem
+
+	column Diagnosis
+		dataType: string
+		lineageTag: 1f287b61-8132-4356-a216-2f03c595f8f1
+		summarizeBy: none
+		sourceColumn: Probable Diagnosis
+
+	column 'Possible Causes'
+		dataType: string
+		lineageTag: 20718093-8242-4691-9520-364d08174f35
+		summarizeBy: none
+		sourceColumn: Possible Causes
+
+	column 'Recommended Verification'
+		dataType: string
+		lineageTag: ce3a3049-97b0-4ddb-949f-cf1e58be4190
+		summarizeBy: none
+		sourceColumn: Recommended Verification
+
+	column 'Dryer Air Temperature'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 8c6d3e32-380a-4f92-ba8b-da4cb17feef2
+		summarizeBy: none
+		sourceColumn: Dryer Air Temperature
+
+	column 'Cooler Air Temperature'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 19d3b791-656d-4454-bc42-87f57e9492aa
+		summarizeBy: none
+		sourceColumn: Cooler Air Temperature
+
+	column 'Air Flow Rate'
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 38397fbe-4bbd-4ac3-bca5-44663a8ee94f
+		summarizeBy: none
+		sourceColumn: "Air Flow Rate "
+
+	column 'Wet Product Feed Rate'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 9d4669ad-d178-4bc3-894a-9959f6c59592
+		summarizeBy: none
+		sourceColumn: Wet Product Feed Rate
+
+	column 'Product Inlet Temperature'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 2b343a18-8664-4d9f-9e7b-16ee1d82856c
+		summarizeBy: none
+		sourceColumn: Product Inlet Temperature
+
+	column 'Residence Time'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 23eb352d-6cc7-4afc-a5ca-ed8aaf2cda3a
+		summarizeBy: none
+		sourceColumn: Residence Time
+
+	column Vacuum
+		dataType: double
+		formatString: 0.0
+		lineageTag: 9d375c64-4613-41f4-ba9a-99344ba92a4e
+		summarizeBy: none
+		sourceColumn: Vacuum
+
+	column 'Steam Pressure'
+		dataType: double
+		formatString: 0.00
+		lineageTag: caadc816-3a3f-4a91-af86-63d5874df4cd
+		summarizeBy: none
+		sourceColumn: Steam Pressure
+
+	column 'Fan Speed'
+		dataType: double
+		formatString: #,0
+		lineageTag: 28dedc41-5c0c-48b8-975b-e0a90aaef6ac
+		summarizeBy: none
+		sourceColumn: Fan Speed
+
+	column 'Product Density'
+		dataType: double
+		formatString: 0.000
+		lineageTag: 6a1dab88-8736-45c5-8b60-6ef1645bd13f
+		summarizeBy: none
+		sourceColumn: Product Density
+
+	column 'Final Product Temperature'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 41fd5d3b-369b-4ad3-bc84-138bcb2de3f2
+		summarizeBy: none
+		sourceColumn: Final Product Temp
+
+	/// ===== BEGIN 5S EXTENSION (generated) =====
+	/// Generated by tools/generate_powerbi_semantic.py — edit the
+	/// generator, not this block. Normal bands are training-period
+	/// quantiles from models/5s/reference_profile.json.
+	column 'Anomaly Risk'
+		dataType: double
+		formatString: 0.000
+		lineageTag: bb82060c-37c1-521f-bca5-1ef531488e3c
+		summarizeBy: none
+		sourceColumn: Anomaly Risk
+
+	column 'Model Version'
+		dataType: string
+		lineageTag: c0b9abd9-1ee3-5834-b066-98ea7af44581
+		summarizeBy: none
+		sourceColumn: Model Version
+
+	column 'Feature Schema Version'
+		dataType: string
+		lineageTag: c7c69dca-33ec-5de4-81c4-ea49283c97d8
+		summarizeBy: none
+		sourceColumn: Feature Schema Version
+
+	column 'Inference Timestamp'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: d29ea7eb-f8a9-50be-b5be-660675d218b1
+		summarizeBy: none
+		sourceColumn: Inference Timestamp
+
+	column 'Inference Latency Ms'
+		dataType: double
+		formatString: 0
+		lineageTag: 6c8bb6f8-424f-51f8-ace8-b70b3996b827
+		summarizeBy: none
+		sourceColumn: Inference Latency Ms
+
+	column 'Latest Lab Sample Timestamp'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: f07211d6-0174-5736-9120-5243186049ab
+		summarizeBy: none
+		sourceColumn: Latest Lab Sample Timestamp
+
+	column 'Latest Lab Product Density'
+		dataType: double
+		formatString: 0.0000
+		lineageTag: 8012ea1b-bf8a-5fd3-bcb4-347c9a3f10f0
+		summarizeBy: none
+		sourceColumn: Latest Lab Product Density
+
+	column 'Latest Lab Final Product Temp'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 618ab855-b8ec-5e2b-a302-2e1f19d2de4e
+		summarizeBy: none
+		sourceColumn: Latest Lab Final Product Temp
+
+	column 'Latest Lab Final Moisture'
+		dataType: double
+		formatString: 0.0000
+		lineageTag: e89b0322-2970-56b7-b935-9cd6e9da9573
+		summarizeBy: none
+		sourceColumn: Latest Lab Final Moisture
+
+	column 'Lab Result Age Min'
+		dataType: double
+		formatString: 0.0
+		lineageTag: ba80bd8d-c1b7-5356-a2d5-c15825cf4f52
+		summarizeBy: none
+		sourceColumn: Lab Result Age Min
+
+	column 'Lab Sample Available'
+		dataType: boolean
+		lineageTag: 30614bd2-f993-5853-8e5b-7dd2d514dce6
+		summarizeBy: none
+		sourceColumn: Lab Sample Available
+
+	column 'Is Lab Sample'
+		dataType: boolean
+		lineageTag: edc28b89-7b3f-5f56-8e46-44bcde8737bf
+		summarizeBy: none
+		sourceColumn: Is Lab Sample
+
+	column 'Validated Moisture Error'
+		dataType: double
+		formatString: +0.0000;-0.0000;0.0000
+		lineageTag: a1de3553-37f2-55f6-862a-4653d8088f72
+		summarizeBy: none
+		sourceColumn: Validated Moisture Error
+
+	column 'Validated Absolute Error'
+		dataType: double
+		formatString: 0.0000
+		lineageTag: 6360293e-c5c2-578f-adcf-3c12e998e119
+		summarizeBy: none
+		sourceColumn: Validated Absolute Error
+
+	/// ===== END 5S EXTENSION (generated) =====
+	partition vw_dryer_dashboard_powerbi = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database(DB_Server, DB_Database),
+				    Data = Source{[Schema = "public", Item = "vw_dryer_dashboard_powerbi"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table
+

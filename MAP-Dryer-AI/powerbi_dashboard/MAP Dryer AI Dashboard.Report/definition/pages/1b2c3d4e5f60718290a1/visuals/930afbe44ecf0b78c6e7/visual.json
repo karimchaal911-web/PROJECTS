@@ -1,0 +1,232 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "930afbe44ecf0b78c6e7",
+  "position": {
+    "x": 1079.5566502463055,
+    "y": 226.10837438423644,
+    "z": 2900,
+    "height": 221.67487684729062,
+    "width": 488.79310344827582,
+    "tabOrder": 2900
+  },
+  "visual": {
+    "visualType": "multiRowCard",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_dryer_anomaly_events"
+                    }
+                  },
+                  "Property": "Event Sel Subsystem"
+                }
+              },
+              "queryRef": "vw_dryer_anomaly_events.Event Sel Subsystem",
+              "nativeQueryRef": "Event Sel Subsystem"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_dryer_anomaly_events"
+                    }
+                  },
+                  "Property": "Event Sel Diagnosis"
+                }
+              },
+              "queryRef": "vw_dryer_anomaly_events.Event Sel Diagnosis",
+              "nativeQueryRef": "Event Sel Diagnosis"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_dryer_anomaly_events"
+                    }
+                  },
+                  "Property": "Event Sel Duration Display"
+                }
+              },
+              "queryRef": "vw_dryer_anomaly_events.Event Sel Duration Display",
+              "nativeQueryRef": "Event Sel Duration Display"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_dryer_anomaly_events"
+                    }
+                  },
+                  "Property": "Event Sel Peak Risk Display"
+                }
+              },
+              "queryRef": "vw_dryer_anomaly_events.Event Sel Peak Risk Display",
+              "nativeQueryRef": "Event Sel Peak Risk Display"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_dryer_anomaly_events"
+                    }
+                  },
+                  "Property": "Event Sel Moisture Display"
+                }
+              },
+              "queryRef": "vw_dryer_anomaly_events.Event Sel Moisture Display",
+              "nativeQueryRef": "Event Sel Moisture Display"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_dryer_anomaly_events"
+                    }
+                  },
+                  "Property": "Event Sel Lab Context"
+                }
+              },
+              "queryRef": "vw_dryer_anomaly_events.Event Sel Lab Context",
+              "nativeQueryRef": "Event Sel Lab Context"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataLabels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#17231F'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryLabels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#5E706A'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card": [
+        {
+          "properties": {
+            "barShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

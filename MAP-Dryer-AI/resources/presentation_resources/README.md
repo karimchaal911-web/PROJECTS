@@ -9,4 +9,4 @@ This folder consolidates the images and links shared as references for the final
 - `links.md` — external reference websites and the intended design lessons to extract from each.
 
 These are reference inputs only, and this folder is their single canonical
-home. Final generated assets live under `final_presentation_claude/`, not here.
+home. Final generated assets live under `final_presentation/`, not here.

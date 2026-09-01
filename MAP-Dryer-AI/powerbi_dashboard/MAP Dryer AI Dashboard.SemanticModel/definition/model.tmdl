@@ -1,0 +1,16 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table vw_dryer_dashboard_powerbi
+ref table vw_dryer_contributors_powerbi
+ref table vw_dryer_anomaly_events
+ref table vw_dryer_lab_samples
+ref table vw_dryer_overview_trends_powerbi
+ref table vw_dryer_latest
+

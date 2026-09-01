@@ -1,0 +1,64 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "name": "43fbbb58f3714e6681f9",
+  "position": {
+    "x": 8,
+    "y": 8,
+    "z": 1,
+    "height": 56,
+    "width": 600,
+    "tabOrder": 101
+  },
+  "visual": {
+    "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "OCP Soluble MAP Dryer — AI Operations Dashboard",
+                    "textStyle": {
+                      "fontSize": "15pt",
+                      "color": "#212B36",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Operations Overview · model outputs read from PostgreSQL (realtime_pipeline)",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#5A6570"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 618.38305001469371,
+            "y": -41.422348979922248
+          },
+          "nodeIndex": "vw_dryer_anomaly_events",
+          "nodeLineageTag": "4490436c-25f7-5336-bdd8-cd1908041938",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 334.20156119318517,
+            "y": -8.577651020077667
+          },
+          "nodeIndex": "vw_dryer_contributors_powerbi",
+          "nodeLineageTag": "2b89c2b9-b632-47c0-84c4-149ca48caf76",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": -11.437238200325226
+          },
+          "nodeIndex": "vw_dryer_dashboard_powerbi",
+          "nodeLineageTag": "e7f6bb4d-d16d-4ae9-8da4-c7bafa6ede0e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 852.38305001469371,
+            "y": 25
+          },
+          "nodeIndex": "vw_dryer_lab_samples",
+          "nodeLineageTag": "0078eeb6-e612-51b1-9473-47690be47348",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1136.3830500146937,
+            "y": 25
+          },
+          "nodeIndex": "vw_dryer_latest",
+          "nodeLineageTag": "75b2d144-3700-4f86-bdb1-b54c4249784c",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1420.3830500146937,
+            "y": 25
+          },
+          "nodeIndex": "vw_dryer_overview_trends_powerbi",
+          "nodeLineageTag": "a8c62ac1-9a10-5796-8848-113ffe9f9da1",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 61.904815609462958,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

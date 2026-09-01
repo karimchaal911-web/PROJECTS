@@ -12,7 +12,7 @@ event, ranked contributors, cause analysis, events table).
 
 All displayed values bind to measures/columns of the DirectQuery model —
 no literal data values are embedded. The previous pages are copied to
-``POWERBI DASHBOARD/backup_report_pages_<date>/`` the first time this
+``powerbi_dashboard/backup_report_pages_<date>/`` the first time this
 script runs. Rerunning is deterministic (stable visual names).
 """
 
@@ -24,13 +24,13 @@ import shutil
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-REPORT_DIR = PROJECT_ROOT / "POWERBI DASHBOARD" / "MAP Dryer AI Dashboard.Report"
+REPORT_DIR = PROJECT_ROOT / "powerbi_dashboard" / "MAP Dryer AI Dashboard.Report"
 PAGES_DIR = REPORT_DIR / "definition" / "pages"
 THEME_PATH = (
     REPORT_DIR / "StaticResources" / "RegisteredResources"
     / "OCPIndustrialTheme.json"
 )
-BACKUP_DIR = PROJECT_ROOT / "POWERBI DASHBOARD" / "backup_report_pages_20260806"
+BACKUP_DIR = PROJECT_ROOT / "powerbi_dashboard" / "backup_report_pages_20260806"
 
 PAGE1 = "0a1b2c3d4e5f60718290"
 PAGE2 = "1b2c3d4e5f60718290a1"

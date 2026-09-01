@@ -932,7 +932,7 @@ $RealtimeScript   = Join-Path $ProjectRoot "realtime_pipeline\src\realtime_servi
 $VerifyScript     = Join-Path $ProjectRoot "realtime_pipeline\src\verify_powerbi_views.py"
 $BootstrapScript  = Join-Path $ProjectRoot "realtime_pipeline\src\apply_sql_migration.py"
 $EnvFile          = Join-Path $ProjectRoot "realtime_pipeline\.env"
-$PowerBIDir       = Join-Path $ProjectRoot "POWERBI DASHBOARD"
+$PowerBIDir       = Join-Path $ProjectRoot "powerbi_dashboard"
 $PowerBIReportRoot = Join-Path $PowerBIDir "MAP Dryer AI Dashboard.Report"
 
 foreach ($requiredPath in @($RealtimeScript, $EnvFile, $PowerBIDir)) {

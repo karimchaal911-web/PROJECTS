@@ -24,7 +24,7 @@ LATEST_VIEW = "vw_dryer_latest"
 
 # The exact column names the Power BI semantic model expects. Each entry maps
 # to a `sourceColumn:` line in
-# "POWERBI DASHBOARD/MAP Dryer AI Dashboard.SemanticModel/definition/tables".
+# "powerbi_dashboard/MAP Dryer AI Dashboard.SemanticModel/definition/tables".
 # Note the historical trailing space in "Air Flow Rate ".
 EXPECTED_COLUMNS: dict[str, list[str]] = {
     DASHBOARD_VIEW: [

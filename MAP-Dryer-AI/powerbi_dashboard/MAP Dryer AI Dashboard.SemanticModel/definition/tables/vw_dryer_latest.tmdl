@@ -1,0 +1,192 @@
+/// One-row DirectQuery snapshot for live KPI cards. Keeping current-state
+/// measures on this view avoids rescanning the full dashboard history for
+/// every card during page load and automatic refresh.
+table vw_dryer_latest
+	lineageTag: 75b2d144-3700-4f86-bdb1-b54c4249784c
+
+	column Timestamp
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: b3321915-d3d3-4970-8aa7-43fb504d0e8a
+		summarizeBy: none
+		sourceColumn: Timestamp
+
+	column 'Predicted Moisture'
+		dataType: double
+		formatString: 0.000000
+		lineageTag: 934642f0-99e7-4c63-bb90-a2dcc3976b57
+		summarizeBy: none
+		sourceColumn: Predicted Final Moisture
+
+	column 'Anomaly Score'
+		dataType: double
+		formatString: 0.000000
+		lineageTag: bc97a927-f080-4934-808c-38ddf1e06088
+		summarizeBy: none
+		sourceColumn: Anomaly Score
+
+	column 'Anomaly Detected'
+		dataType: boolean
+		isHidden
+		lineageTag: b83a878d-6d48-433b-b2a3-f2e04ca40088
+		summarizeBy: none
+		sourceColumn: Anomaly Detected
+
+	column Severity
+		dataType: string
+		lineageTag: 1a267876-ad9d-4ed4-b0e4-12033f49de9e
+		summarizeBy: none
+		sourceColumn: Severity
+
+	column Subsystem
+		dataType: string
+		lineageTag: b9983933-587b-42f8-90f6-99075f453afa
+		summarizeBy: none
+		sourceColumn: Likely Subsystem
+
+	column Diagnosis
+		dataType: string
+		lineageTag: e49ec147-e2ae-42ec-9e0d-92da64763f8c
+		summarizeBy: none
+		sourceColumn: Probable Diagnosis
+
+	column 'Possible Causes'
+		dataType: string
+		lineageTag: 9c8a62e9-72a0-4734-bc38-78c253da2c74
+		summarizeBy: none
+		sourceColumn: Possible Causes
+
+	column 'Recommended Verification'
+		dataType: string
+		lineageTag: 2d2e8320-253f-4143-8558-7fa28de4b92d
+		summarizeBy: none
+		sourceColumn: Recommended Verification
+
+	column 'Dryer Air Temperature'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 598d0330-99ac-450f-a79d-d53bcd8d5ac3
+		summarizeBy: none
+		sourceColumn: Dryer Air Temperature
+
+	column 'Cooler Air Temperature'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 75a84089-f228-498f-9223-38d96daf6a52
+		summarizeBy: none
+		sourceColumn: Cooler Air Temperature
+
+	column 'Air Flow Rate'
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 3f5814ea-f3ef-410d-a17a-10987614c56a
+		summarizeBy: none
+		sourceColumn: "Air Flow Rate "
+
+	column 'Wet Product Feed Rate'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 69ac5940-1aa4-4467-807f-59678a7db88a
+		summarizeBy: none
+		sourceColumn: Wet Product Feed Rate
+
+	column 'Product Inlet Temperature'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 5e8808dc-f189-426f-8175-2f8f3aa7a623
+		summarizeBy: none
+		sourceColumn: Product Inlet Temperature
+
+	column 'Residence Time'
+		dataType: double
+		formatString: 0.0
+		lineageTag: bf6456a9-a111-4e32-b8f8-70c19af05a4c
+		summarizeBy: none
+		sourceColumn: Residence Time
+
+	column Vacuum
+		dataType: double
+		formatString: 0.0
+		lineageTag: 651edb18-b413-4edc-805e-f15980bf6ba7
+		summarizeBy: none
+		sourceColumn: Vacuum
+
+	column 'Steam Pressure'
+		dataType: double
+		formatString: 0.00
+		lineageTag: d95cd881-c24f-4b3b-91bd-685480f9dd22
+		summarizeBy: none
+		sourceColumn: Steam Pressure
+
+	column 'Fan Speed'
+		dataType: double
+		formatString: #,0
+		lineageTag: d8a915ed-cb70-42de-8149-dd84b7172efa
+		summarizeBy: none
+		sourceColumn: Fan Speed
+
+	column 'Product Density'
+		dataType: double
+		formatString: 0.000
+		lineageTag: 5f1abb64-528e-4db7-b481-b6a3d32496d1
+		summarizeBy: none
+		sourceColumn: Product Density
+
+	column 'Final Product Temperature'
+		dataType: double
+		formatString: 0.0
+		lineageTag: cd981c39-29b7-4a98-a764-1e11e1f24c38
+		summarizeBy: none
+		sourceColumn: Final Product Temp
+
+	column 'Anomaly Risk'
+		dataType: double
+		formatString: 0.000
+		lineageTag: da885542-16d7-4259-b9db-590692e04b61
+		summarizeBy: none
+		sourceColumn: Anomaly Risk
+
+	column 'Model Version'
+		dataType: string
+		lineageTag: 373bf50f-a58a-430d-b11b-19294754eeae
+		summarizeBy: none
+		sourceColumn: Model Version
+
+	column 'Feature Schema Version'
+		dataType: string
+		lineageTag: 18f5c5af-8607-49aa-a313-bcce983237b4
+		summarizeBy: none
+		sourceColumn: Feature Schema Version
+
+	column 'Inference Timestamp'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 4f344544-75b1-4159-a609-d48719e44af1
+		summarizeBy: none
+		sourceColumn: Inference Timestamp
+
+	column 'Latest Lab Sample Timestamp'
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 2b2c4002-61e1-4fbb-8302-1de207f7de63
+		summarizeBy: none
+		sourceColumn: Latest Lab Sample Timestamp
+
+	column 'Latest Lab Final Moisture'
+		dataType: double
+		formatString: 0.000000
+		lineageTag: 5effcda7-225e-4405-9748-ad34c7593ca6
+		summarizeBy: none
+		sourceColumn: Latest Lab Final Moisture
+
+	partition vw_dryer_latest = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database(DB_Server, DB_Database),
+				    Data = Source{[Schema = "public", Item = "vw_dryer_latest"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table
+

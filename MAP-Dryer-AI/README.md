@@ -53,7 +53,7 @@ new test set.
 
 | Item | Current implementation |
 |---|---|
-| Canonical source | `data/raw/MAP_Dryer_Canonical_5s_deterministic.csv` |
+| Canonical source | `data/raw/MAP_Dryer_Canonical_5s_deterministic.csv`, restored from the versioned `.csv.xz` archive |
 | Process history | 1,589,760 gap-free rows over 92 days |
 | Prototype cadence | 5 seconds |
 | Laboratory results | 1,104 sparse samples, approximately every 2 hours |
@@ -124,7 +124,21 @@ or rebuilds the report.
 
 ## Reproducing the analytical workflow
 
-Install the notebook dependencies and run the notebooks in order:
+The canonical 92-day CSV is 235 MB, past GitHub's per-file limit, so the
+repository versions it as a 40 MB XZ archive. It is user-supplied and
+deterministic; nothing here regenerates it, so that archive is the copy of
+record. Expand it once before running the notebooks:
+
+```powershell
+python tools/restore_canonical_dataset.py
+```
+
+That writes both referenced paths - `data/raw/MAP_Dryer_Canonical_5s_deterministic.csv`
+and `data/processed/MAP_Dryer_Canonical_5s.csv` - and verifies each against the
+SHA-256 in `data/processed/MAP_Dryer_Canonical_5s.manifest.json`. Use
+`--check` to re-verify an existing copy without writing anything.
+
+Then install the notebook dependencies and run the notebooks in order:
 
 ```powershell
 python -m pip install -r requirements.txt
@@ -161,14 +175,14 @@ individually.
 | `realtime_pipeline/src/realtime_service.py` | Loads the exported models once, performs five-second inference, and uses idempotent database writes |
 | PostgreSQL | Stores `dryer_map`, `dryer_model_outputs`, and `dryer_abnormal_variables` and exposes five Power BI views |
 | `realtime_pipeline/src/verify_powerbi_views.py` | Checks live SQL columns against the checked-in TMDL contracts |
-| `POWERBI DASHBOARD/` | Two-page PBIP report using PostgreSQL DirectQuery and five-second automatic page refresh |
+| `powerbi_dashboard/` | Two-page PBIP report using PostgreSQL DirectQuery and five-second automatic page refresh |
 
 Power BI performs visualization only; it does not load joblib files or execute
-model inference. See `POWERBI DASHBOARD/README.md` for connection details,
+model inference. See `powerbi_dashboard/README.md` for connection details,
 semantic-model behavior, and dashboard limitations.
 
 For a new PostgreSQL instance, apply
-`POWERBI DASHBOARD/sql/bootstrap_base_schema.sql`, then run:
+`powerbi_dashboard/sql/bootstrap_base_schema.sql`, then run:
 
 ```powershell
 python realtime_pipeline/src/apply_sql_migration.py
@@ -198,14 +212,14 @@ complete technical narrative is in
 ```text
 artifacts/                machine-readable audits, metrics, and validation record
 config/                   data dictionary, thresholds, subsystems, diagnosis rules
-data/raw/                 supplied canonical 92-day dataset (kept local, see .gitignore)
+data/raw/                 canonical 92-day dataset, versioned as .csv.xz (see .gitignore)
 data/processed/           canonical manifest and the versioned Notebook 02 handoff
 figures/                  notebook-generated analytical figures
-final_presentation_claude/ Three.js soutenance keynote, exports, speaker notes and QA
+final_presentation/ Three.js soutenance keynote, exports, speaker notes and QA
 final_report/             LaTeX sources and final internship report
 models/5s/                active moisture, anomaly, scaler, schema, and profile
 notebooks/                four-stage analytical workflow
-POWERBI DASHBOARD/        PBIP report, TMDL model, PBIR pages, and SQL definitions
+powerbi_dashboard/        PBIP report, TMDL model, PBIR pages, and SQL definitions
 realtime_pipeline/        environment, database utilities, and replay service
 resources/dashboard_demo/ the two-day replay fork the runtime reads
 resources/presentation_resources/ process and site reference material
@@ -223,11 +237,10 @@ RUN_PRESENTATION.ps1      canonical one-command soutenance keynote launcher
 | Deliverable | Location |
 |---|---|
 | Internship report | `final_report/MAP_Dryer_AI_Internship_Report.pdf` (LaTeX sources alongside) |
-| Soutenance keynote | `final_presentation_claude/` — interactive Three.js build plus PDF and PPTX fallbacks |
-| Operations dashboard | `POWERBI DASHBOARD/MAP Dryer AI Dashboard.pbip` |
+| Soutenance keynote | `final_presentation/` — interactive Three.js build plus PDF and PPTX fallbacks |
+| Operations dashboard | `powerbi_dashboard/MAP Dryer AI Dashboard.pbip` |
 | Model artifacts | `models/5s/` |
 | Validation record | `artifacts/FINAL_VALIDATION_2026-08-24.md` |
-| Repository audit | `FINAL_PROJECT_AUDIT.md` |
 
 ## Interpretation boundaries
 

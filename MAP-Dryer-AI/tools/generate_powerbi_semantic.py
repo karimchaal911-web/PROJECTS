@@ -31,7 +31,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SEMANTIC_DIR = (
     PROJECT_ROOT
-    / "POWERBI DASHBOARD"
+    / "powerbi_dashboard"
     / "MAP Dryer AI Dashboard.SemanticModel"
     / "definition"
 )

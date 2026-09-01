@@ -1,0 +1,130 @@
+/// Ranked abnormal process variables (0-4 rows per anomalous timestamp)
+/// produced by the realtime_pipeline diagnosis engine. Filtered through the
+/// one-to-many Timestamp relationship from vw_dryer_dashboard_powerbi.
+table vw_dryer_contributors_powerbi
+	lineageTag: 2b89c2b9-b632-47c0-84c4-149ca48caf76
+
+	measure 'Contributor Count' = COUNTROWS ( 'vw_dryer_contributors_powerbi' )
+		formatString: #,0
+		displayFolder: 06 Diagnostics Page
+		lineageTag: 702af655-43c6-4e40-bfbd-7de0cf994997
+
+	measure 'Contributor Empty State' =
+			IF (
+			    COALESCE ( [Contributor Count], 0 ) = 0,
+			    "No abnormal contributors recorded for this selection.",
+			    ""
+			)
+		displayFolder: 06 Diagnostics Page
+		lineageTag: dd9d86b3-53d4-4c9c-bd45-6c245333ee4d
+
+	measure 'Contributor Bar Color' =
+			SWITCH (
+			    UPPER ( MAX ( 'vw_dryer_contributors_powerbi'[Variable Severity] ) ),
+			    "HIGH", "#C8102E",
+			    "#E8A013"
+			)
+		displayFolder: 05 State Colors
+		lineageTag: 5ad9f95b-adcf-452d-b35e-23e7395fa426
+
+	measure 'Contribution Score Value' = AVERAGE ( 'vw_dryer_contributors_powerbi'[Contribution Score] )
+		formatString: 0.00
+		displayFolder: 07 Chart Series
+		lineageTag: e8e7a8b3-1d46-4272-84d2-09c80d0ecaab
+
+	measure 'Contributor Rank Value' = MIN ( 'vw_dryer_contributors_powerbi'[Contributor Rank] )
+		formatString: 0
+		displayFolder: 07 Chart Series
+		lineageTag: 710553a2-9fe6-402b-bf16-8ec13f09660f
+
+	column Timestamp
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 72eab6ad-ea2e-488f-bd6c-8686eb2f061e
+		summarizeBy: none
+		sourceColumn: Timestamp
+
+	column 'Contributor Rank'
+		dataType: int64
+		formatString: 0
+		lineageTag: 422dfa8e-449d-49a4-a59a-b0e880826be1
+		summarizeBy: none
+		sourceColumn: contribution_rank
+
+	column 'Contributor Name'
+		dataType: string
+		lineageTag: 8385cfa2-9001-4b9f-a43a-e1e3679d7d31
+		summarizeBy: none
+		sourceColumn: feature_name
+
+	column 'Observed Value'
+		dataType: double
+		formatString: 0.0000
+		lineageTag: bf9e6284-469d-45d4-bd09-edb37a9fc00d
+		summarizeBy: none
+		sourceColumn: observed_value
+
+	column 'Signed Deviation'
+		dataType: double
+		formatString: +0.0000;-0.0000;0.0000
+		lineageTag: 83f34d9a-2046-44a7-a791-17541c111797
+		summarizeBy: none
+		sourceColumn: signed_deviation
+
+	column 'Deviation Percent'
+		dataType: double
+		formatString: 0.0
+		lineageTag: f4794360-02ea-4feb-b970-e61d913401d9
+		summarizeBy: none
+		sourceColumn: deviation_percent
+
+	column 'Contribution Score'
+		dataType: double
+		formatString: 0.0000
+		lineageTag: 4f3ddd8d-b031-4662-9d1d-d964fad8adb4
+		summarizeBy: none
+		sourceColumn: contribution_score
+
+	column 'Deviation Direction'
+		dataType: string
+		lineageTag: 10424424-8a1f-4da6-bc86-7bbd09b24137
+		summarizeBy: none
+		sourceColumn: deviation_direction
+
+	column 'Variable Severity'
+		dataType: string
+		lineageTag: 34ac22f4-9f59-4c8e-8929-742ea350c48f
+		summarizeBy: none
+		sourceColumn: variable_severity
+
+	column 'Contributor Display Name' =
+			SWITCH (
+			    'vw_dryer_contributors_powerbi'[Contributor Name],
+			    "wet_product_feed_rate", "Wet Product Feed Rate",
+			    "product_inlet_temperature", "Product Inlet Temperature",
+			    "residence_time", "Residence Time",
+			    "cooler_air_temperature", "Cooler Air Temperature",
+			    "dryer_air_temperature", "Dryer Air Temperature",
+			    "steam_pressure", "Steam Pressure",
+			    "air_flow_rate", "Air Flow Rate",
+			    "fan_speed", "Fan Speed",
+			    "vacuum", "Vacuum",
+			    "air_product_delta", "Air-Product Temperature Delta",
+			    "thermal_load", "Thermal Load",
+			    'vw_dryer_contributors_powerbi'[Contributor Name]
+			)
+		dataType: string
+		lineageTag: e2d9f9d8-43de-4e1f-bbf6-a311f5b9811d
+		summarizeBy: none
+
+	partition vw_dryer_contributors_powerbi = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database(DB_Server, DB_Database),
+				    Data = Source{[Schema = "public", Item = "vw_dryer_contributors_powerbi"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table
+
