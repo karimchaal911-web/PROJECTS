@@ -16,7 +16,8 @@ are cleanup, correctness and reproducibility fixes.
 | | Before | After |
 |---|---|---|
 | `MAP-Dryer-AI/` working tree | 3.1 GB | 1.3 GB |
-| Space reclaimed | — | **≈ 1.8 GB** |
+| `.git` object store | 4.9 GB (4.49 GiB loose) | 3.9 GB (0 loose, 0 garbage) |
+| Space reclaimed | — | **≈ 2.8 GB total** |
 | Tracked files changed | — | 104 added, 207 modified, 248 deleted |
 | Test suite | 77 passed | 77 passed |
 | Notebooks executing end to end | 0 of 4 | **4 of 4** |
@@ -445,7 +446,23 @@ data during this audit.
 * Repository: `https://github.com/karimchaal911-web/PROJECTS.git`
 * Branch: `main`
 * No history was rewritten, no force push, no reset, no new repository.
-* `git gc` was run to reclaim loose objects; this repacks, it does not alter
-  history.
+* `git gc` was run to reclaim loose objects: 4.49 GiB of loose objects packed,
+  `.git` 4.9 GB to 3.9 GB, `size-garbage` 0. This repacks; it does not alter
+  history. An orphaned `tmp_pack_*` left by an earlier interrupted `gc` was
+  removed after `git fsck` reported no errors. Unreachable objects younger than
+  the default two-week window were kept, so recent dropped work is still
+  recoverable; `git gc --prune=now` would reclaim more but discard that safety
+  net, and was deliberately not run.
 
-Commit hash and push status are recorded in the final session summary.
+### Commits
+
+| Hash | Subject |
+|---|---|
+| `e4a9e1ea6d05fb08d44debfea9f9bdbc525ee606` | Final project audit, cleanup, notebook QA and reproducibility |
+| `55a765c05bf0fe393d5a1a4996293a542e45d647` | Correct stale references to the superseded presentation build |
+
+**Push status: succeeded.** `b95bbb8..e4a9e1e` (154.79 MiB) then
+`e4a9e1e..55a765c`, both to `origin/main`. Verified after the fact: local HEAD
+equals `origin/main`, the working tree is clean, every canonical deliverable is
+present on the remote branch, and a scan of the remote tree finds no `.env`,
+cache, checkpoint, `node_modules` or scratch path.
