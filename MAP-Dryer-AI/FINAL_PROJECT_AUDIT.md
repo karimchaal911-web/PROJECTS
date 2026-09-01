@@ -388,7 +388,12 @@ data during this audit.
   needs it.
 * **Broken document paths.** `design/RESOURCE_AUDIT.md` cited
   `branding/ocp.png`, which does not exist; it now points at
-  `assets/original/ocp.png`.
+  `assets/original/ocp.png`. `resources/presentation_resources/README.md`
+  listed a `screenshots/model_reference/` folder that was never there and told
+  the reader to put generated assets in the removed `final_presentation/`;
+  both were corrected. Three statements that the superseded presentation build
+  "exists" and "is left untouched" were rewritten to say it was removed in this
+  audit and remains in Git history.
 * **README** gained the automated notebook runner, a final-deliverables table,
   the notebook ordering constraint, and a repository map that includes
   `final_presentation_claude/`, `resources/`, `tools/`, `conftest.py` and

@@ -197,6 +197,7 @@ source of truth stays where it belongs:
 | `POWERBI DASHBOARD/preview/` | The real dashboard pages |
 | `resources/presentation_resources/` | OCP and SiteAssist art direction |
 
-An earlier non-React attempt exists at `final_presentation/`. It was
-deliberately not used as a foundation, reference or storyboard, and it is left
-untouched. **This directory is the canonical final version.**
+An earlier non-React attempt lived at `final_presentation/`. It was
+deliberately not used as a foundation, reference or storyboard, and was
+removed in the final repository audit; it remains in Git history.
+**This directory is the canonical final version.**

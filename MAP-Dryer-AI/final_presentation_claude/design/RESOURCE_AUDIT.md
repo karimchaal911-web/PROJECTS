@@ -258,8 +258,9 @@ canonical copy of the reference captures.
 
 ## 8. Prior presentation attempts
 
-`final_presentation/` contains an earlier non-React Three.js + GSAP attempt.
-It was deliberately **not** read for storyboard, layout, scene composition,
-motion or visual direction, and nothing in it is inherited. It is left
-untouched. This audit and everything under `final_presentation_claude/` derive
+`final_presentation/` held an earlier non-React Three.js + GSAP attempt. It
+was deliberately **not** read for storyboard, layout, scene composition,
+motion or visual direction, and nothing in it is inherited. It was removed
+in the final repository audit as a superseded deliverable and remains
+recoverable from Git history. This audit and everything under `final_presentation_claude/` derive
 directly from the repository, the report and `resources/`.
