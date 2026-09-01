@@ -2,4 +2,6 @@
 .env
 __pycache__/
 *.pyc
-logs/
+# logs/* rather than logs/, so the placeholder below can be re-included.
+logs/*
+!logs/.gitkeep

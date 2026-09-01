@@ -161,6 +161,8 @@ not compile the report, and could not run the dashboard demo.
 | `qa/PRESENTATION_REMEDIATION_REPORT.md`, `qa/PRESENTATION_RUTHLESS_AUDIT.md` | presentation QA deliverables |
 | `exports/powerbi_backup/` | the documented static fallback for the live demo |
 | `data/processed/MAP_Dryer_Lab_Aligned_16.csv` (220 KB) | the Notebook 02 handoff; lets Notebooks 03–04 be rerun without the 500 MB canonical sources |
+| `models/anomaly_pipeline/reference_profile.json` (12 KB) | the fourth artifact of the legacy anomaly set, whose three siblings were already tracked; excluded only by the parent workspace's broad `**/models/*` rule |
+| `realtime_pipeline/logs/.gitkeep` | the directory placeholder, tracked like its `models/` and `src/` siblings; `logs/` became `logs/*` so the negation can apply |
 | `models/5s/{quality_moisture_pipeline,anomaly_model,anomaly_scaler}.joblib` (40 KB) | the three artifacts the runtime loads. `RUN_FINAL_DEMO.ps1` deliberately never retrains, so without these the one-command demo could not run from a clone |
 
 ---
