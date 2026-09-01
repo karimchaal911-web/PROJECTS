@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "a304ef4e7910ecd5f834",
   "position": {
-    "x": 1080,
-    "y": 166,
+    "x": 1079.5566502463055,
+    "y": 166.25615763546799,
     "z": 2600,
-    "height": 24,
-    "width": 200,
+    "height": 35.4679802955665,
+    "width": 230.54187192118226,
     "tabOrder": 2600
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -20,11 +19,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Selected event",
+                    "value": "Selected anomaly event",
                     "textStyle": {
+                      "fontWeight": "bold",
                       "fontSize": "12pt",
-                      "color": "#17231F",
-                      "fontWeight": "bold"
+                      "color": "#17231f"
                     }
                   }
                 ]
@@ -87,6 +86,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

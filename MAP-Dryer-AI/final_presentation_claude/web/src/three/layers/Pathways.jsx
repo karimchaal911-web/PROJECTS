@@ -45,7 +45,6 @@ function QualityLane() {
   const labels = useRef();
   const presence = useChannel('lanes');
   const focus = useChannel('laneFocus', 0);
-  const solid = useRef();
 
   const coefs = useMemo(() => {
     const list = getData().coefficients?.features ?? [];
@@ -65,31 +64,31 @@ function QualityLane() {
     color: C.predict, transparent: true, opacity: 0, depthWrite: false,
   }), []);
 
-  useFrame((state) => {
+  useFrame(() => {
     const p = presence.current;
     if (group.current) {
       group.current.visible = p > 0.01;
       if (p <= 0.01) return;
     }
     // laneFocus: -1 favours quality, +1 favours process, 0 is neutral
-    const f = THREE.MathUtils.clamp(1 - Math.max(0, focus.current), 0.35, 1);
+    const f = THREE.MathUtils.clamp(1 - Math.max(0, focus.current), 0.2, 1);
     if (labels.current) labels.current.visible = p > 0.4;
     barMat.opacity = p * 0.75 * f;
     solidMat.opacity = p * f;
     outMat.opacity = p * 0.9 * f;
-    if (solid.current) {
-      solid.current.rotation.y = state.clock.elapsedTime * 0.14;
-    }
+    // The model does NOT rotate. A perpetually spinning crystal is the exact
+    // "AI black box" trope this scene exists to refuse; it also contradicted
+    // the object's own brief — compact, solid, unmysterious.
   });
 
   return (
     <group ref={group} position={LANE_A}>
       <group ref={labels}>
-      <WLabel position={[-7.5, 8.4, 0]} fontSize={1.05} color={C.dustBright} fillOpacity={0.95}>
+      <WLabel overlay position={[-7.5, 8.4, 0]} fontSize={1.05} color={C.dustBright} fillOpacity={0.95}>
         QUALITY INTELLIGENCE
       </WLabel>
-      <WMono position={[-7.5, 7.1, 0]} fontSize={0.5} color={C.dataTeal} fillOpacity={0.7}>
-        RIDGE · alpha = 10 · 16 FEATURES · SELECTED ON VALIDATION RMSE
+      <WMono overlay position={[-7.5, 7.1, 0]} fontSize={0.5} color={C.dataTeal} fillOpacity={0.8}>
+        RIDGE - alpha = 10 - 16 FEATURES
       </WMono>
       </group>
 
@@ -111,18 +110,25 @@ function QualityLane() {
       })}
 
       {/* the model itself: compact, solid, unmysterious */}
-      <mesh ref={solid} position={[2.4, 0.6, 0]} material={solidMat} castShadow>
+      {/* A stable, faceted solid at a fixed attitude: sixteen coefficients in,
+          one estimate out. It is a linear model and it is drawn as one. */}
+      <mesh position={[2.4, 0.6, 0]} rotation={[0.32, 0.62, 0]} material={solidMat} castShadow>
         <icosahedronGeometry args={[1.9, 1]} />
       </mesh>
 
-      {/* one continuous estimate leaving */}
-      <Line points={[[4.4, 0.6, 0], [8.6, 0.6, 0]]} color={C.predict} lineWidth={2.2}
+      {/* One continuous estimate leaving. The label sits UNDER the endpoint
+          rather than beyond it: read out to the right it made the lane 31
+          world units wide, which cannot fit beside the copy column at any
+          focal length — so the sixteen coefficient names were pushed under
+          the headline and six of them became unreadable. */}
+      <Line points={[[4.4, 0.6, 0], [6.7, 0.6, 0]]} color={C.predict} lineWidth={2.2}
         transparent opacity={0.85} />
-      <mesh position={[8.9, 0.6, 0]} material={outMat}>
+      <mesh position={[7.0, 0.6, 0]} material={outMat}>
         <sphereGeometry args={[0.26, 14, 10]} />
       </mesh>
-      <WMono position={[9.5, 0.6, 0]} fontSize={0.62} color={C.predict} fillOpacity={0.95}>
-        PREDICTED FINAL MOISTURE · % H2O
+      <WMono overlay position={[7.0, -0.9, 0]} fontSize={0.52} color={C.predict}
+        anchorX="center" fillOpacity={0.95}>
+        PREDICTED MOISTURE
       </WMono>
     </group>
   );
@@ -136,6 +142,7 @@ function ManifoldCloud() {
   const presence = useChannel('lanes');
   const reveal = useChannel('manifoldReveal', 0);
   const supportReveal = useChannel('supportReveal', 0);
+  const supportFocus = useChannel('supportFocus', 0);
   const traj = useChannel('trajectory', 0);
   const focus = useChannel('laneFocus', 0);
   const safeMode = useShow((s) => s.safeMode);
@@ -146,7 +153,14 @@ function ManifoldCloud() {
 
   const model = useMemo(() => {
     const m = getData().manifold;
-    const normal = (m.normal?.points ?? []).slice(0, maxPoints);
+    const all = m.normal?.points ?? [];
+    // The caption states the size of the TRAINING SET, which is a fact about
+    // the model. `maxPoints` only decides how many of them are drawn, and safe
+    // mode draws fewer. Deriving the printed number from the rendered subset
+    // meant a graphics budget silently rewrote a claim on screen: the same
+    // frame read "2,400 TRAIN STATES" on one machine and "900" on another.
+    const normalTotal = all.length;
+    const normal = all.slice(0, maxPoints);
     const support = m.support?.points ?? [];
     const path = m.trajectory?.points ?? [];
     const risk = m.trajectory?.risk ?? [];
@@ -178,7 +192,8 @@ function ManifoldCloud() {
     return {
       normalGeo, supportGeo, worldPath, risk, inEvent,
       supportCount: support.length,
-      normalCount: normal.length,
+      normalCount: normalTotal,
+      drawnCount: normal.length,
       centroid,
       variance: m.explainedVariance ?? [],
     };
@@ -186,7 +201,9 @@ function ManifoldCloud() {
 
   const normalMat = useMemo(() => new THREE.PointsMaterial({
     color: C.dataTeal, size: 0.34, transparent: true, opacity: 0,
-    depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, fog: false,
+    // Normal blending, not additive: 2,400 additive points accumulate into a
+    // brightness that no 136-point highlight can win against.
+    depthWrite: false, sizeAttenuation: true, fog: false,
   }), []);
   const supportMat = useMemo(() => new THREE.PointsMaterial({
     color: C.dataCyan, size: 0.62, transparent: true, opacity: 0,
@@ -235,8 +252,15 @@ function ManifoldCloud() {
     const f = THREE.MathUtils.clamp(1 + Math.min(0, focus.current), 0.35, 1);
     const r = reveal.current;
     if (labels.current) labels.current.visible = p > 0.4 && r > 0.3;
-    normalMat.opacity = p * r * 0.8 * f;
-    supportMat.opacity = p * supportReveal.current * 0.95 * f;
+    // The claim "these 136 points define the learned boundary" has to be
+    // VERIFIABLE. With 2,400 additively-blended points behind them, the
+    // support vectors were simply a denser part of the same cloud. So the
+    // cloud recedes as they arrive, and they get scale as well as brightness.
+    const sf = THREE.MathUtils.clamp(supportFocus.current, 0, 1);
+    normalMat.opacity = p * r * f * (0.8 - sf * 0.55);
+    normalMat.size = 0.34 - sf * 0.10;
+    supportMat.opacity = p * supportReveal.current * f;
+    supportMat.size = 0.62 + sf * 0.42;
 
     const u = THREE.MathUtils.clamp(traj.current, 0, 1);
     const n = model.worldPath.length;
@@ -270,20 +294,23 @@ function ManifoldCloud() {
   return (
     <group ref={group} position={LANE_B}>
       <group ref={labels}>
-      <WLabel position={[-14, 13.5, 0]} fontSize={1.05} color={C.dustBright} fillOpacity={0.95}>
+      <WLabel overlay position={[-14, 11.6, 0]} fontSize={1.05} color={C.dustBright} fillOpacity={0.95}>
         PROCESS INTELLIGENCE
       </WLabel>
-      <WMono position={[-14, 12.2, 0]} fontSize={0.5} color={C.dataTeal} fillOpacity={0.7}>
-        ONE-CLASS SVM · v = 0.02 · 15 PROCESS-ONLY FEATURES · UNSUPERVISED
-      </WMono>
-      <WMono position={[-14, -13.0, 0]} fontSize={0.5} color={C.outline} fillOpacity={0.7}>
+      {/* The model spec lives in the DOM caption, which has the full font
+          subset and a scrim. Repeating it in perspective here only produced a
+          second, less legible copy of the same line. */}
+      {/* Provenance sits directly under the cloud rather than at the foot of
+          the lane, where it used to be overwritten by the persistent boundary
+          badge and skewed to the point of illegibility. */}
+      <WMono overlay position={[-14, -9.4, 0]} fontSize={0.62} color={C.dustBright} fillOpacity={0.95}>
         {`${model.normalCount.toLocaleString('en-US')} TRAIN STATES · PCA(3) · ${
           model.variance.length
             ? `${(model.variance.reduce((a, b) => a + b, 0) * 100).toFixed(1)} % OF VARIANCE`
             : ''
         }`}
       </WMono>
-      <WMono position={[-14, -14.1, 0]} fontSize={0.5} color={C.dataCyan} fillOpacity={0.85}>
+      <WMono overlay position={[-14, -10.6, 0]} fontSize={0.62} color={C.dataCyan} fillOpacity={1}>
         {`${model.supportCount} SUPPORT VECTORS — THE LEARNED BOUNDARY`}
       </WMono>
       </group>

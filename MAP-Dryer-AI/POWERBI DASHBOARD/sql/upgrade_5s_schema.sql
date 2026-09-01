@@ -53,6 +53,13 @@ CREATE INDEX IF NOT EXISTS ix_dryer_model_outputs_canonical_v6_timestamp
     ON public.dryer_model_outputs ((("Date" + "Time")))
     WHERE "Model Version" = 'canonical_92d_v6.0';
 
+-- Diagnostics page queries only anomalous rows. Keep event-building scans off
+-- the full five-second history during page switches and refresh cycles.
+CREATE INDEX IF NOT EXISTS ix_dryer_model_outputs_anomaly_v6_timestamp
+    ON public.dryer_model_outputs ((("Date" + "Time")))
+    WHERE "Anomaly Detected" IS TRUE
+      AND "Model Version" = 'canonical_92d_v6.0';
+
 -- ----------------------------------------------------------------------------
 -- Extended dashboard view. Columns 1-26 are byte-identical to the previous
 -- definition (previously SELECTed through vw_dryer_dashboard_v2); columns

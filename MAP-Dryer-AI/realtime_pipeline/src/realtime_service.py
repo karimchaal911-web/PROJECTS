@@ -1,6 +1,7 @@
-"""5-second held-out TEST replay service for the MAP dryer prototype.
+"""5-second dashboard demonstration replay service for the MAP dryer prototype.
 
-Replays the canonical dataset's chronological TEST partition:
+Replays the isolated final-two-day dashboard fork by default. The canonical
+held-out TEST partition remains supported through explicit configuration:
 
 * one new observation per cycle, resumed **incrementally** from the latest
   ``Timestamp`` already present in PostgreSQL (idempotent upserts — a
@@ -25,8 +26,9 @@ is performed anywhere.
 
 Configuration (``realtime_pipeline/.env``):
 
-    SOURCE_CSV_5S           canonical 5-second CSV or held-out TEST replay
-    SOURCE_PARTITION_5S     ``held_out_test`` to replay only the TEST partition
+    SOURCE_CSV_5S           dashboard-demo CSV or an explicit canonical source
+    WARMUP_CSV_5S           hidden pre-replay context for dashboard-demo mode
+    SOURCE_PARTITION_5S     ``dashboard_demo`` (default) or ``held_out_test``
     REPLAY_START_TIMESTAMP  first TEST timestamp when using the canonical CSV
     POLL_INTERVAL_SECONDS   cycle budget, default 5
     REPLAY_SPEED            pacing divisor: 1 = real time, 60 = 60x faster,
@@ -129,6 +131,7 @@ DB_RETRY_BACKOFF_SECONDS = 2.0
 @dataclass
 class ServiceConfig:
     source_csv: Path
+    warmup_csv: Path | None
     source_partition: str
     replay_start_timestamp: pd.Timestamp | None
     poll_interval_seconds: float
@@ -205,13 +208,24 @@ def require_env(name: str) -> str:
 def load_config() -> ServiceConfig:
     source_default = str(
         PROJECT_ROOT
-        / "data"
-        / "processed"
-        / "MAP_Dryer_TEST_Replay_5s.csv"
+        / "resources"
+        / "dashboard_demo"
+        / "MAP_Dryer_Dashboard_Demo_5s.csv"
     )
     source_csv = Path(os.getenv("SOURCE_CSV_5S", source_default).strip())
     if not source_csv.is_absolute():
         source_csv = PIPELINE_ROOT / source_csv
+
+    warmup_default = str(
+        PROJECT_ROOT
+        / "resources"
+        / "dashboard_demo"
+        / "MAP_Dryer_Dashboard_Warmup_5s.csv"
+    )
+    warmup_raw = os.getenv("WARMUP_CSV_5S", warmup_default).strip()
+    warmup_csv = Path(warmup_raw) if warmup_raw else None
+    if warmup_csv is not None and not warmup_csv.is_absolute():
+        warmup_csv = PIPELINE_ROOT / warmup_csv
 
     models_dir = Path(
         os.getenv("MODELS_5S_DIR", str(PROJECT_ROOT / "models" / "5s")).strip()
@@ -219,7 +233,14 @@ def load_config() -> ServiceConfig:
     if not models_dir.is_absolute():
         models_dir = PIPELINE_ROOT / models_dir
 
-    source_partition = os.getenv("SOURCE_PARTITION_5S", "dashboard").strip().lower()
+    source_partition = os.getenv(
+        "SOURCE_PARTITION_5S", "dashboard_demo"
+    ).strip().lower()
+    if source_partition not in {"dashboard_demo", "held_out_test"}:
+        raise RuntimeError(
+            "SOURCE_PARTITION_5S must be 'dashboard_demo' or "
+            "'held_out_test'."
+        )
     replay_start_raw = os.getenv("REPLAY_START_TIMESTAMP", "").strip()
     replay_start_timestamp = (
         pd.Timestamp(replay_start_raw) if replay_start_raw else None
@@ -232,6 +253,11 @@ def load_config() -> ServiceConfig:
 
     return ServiceConfig(
         source_csv=source_csv.resolve(),
+        warmup_csv=(
+            warmup_csv.resolve()
+            if warmup_csv is not None and source_partition == "dashboard_demo"
+            else None
+        ),
         source_partition=source_partition,
         replay_start_timestamp=replay_start_timestamp,
         poll_interval_seconds=_env_float("POLL_INTERVAL_SECONDS", 5.0, 0.1),
@@ -640,20 +666,15 @@ def _load_partition_with_history(
     return pd.concat(selected_chunks, ignore_index=True)
 
 
-def load_source(config: ServiceConfig) -> pd.DataFrame:
-    if config.source_partition == "held_out_test":
-        assert config.replay_start_timestamp is not None
-        raw = _load_partition_with_history(
-            config.source_csv, config.replay_start_timestamp
-        )
-    else:
-        raw = load_raw_source(config.source_csv)
+def _build_replay_frame(raw: pd.DataFrame, label: str) -> pd.DataFrame:
+    """Apply the production preprocessing contract to replay or context rows."""
+
     process, report = build_process_table(raw)
     lab = build_lab_table(raw)
 
     if report.gap_count:
         print(
-            f"WARNING: source has {report.gap_count} gaps "
+            f"WARNING: {label.lower()} has {report.gap_count} gaps "
             f"({report.missing_interval_rows} missing 5-second rows)."
         )
 
@@ -665,11 +686,75 @@ def load_source(config: ServiceConfig) -> pd.DataFrame:
         how="left",
     )
     print(
-        f"Source: {len(merged):,} process rows | "
+        f"{label}: {len(merged):,} process rows | "
         f"{int(merged['Final Moisture (%H2O)'].notna().sum())} lab samples | "
         f"{merged['Timestamp'].min()} .. {merged['Timestamp'].max()}"
     )
     return merged
+
+
+def load_source(config: ServiceConfig) -> pd.DataFrame:
+    if config.source_partition == "held_out_test":
+        assert config.replay_start_timestamp is not None
+        raw = _load_partition_with_history(
+            config.source_csv, config.replay_start_timestamp
+        )
+    else:
+        raw = load_raw_source(config.source_csv)
+    return _build_replay_frame(raw, "Source")
+
+
+def load_warmup_context(config: ServiceConfig) -> pd.DataFrame:
+    """Load dashboard-only history that is never replayed or persisted."""
+
+    columns = ["Timestamp", *PROCESS_VARIABLES, *QUALITY_VARIABLES]
+    if config.source_partition != "dashboard_demo":
+        return pd.DataFrame(columns=columns)
+    if config.warmup_csv is None:
+        raise RuntimeError(
+            "WARMUP_CSV_5S is required for dashboard_demo so the soft sensor "
+            "can predict on the first visible row."
+        )
+    if not config.warmup_csv.is_file():
+        raise FileNotFoundError(
+            "Dashboard warm-up context was not found:\n"
+            f"{config.warmup_csv}\n"
+            "Run: python tools/build_dashboard_demo.py"
+        )
+    return _build_replay_frame(
+        load_raw_source(config.warmup_csv), "Hidden warm-up"
+    ).loc[:, columns]
+
+
+def seed_history_buffer(
+    source: pd.DataFrame,
+    warmup: pd.DataFrame,
+    next_position: int,
+    buffer_rows: int,
+) -> pd.DataFrame:
+    """Seed inference history without adding hidden rows to the replay stream."""
+
+    columns = ["Timestamp", *PROCESS_VARIABLES, *QUALITY_VARIABLES]
+    if next_position < len(source):
+        cutoff = pd.Timestamp(source["Timestamp"].iloc[next_position])
+    else:
+        cutoff = pd.Timestamp(source["Timestamp"].max()) + pd.Timedelta(seconds=5)
+
+    already_replayed = source.iloc[
+        max(0, next_position - buffer_rows):next_position
+    ].loc[:, columns]
+    parts = [frame for frame in (warmup, already_replayed) if not frame.empty]
+    if not parts:
+        return pd.DataFrame(columns=columns)
+
+    return (
+        pd.concat(parts, ignore_index=True)
+        .loc[lambda frame: frame["Timestamp"] < cutoff]
+        .drop_duplicates(subset="Timestamp", keep="last")
+        .sort_values("Timestamp", kind="stable")
+        .tail(buffer_rows)
+        .reset_index(drop=True)
+    )
 
 
 def main() -> None:
@@ -678,6 +763,8 @@ def main() -> None:
     print("=" * 72)
     print(f"Environment:      {ENV_PATH}")
     print(f"Source CSV:       {config.source_csv}")
+    if config.warmup_csv is not None:
+        print(f"Warm-up CSV:      {config.warmup_csv}")
     print(f"Models:           {config.models_dir}")
     print(f"Poll interval:    {config.poll_interval_seconds:g} s")
     print(
@@ -701,6 +788,7 @@ def main() -> None:
     )
 
     source = load_source(config)
+    warmup = load_warmup_context(config)
 
     shutdown_requested = False
 
@@ -752,10 +840,10 @@ def main() -> None:
         artifacts.window_minutes + config.transport_delay_minutes + 45.0,
     )
     buffer_rows = int(buffer_minutes * 60 / 5)
-    buffer = source.iloc[max(0, next_position - buffer_rows):next_position][
-        ["Timestamp", *PROCESS_VARIABLES, *QUALITY_VARIABLES]
-    ].copy()
-    if config.replay_start_timestamp is not None:
+    buffer = seed_history_buffer(
+        source, warmup, next_position, buffer_rows
+    )
+    if not buffer.empty:
         print(
             f"Warm-up history:  {len(buffer):,} rows loaded in memory only; "
             "none will be written to PostgreSQL.\n"

@@ -18,6 +18,8 @@ DASHBOARD_VIEW = "vw_dryer_dashboard_powerbi"
 CONTRIBUTORS_VIEW = "vw_dryer_contributors_powerbi"
 LAB_SAMPLES_VIEW = "vw_dryer_lab_samples"
 EVENTS_VIEW = "vw_dryer_anomaly_events"
+OVERVIEW_VIEW = "vw_dryer_overview_trends_powerbi"
+LATEST_VIEW = "vw_dryer_latest"
 
 
 # The exact column names the Power BI semantic model expects. Each entry maps
@@ -99,6 +101,46 @@ EXPECTED_COLUMNS: dict[str, list[str]] = {
         "Recommended Verification",
         "Predicted Moisture At Peak",
     ],
+    OVERVIEW_VIEW: [
+        "Timestamp",
+        "Predicted Final Moisture",
+        "Laboratory Moisture",
+        "Anomaly Risk",
+        "Anomaly Detected",
+        "Dryer Air Temperature",
+        "Wet Product Feed Rate",
+        "Steam Pressure",
+        "Air Flow Rate",
+        "Vacuum",
+    ],
+    LATEST_VIEW: [
+        "Timestamp",
+        "Predicted Final Moisture",
+        "Anomaly Score",
+        "Anomaly Detected",
+        "Severity",
+        "Likely Subsystem",
+        "Probable Diagnosis",
+        "Possible Causes",
+        "Recommended Verification",
+        "Dryer Air Temperature",
+        "Cooler Air Temperature",
+        "Air Flow Rate ",
+        "Wet Product Feed Rate",
+        "Product Inlet Temperature",
+        "Residence Time",
+        "Vacuum",
+        "Steam Pressure",
+        "Fan Speed",
+        "Product Density",
+        "Final Product Temp",
+        "Anomaly Risk",
+        "Model Version",
+        "Feature Schema Version",
+        "Inference Timestamp",
+        "Latest Lab Sample Timestamp",
+        "Latest Lab Final Moisture",
+    ],
 }
 
 # Views without their own Timestamp column use these for the freshness probe.
@@ -107,6 +149,8 @@ TIMESTAMP_COLUMN: dict[str, str] = {
     CONTRIBUTORS_VIEW: "Timestamp",
     LAB_SAMPLES_VIEW: "Sample Timestamp",
     EVENTS_VIEW: "Peak Timestamp",
+    OVERVIEW_VIEW: "Timestamp",
+    LATEST_VIEW: "Timestamp",
 }
 
 
@@ -238,13 +282,15 @@ def main() -> None:
                         CONTRIBUTORS_VIEW,
                         LAB_SAMPLES_VIEW,
                         EVENTS_VIEW,
+                        OVERVIEW_VIEW,
+                        LATEST_VIEW,
                     )
                 ]
 
         print(f"\n{'=' * 72}")
         if all(results):
             print(
-                "RESULT: all four views match the Power BI semantic model "
+                "RESULT: all six views match the Power BI semantic model "
                 "contract. The .pbip can connect as-is."
             )
         else:

@@ -23,8 +23,19 @@ from canonical_pipeline import (  # noqa: E402
     TEST_REPLAY_PATH,
     validate_runtime_contract,
 )
-from multirate import PROCESS_VARIABLES, QUALITY_VARIABLES  # noqa: E402
+from multirate import (  # noqa: E402
+    PROCESS_VARIABLES,
+    QUALITY_VARIABLES,
+    build_timestamp,
+)
 from realtime_service import load_artifacts, predict_moisture  # noqa: E402
+
+
+REPLAY_REQUIRED = unittest.skipUnless(
+    TEST_REPLAY_PATH.exists(),
+    f"{TEST_REPLAY_PATH.name} is git-ignored heavyweight local data; "
+    "run the notebooks to regenerate it before this check can execute.",
+)
 
 
 class CanonicalPipelineTests(unittest.TestCase):
@@ -72,6 +83,7 @@ class CanonicalPipelineTests(unittest.TestCase):
         self.assertLess(split["validation"]["end_timestamp"], split["test"]["start_timestamp"])
         self.assertTrue(split["time_series_cross_validation"]["used"])
 
+    @REPLAY_REQUIRED
     def test_runtime_loads_exact_notebook03_and_notebook04_artifacts(self):
         checks = validate_runtime_contract()
         self.assertTrue(all(checks.values()))
@@ -85,6 +97,7 @@ class CanonicalPipelineTests(unittest.TestCase):
             "artifacts\\notebook03_model_evaluation.json",
         )
 
+    @REPLAY_REQUIRED
     def test_held_out_replay_and_one_runtime_prediction(self):
         preview = pd.read_csv(TEST_REPLAY_PATH, nrows=1_500)
         self.assertTrue((preview["Replay Partition"] == "test").all())
@@ -105,6 +118,33 @@ class CanonicalPipelineTests(unittest.TestCase):
         )
         self.assertIsNone(prediction.reason)
         self.assertIsNotNone(prediction.predicted_moisture)
+
+    def test_dashboard_warmup_predicts_on_first_visible_row(self):
+        demo_dir = PROJECT_ROOT / "resources" / "dashboard_demo"
+        warmup = pd.read_csv(demo_dir / "MAP_Dryer_Dashboard_Warmup_5s.csv")
+        first_visible = pd.read_csv(
+            demo_dir / "MAP_Dryer_Dashboard_Demo_5s.csv", nrows=1
+        )
+        warmup.insert(0, "Timestamp", build_timestamp(warmup))
+        first_visible.insert(0, "Timestamp", build_timestamp(first_visible))
+        columns = ["Timestamp", *PROCESS_VARIABLES, *QUALITY_VARIABLES]
+        buffer = pd.concat(
+            [warmup.loc[:, columns], first_visible.loc[:, columns]],
+            ignore_index=True,
+        )
+        artifacts = load_artifacts(PROJECT_ROOT / "models" / "5s")
+        prediction = predict_moisture(
+            buffer,
+            pd.Timestamp(first_visible["Timestamp"].iloc[0]),
+            artifacts,
+            transport_delay_minutes=0.0,
+        )
+        self.assertIsNone(prediction.reason)
+        self.assertIsNotNone(prediction.predicted_moisture)
+        self.assertLess(
+            pd.Timestamp(warmup["Timestamp"].max()),
+            pd.Timestamp(first_visible["Timestamp"].iloc[0]),
+        )
 
 
 if __name__ == "__main__":

@@ -12,4 +12,5 @@ ref table vw_dryer_contributors_powerbi
 ref table vw_dryer_anomaly_events
 ref table vw_dryer_lab_samples
 ref table vw_dryer_overview_trends_powerbi
+ref table vw_dryer_latest
 

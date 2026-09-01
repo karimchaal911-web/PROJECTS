@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "63a7fd3c5312833081bd",
   "position": {
-    "x": 860,
-    "y": 502,
+    "x": 860.09852216748766,
+    "y": 502.09359605911328,
     "z": 3300,
-    "height": 16,
-    "width": 500,
+    "height": 29.926108374384235,
+    "width": 510.96059113300493,
     "tabOrder": 3300
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -20,10 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Operator-readable explanation \u2014 diagnostic evidence, not automatic control action",
+                    "value": "Operator-readable explanation — diagnostic evidence, not automatic control action",
                     "textStyle": {
                       "fontSize": "8pt",
-                      "color": "#66756F"
+                      "color": "#5e706a"
                     }
                   }
                 ]
@@ -86,6 +85,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

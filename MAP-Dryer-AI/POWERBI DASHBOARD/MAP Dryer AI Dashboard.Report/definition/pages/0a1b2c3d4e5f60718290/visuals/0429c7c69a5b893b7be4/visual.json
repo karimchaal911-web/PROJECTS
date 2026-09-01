@@ -4,10 +4,10 @@
   "position": {
     "x": 854,
     "y": 86,
-    "z": 2000,
+    "z": 1700,
     "height": 118,
     "width": 234,
-    "tabOrder": 2000
+    "tabOrder": 1700
   },
   "visual": {
     "visualType": "card",
@@ -92,7 +92,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'ANOMALY SCORE'"
+                  "Value": "'CURRENT ANOMALY RISK'"
                 }
               }
             },
@@ -101,7 +101,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -168,7 +168,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E0DC'"
+                      "Value": "'#D6E2DD'"
                     }
                   }
                 }
@@ -177,7 +177,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "10D"
                 }
               }
             }

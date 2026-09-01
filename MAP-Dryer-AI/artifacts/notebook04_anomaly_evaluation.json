@@ -1,6 +1,6 @@
 {
   "notebook": "04_Model2_AnomalyDetection&Diagnosis.ipynb",
-  "created_at": "2026-08-24T14:00:31",
+  "created_at": "2026-09-01T17:15:03",
   "depends_on": "artifacts\\notebook03_model_evaluation.json",
   "canonical_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
   "canonical_dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
@@ -48,7 +48,7 @@
     },
     "reference_profile": {
       "path": "models\\5s\\reference_profile.json",
-      "sha256": "b83fe03d03cec3086858c7b5497fecafc65c833a1604a267875aef5df48dfd44"
+      "sha256": "b42b3a73bc1d612a319a3b2bad0a74dd637636f2507951a59c58585e1d33cefa"
     }
   },
   "diagnosis_contract": {

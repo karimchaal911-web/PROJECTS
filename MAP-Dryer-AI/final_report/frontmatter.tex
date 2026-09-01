@@ -31,7 +31,7 @@
 {\color{DeepBlue}\fontsize{20}{25}\selectfont\bfseries
 Digitalization and Design of an Intelligent Supervision Solution for the Soluble MAP Production Process\par}
 \vspace{3mm}
-{\small\sffamily\bfseries\color{OCPGreen}\MakeUppercase{Industrial AI · Process Engineering · Decision Support}\par}
+{\small\sffamily\bfseries\color{OCPGreen}\MakeUppercase{Industrial AI \textperiodcentered\ Process Engineering \textperiodcentered\ Decision Support}\par}
 \vspace{5mm}
 {\color{ENSAMTeal}\rule{0.88\textwidth}{1.2pt}}\par
 \vspace{5mm}
@@ -50,20 +50,22 @@ Industrial Engineering student & OCP Engineer, Soluble MAP Production Manager\\
 \pagenumbering{roman}
 \chapter*{Acknowledgements}
 \addcontentsline{toc}{chapter}{Acknowledgements}
-I would first like to express my sincere gratitude to \textbf{Mr Mouad CHERIFI} for his technical supervision, guidance and support throughout this introductory engineering internship. His availability and explanations made it possible to connect industrial observations with a structured engineering problem.
+I would first like to thank \textbf{Mr Mouad CHERIFI} for supervising this internship and for helping me connect what I observed in the plant with a clear engineering problem. His explanations of the soluble MAP process gave the project its practical direction.
 
-I also thank the \textbf{OCP Jorf Lasfar teams and personnel} for their welcome, availability and help in understanding the production environment, its operating discipline and its supervision practices. My thanks go to \textbf{ENSAM Meknes and its teaching staff} for the academic and engineering foundation that supported this work.
+I also thank the \textbf{OCP Jorf Lasfar teams} for their welcome and for the time they gave me to understand the production environment and its supervision practices. I am grateful to \textbf{ENSAM Meknes and its teaching staff} for the methods and technical foundation used throughout the work.
 
-Finally, I thank \textbf{Doha Hailassi} for guiding me through the company environment. Drawing on her experience and aptitude, she facilitated my integration into the worksite and helped me understand its industrial context.
+Finally, I thank \textbf{Doha Hailassi} for helping me navigate the company environment and understand its industrial context during the first days of the internship.
 
 \clearpage
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-This introductory engineering internship addresses an Industrial Engineering problem at OCP Jorf Lasfar: the information used to assess final soluble monoammonium phosphate (MAP) moisture is delivered by laboratory analysis at an interval of approximately two hours, whereas process conditions evolve continuously. The work therefore investigates a digital supervision architecture focused on the drying stage, where final moisture is strongly influenced and product conformity can be affected rapidly.
+Final soluble monoammonium phosphate (MAP) moisture is confirmed by laboratory analysis approximately every two hours, while dryer conditions evolve continuously. This internship investigates how that information delay can be reduced without replacing the laboratory or interfering with process control.
 
-The contribution is a decision-support \prototype{} that combines a moisture soft sensor, unsupervised anomaly detection, explainable diagnostic logic and a centralized Power BI dashboard. Plant process variables are available continuously through the industrial monitoring environment. For the software demonstration, they are represented on a deliberately selected five-second replay and visualization grid, while laboratory density, product temperature and moisture remain structurally sparse at their approximately two-hour availability. Python performs preprocessing, residence-time-aware alignment, feature computation and inference; PostgreSQL stores idempotent process and model outputs and exposes dashboard-oriented views; Power BI uses DirectQuery to present process KPIs, predicted and measured moisture, anomaly risk, operational severity, probable subsystem, contributors and verification guidance.
+I developed an advisory supervision prototype that connects a moisture soft sensor, a One-Class Support Vector Machine (One-Class SVM) novelty detector, transparent diagnostic rules, PostgreSQL and a two-page Power BI dashboard. The data path preserves the difference between fast process observations and sparse laboratory measurements. Process snapshots are shifted by residence time, only strictly previous laboratory context enters a prediction, Python executes all preprocessing and models, and Power BI is limited to visualization through DirectQuery.
 
-The final demonstration uses one deterministic 92-day synthetic source because sufficient real historical and real-time industrial data were not available. The same chronology feeds exploration, feature engineering, moisture-model selection, anomaly modelling and a held-out TEST replay; the runtime loads the exact artifacts exported by Notebooks 03 and 04, including the governed 16-feature moisture contract. The prototype is grounded in the observed soluble MAP process and PCS7 context, but it is not connected to live PCS7, does not command equipment and has not received industrial-scale validation. Its principal result is therefore a tested technical feasibility demonstration and a structured path toward future validation on OCP data.
+The supplied deterministic source contains 92 days of synthetic data: 1,589,760 process rows and 1,104 sparse laboratory observations. On the untouched 165-sample chronological TEST tail, the selected Ridge model obtains MAE 0.001069, RMSE 0.001403 and $R^2=0.824530$. It reduces MAE by 26.8\% and RMSE by 24.1\% relative to carrying forward the previous laboratory moisture. The One-Class SVM has a 5.925\% validation novelty flag rate and responds strongly to the held-out steam and airflow disturbances, although it does not flag the feed-surge episode.
 
-\textbf{Keywords:} Industrial Engineering; operational excellence; soluble MAP; soft sensor; anomaly detection; diagnosis; digital supervision; Power BI; PostgreSQL; decision support.
+These results support the feasibility of the prototype, not plant-wide performance. The five-second rhythm is a replay and visualization choice, the dashboard demonstration uses disclosed injected scenarios, and no autonomous action is implemented. Laboratory moisture remains the quality reference. The proposed next step is a read-only shadow validation using representative OCP historian and laboratory data.
+
+\textbf{Keywords:} Industrial Engineering; soluble MAP; rotary dryer; soft sensor; novelty detection; PostgreSQL; Power BI; decision support.
 \clearpage

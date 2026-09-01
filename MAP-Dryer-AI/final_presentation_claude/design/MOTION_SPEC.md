@@ -3,340 +3,241 @@
 Every transition in the film, specified. Each one answers *why is this moving?*
 If the answer had been "to look nice", the motion was cut.
 
-**Global constants** — transition 2.2 s · camera `power2.inOut` · reveal
-`power3.out` · exit `power2.in` · text in 0.7 s with 0.06 s stagger · 0.4 s
-settle tail · idle drift ±0.12 u over 24 s.
-
-Each transition is **one GSAP timeline**. Camera, object morphs, material
-crossfades, light changes and overlay copy are all children of it, so they can
-never desynchronise and there is no independent `setTimeout` anywhere.
-
----
-
-## T00 → 01 · BOOT → AWAKENING
-
-* **Anchor:** darkness itself.
-* **Camera:** (−34, 2.4, 26) → (−26.0, 2.4, 19.0), target (−4, 5.4, 2). FOV 38.
-* **Transform:** none — the world is already there.
-* **Material:** dryer shell emissive 0 → 0.02; dust motes opacity 0 → 0.5.
-* **Light:** ambient 0 → 0.35 over 3.0 s; rim 0 → 0.9 delayed 1.2 s; process
-  warmth 0 → 1.0 delayed 2.0 s and then begins its ±8 % sine.
-* **Duration:** 4.0 s. **Ease:** `power1.inOut` for light, `power2.out` camera.
-* **Why:** the plant is not switched on — it is *found*. The rim light arriving
-  last is what makes the drum read as a solid object rather than a shape.
-
-## T01 → 02 · AWAKENING → WHY THIS MATERIAL
-
-* **Anchor:** a single granule already resting in the discharge stream.
-* **Camera:** dolly in and lens up: (−26, 2.4, 19) → (−13.4, 5.9, 6.2),
-  FOV 38 → 26. Target snaps to the granule over the first 0.6 s.
-* **Transform:** one granule instance scales 1 → 46× while the camera closes,
-  so it appears to be a macro shot, not a growing object.
-* **Material:** background DOF-substitute — plant fog density 0.014 → 0.030,
-  which defocuses the hall without a post-processing pass.
-* **Duration:** 2.6 s. **Ease:** `power2.inOut`.
-* **Why:** long-lens compression is how a product is introduced. The fog trick
-  buys the depth-of-field read for zero GPU cost.
-
-## T02 → 03 · WHY THIS MATERIAL → FOLLOW THE MATERIAL
-
-* **Anchor:** the granule → the stream.
-* **Camera:** pulls back and up to (−58, 16, 30), FOV 26 → 44, then **tracks**
-  along the chain for the scene's duration (a separate looping timeline the
-  presenter's next press interrupts cleanly).
-* **Transform:** the single granule shrinks back to 1× as 2,600 instances fade
-  in along `flowPath`; flow velocity 0 → 1.
-* **Material:** the 7 stations' emissive lifts from 0 to 0.06 as the stream
-  enters each — driven by the stream head position, not by time.
-* **Duration:** 2.4 s to settle, then continuous tracking.
-* **Why:** causality. The stations light *because* the material arrives, so the
-  audience reads a process, not a slideshow of vessels.
-
-## T03 → 04 · FOLLOW → ENTER THE DRYER
-
-* **Anchor:** the dryer, already the destination of the stream.
-* **Camera:** (−58, 16, 30) → (2.0, 6.6, 15.5), target → (0, 5.2, 0), FOV 44 → 34.
-  Then a slow 22° arc to (−9, 7, 11) over the scene.
-* **Transform:** none on the dryer — **the world recedes instead.** Upstream
-  stations opacity → 0.12, fog density 0.014 → 0.026, key light cone narrows.
-* **Light:** key intensity 2.4 → 3.1, shadow frustum refits to the drum.
-* **Duration:** 2.6 s. **Ease:** `power2.inOut`.
-* **Why:** this is the film's thesis about focus — we do not cut to the dryer,
-  we let everything else fall away. It costs nothing and reads as cinema.
-
-### T04a · MACHINE → PHYSICS *(within Scene 04)*
-* Shell material crossfades to wireframe over 1.1 s (`opacity 1 → 0.18`,
-  wireframe overlay `0 → 0.5`); flights, material bed and counter-current air
-  fade in with 0.08 s stagger; vapour particles start.
-* **Why:** the audience must see *inside* to accept that moisture removal is a
-  transfer problem, not a black box.
-
-### T04b · PHYSICS → DATA *(within Scene 04)*
-* Seven telemetry chips arrive with 0.09 s stagger, each on a 0.5 s
-  `power3.out`, each with a 1 px leader line drawn to its origin point on the
-  equipment.
-* **Why:** every number is anchored to the physical thing that produces it.
-  This is the moment the project stops being about a machine.
+> **This document is generated against the source.** The table in §4 comes from
+> `web/scripts/spec-dump.mjs`, which reads `state/scenes.js` directly. Regenerate
+> it with `node scripts/spec-dump.mjs > ../design/_motion_table.md` after any
+> change to a camera pose, a tier or a lens. The previous version of this file
+> described a build that no longer exists — a uniform 2.2 s transition, a macro
+> granule in scene 02, and beats that have since been cut — which is exactly the
+> failure mode this note exists to prevent.
 
 ---
 
-## T04 → 05 · DRYER → THE GAP *(the film's most important move)*
+## 1. GLOBAL CONSTANTS
 
-* **Anchor:** the material flow line.
-* **Camera:** (−9, 7, 11) → (34, 27, 34), target (0, 5.2, 0) → (74, 6, 0),
-  FOV 34 → 46. Then, after the axis has formed, drop to (46, 4.6, 5.2),
-  target (78, 5, 0), FOV → 40.
-* **Transform:** `straighten` 0 → 1 over **3.2 s**. The flow path unbends into
-  a straight line along +X. **The granules keep riding it throughout** — they
-  are never hidden and never re-emitted. Simultaneously the axis extends from
-  x 16 to x 142 by animating `drawRange`.
-* **Material:** the quality plane above the axis fades in at 0.04 opacity —
-  visible as an emptiness, not as a surface.
-* **Light:** rim holds; key dims to 1.8 so the lab markers can be the brightest
-  thing in the frame.
-* **Duration:** 4.6 s total (the longest transition in the film).
-* **Ease:** `power2.inOut` on camera, `power3.inOut` on `straighten`.
-* **Why:** **distance becomes time.** This is the single transformation the
-  whole argument depends on, so it is given the most screen time, the slowest
-  ease and no competing motion. Nothing else animates during it.
+* **One GSAP timeline per transition.** Camera, layer presence, material
+  crossfades, light changes and in-world reveals are all children of it, so they
+  cannot desynchronise. There is no independent `setTimeout` in the application.
+* **`gsap.ticker.lagSmoothing(0)`.** A hitch skips frames instead of stretching a
+  3.1 s move into 30 s. For a live talk the wall clock is what matters.
+* **Camera ease** `power2.inOut` · **reveal** `power3.out` · **exit** `power2.in`.
+* **Reverse** runs at `tier x 0.72`; **random access** (the `G` prefix) settles in
+  0.9 s and hard-sets every channel first, so a jump can never leave a half-dressed
+  world.
+* **Light resolves early:** mode changes tween over `min(1.4, dur x 0.55)` from
+  position 0, so a lighting flip and a long translation are never both still
+  finishing at the end of a move.
+* **Idle drift** +/-0.12 u over ~24 s, **disabled in editorial mode** — breathing the
+  camera makes static type swim.
 
-### T05a · THE MARKERS *(within Scene 05)*
-* Six lab markers rise from the axis with 0.14 s stagger, 0.6 s `back.out(1.4)`
-  — the only overshoot in the entire film, reserved for the one thing that is
-  actually measured.
-* **Why:** overshoot reads as *solidity*. It says these are facts.
+### Text is sequenced against the world, not swapped underneath it
 
-### T05b · THE TRAVEL *(within Scene 05)*
-* Camera translates x 46 → 67 at **constant velocity** over 5.5 s (`none`
-  easing — the only linear move in the film), holding y and target offset.
-  A monospace counter runs `+00:00 → +02:00`. Granules stream past at speed.
-* **Why:** linear motion with no easing is uncomfortable, and it should be.
-  The jury is meant to feel the duration, not admire the camera.
+The single highest-value motion fix in the deck. `Overlay.jsx` no longer re-keys
+on scene+beat.
 
-## T05 → 06 · THE GAP → THE ENGINEERING RESPONSE
-
-* **Anchor:** the empty interval; the camera does not leave it.
-* **Camera:** (67, 4.6, 5.2) → (60, 12, 40), target → (78, 7.5, 0), FOV 40 → 44.
-  This pull-back only begins **after** the trace is 60 % drawn.
-* **Transform:** signal lines emit from the dryer's sensor points and travel
-  +X along the axis (0.9 s each, 0.05 s stagger). As each arrives, the
-  prediction trace's `drawRange` advances — **the trace is drawn by the arriving
-  signals, not by a timer.**
-* **Material:** trace `--predict`, additive, 2 px; lab markers hold full
-  brightness and are never overdrawn.
-* **Duration:** 5.2 s for the draw, 2.2 s for the pull-back, overlapped.
-* **Why:** causality again, and the discipline of never letting the estimate
-  visually outrank the measurement.
-
-## T06 → 07 · RESPONSE → PHYSICAL BECOMES DIGITAL
-
-* **Anchor:** the time axis, travelled in reverse.
-* **Camera:** flies back down the axis, (60, 12, 40) → (−2, 12, 26), then
-  rotates to face the stack at target (−5, 14, −22). FOV 44 → 42.
-* **Transform:** the axis and trace fade to 0.15 as the camera passes them —
-  they recede rather than vanish. Sensor nodes ignite on arrival (0.3 s each).
-  The dryer crossfades to a point-cloud/wireframe hybrid over 1.4 s **while
-  still rotating**.
-* **Duration:** 3.4 s. **Ease:** `power2.inOut`.
-* **Why:** reversing the Scene 05 move re-anchors the space. The audience knows
-  exactly where they are because they have flown this line before.
-
-### T07a · THE STACK BUILDS *(within Scene 07)*
-* 900 instanced packets stream from sensors to (−6, y, −44). Each architecture
-  layer's slab scales y 0 → 1 (0.5 s, `power3.out`) **only when its packet
-  count threshold is met**. Eight layers, ≈ 7 s total.
-* **Why:** the architecture is a consequence, not an illustration.
-
-### T07b · THE WAITING PACKET *(within Scene 07)*
-* One packet is isolated (others dim to 0.25), stops at the ALIGN layer, and a
-  monospace counter counts `24.5 min` while it waits. Then it joins.
-* **Duration:** 3.5 s of near-stillness.
-* **Why:** residence-time alignment is the one methodological idea that cannot
-  be explained by a static picture. It is worth three seconds of the film.
-
-## T07 → 08 · DIGITAL → TWO PATHWAYS
-
-* **Anchor:** the packet stream.
-* **Camera:** (−2, 12, 26) → (0, 16, −34), target (0, 15, −78), FOV 42 → 46.
-* **Transform:** the single stream **bifurcates** — instance targets are
-  reassigned over 1.6 s so packets visibly choose a lane. 16 go left, 15 go
-  right, and the counts are shown.
-* **Duration:** 2.8 s.
-* **Why:** one input, two questions. The split must be seen to happen to the
-  same data.
-
-### T08a · INTO THE MANIFOLD *(within Scene 08)*
-* Camera pushes from (0, 16, −34) to (26, 15, −64) — **inside** the point cloud.
-  2,400 points fade in over 1.2 s; 136 support vectors brighten 0.8 s later.
-* The current-state point follows the real recorded trajectory. Over 6 s of
-  playback it leaves the cloud; its colour ramps normal → `--warn` at risk 0.50
-  → `--critical` at 0.80, sampled from the real risk series.
-* A thin tether line to the cloud centroid lengthens as distance grows.
-* **Why:** "novelty detection" is an abstraction until you watch a point leave a
-  region. The tether is the only added metaphor, and it is honest: it is the
-  distance the model is actually measuring.
-
-## T08 → 09 · PATHWAYS → PROVE IT
-
-* **Anchor:** the prediction trace, recalled from Scene 06.
-* **Camera:** (26, 15, −64) → (79, 10.5, 44), target (79, 10.5, 0), FOV 46 → 34.
-  A long move; it is covered by the mode change.
-* **Transform:** the trace flattens (its z-variance → 0) and rotates to face
-  camera, becoming the axis of the holdout scatter. 165 real points arrive with
-  a 0.008 s stagger — 1.3 s of accumulating evidence.
-* **Light / mode:** **dark → OCP editorial** over 1.4 s: fog `--ink-deep` →
-  `--cream` and density 0.026 → 0.004; ambient 0.35 → 0.9; tone-mapping exposure
-  1.0 → 1.35; overlay palette crossfades on the same timeline.
-* **Duration:** 3.0 s.
-* **Ease:** `power2.inOut` camera, `power1.inOut` exposure (linear-ish, so the
-  lights feel like they come *up* rather than snap).
-* **Why:** evidence is presented in the light. The mode change is dramatic
-  precisely because it happens once.
-
-## T09 → 10 · PROVE IT → SUPERVISION
-
-* **Anchor:** panel A's frame.
-* **Camera:** (79, 10.5, 44) → (76, 10, 52), target → (76, 10, 26), FOV 34 → 32.
-* **Transform:** the chart's bounding frame **thickens into a card**: border
-  0 → 1 px, corner radius 0 → 6 px, a title bar grows above it, a legend row
-  below. The frame's world position and scale are tweened so that at the end of
-  the move the chart sits **exactly registered** over the trend-chart rectangle
-  of the real Power BI capture, which fades up beneath it at 0.62 s.
-* **Then:** eight dashboard regions highlight in reading order, 0.55 s apart —
-  a 1 px `--ocp-green` outline plus a 4 % brightness lift, no zoom, no pop.
-* **Light:** exposure 1.35 → 1.1; a soft area light warms from the dashboard
-  plane, spilling green-white onto the dark world behind the camera.
-* **Duration:** 2.6 s + 4.4 s of highlights.
-* **Why:** this is the promised transformation — *the graph becomes the real
-  Power BI visual.* The registration must be pixel-honest or the trick fails,
-  so the target rectangle is measured from the actual capture, not eyeballed.
-
-## T10 → 11 · SUPERVISION → THROUGH THE DASHBOARD
-
-* **Anchor:** the dashboard plane.
-* **Camera:** (76, 10, 52) → (76, 10, 30) → **through** z = 26 → (76, 10, −36).
-  FOV 32 → 52 (the widening is what makes it feel like passing through).
-* **Transform:** as the near plane crosses the dashboard, its material switches
-  to `side: DoubleSide` and opacity drops to 0.25 — we see it from behind,
-  which is the point. Four runtime slabs are revealed in depth, each with a
-  0.4 s `power3.out` scale-in as the camera reaches it.
-* **Final beat:** the replay stream leaves the last slab as a line of packets
-  and travels back to the dryer at the origin. The camera yaws 34° so that the
-  dashboard, the slabs, the stream and the still-turning dryer are **all in one
-  frame**.
-* **Duration:** 5.0 s.
-* **Why:** end-to-end integration is a spatial claim. Proving it spatially is
-  more convincing than any block diagram, and the closing frame is the proof.
-
-## T11 → 12 · THROUGH → WHAT THIS IS WORTH
-
-* **Anchor:** the returning replay stream.
-* **Camera:** (76, 10, −36) → (0, 46, 22), target (0, 24, 0), FOV 52 → 40.
-  Rises and looks down.
-* **Transform:** the runtime slabs and architecture collapse inward and resolve
-  into seven ring nodes (1.8 s, `power3.inOut`). The material stream continues
-  around the ring.
-* **Light / mode:** dark → editorial again, 1.2 s.
-* **Duration:** 3.2 s.
-* **Why:** altitude is the visual grammar for synthesis. We rise because we are
-  summarising.
-
-## T12 → 13 · VALUE → TODAY → NEXT
-
-* **Anchor:** the ring.
-* **Camera:** (0, 46, 22) → (16, 30, 34), target (0, 22, 0). FOV holds at 40.
-* **Transform:** implemented nodes stay solid; the roadmap extends away from
-  the ring as **outlined** geometry, one stage at a time (0.45 s each, 0.25 s
-  apart). The last two stages arrive dimmer and with a dashed edge.
-* **Material:** solid `--ocp-green` / outline `--outline`, 0.4 opacity, dashed.
-* **Duration:** 2.4 s + 3.2 s of staging.
-* **Why:** the distinction between built and not-built is the most important
-  honesty signal in the presentation, so it is carried by material, opacity,
-  line style and position — four redundant channels.
-
-## T13 → 14 · ROADMAP → RETURN
-
-* **Anchor:** the dryer, which has been turning for fourteen minutes.
-* **Camera:** (16, 30, 34) → **(−26.0, 2.4, 19.0)**, target (−4, 5.4, 2),
-  FOV 40 → 38. The exact opening pose.
-* **Transform:** roadmap and ring fade to 0 over 1.4 s. The plant fades back in.
-  Sensor nodes remain lit at 0.4. A faint prediction trace runs above the
-  product line at 0.25 opacity. Signal lines move slowly.
-* **Light / mode:** editorial → dark over 1.8 s. Process warmth returns.
-* **Duration:** 4.2 s. **Ease:** `power2.inOut`.
-* **Why:** the closing rhyme. Same frame, same light, same machine — but the
-  audience can now read the data layer, and that difference *is* the conclusion.
-  It only lands because the world was persistent.
-
----
-
-## Motion that was considered and cut
-
-| Idea | Why it was cut |
+| Phase | Values |
 |---|---|
-| Orbiting the dryer continuously | Gaming camera. It hides the machine's axis and makes scale unreadable. |
-| Camera shake on the anomaly event | Drama the data does not support. Risk 0.976 is a number, not an explosion. |
-| Particles bursting on each metric reveal | Decorative. Answers none of the four motion questions. |
-| Flying the architecture diagram in as a unit | It would have been a slide. Building it from arriving packets is the whole point. |
-| A "neural network" visual for the Ridge model | It is a 16-coefficient linear model. Drawing a network would be a lie. |
-| Parallax on the DOM overlay | Competes with real 3D depth and reads as a website. |
-| Cross-dissolve between scenes | The film has no dissolves at all. Every change is a move through space. |
+| old copy leaves | opacity → 0, y → −8 px, blur → 3 px, **0.34 s** |
+| world travels | the transition's own tier |
+| new copy resolves | opacity 0 → 1, y +14 px → 0, blur 4 → 0, **0.7 s**, 0.06 s stagger |
+
+The swap fires at `max(0.34, tier x 0.46)`. A micro-beat therefore stays snappy and
+an act change gets room; the world always arrives before the language does.
 
 ---
 
-## Interruption behaviour
+## 2. TRANSITION TIERS
 
-The presenter can advance at any moment, including mid-transition.
+Duration follows **narrative weight first, spatial distance second**. Before this
+existed, a 4.6 u micro-creep and a 100 u act change both took 2.2 s, which is what
+made the film read as templated rather than directed.
 
-* The active timeline is **killed, not reversed**.
-* The world snaps to the *settled* state of the scene being left (0.25 s
-  `power2.out`), then the next transition starts from there.
-* Camera position is never discontinuous — the snap tweens, it does not cut.
-* Rapid presses (< 0.4 s apart) queue at most one scene ahead, so hammering the
-  arrow key cannot desynchronise the show.
-* `Left Arrow` reverses through the same poses at 0.7× duration, because
-  backward navigation is recovery, not narrative, and should be quick.
+| Tier | s | Used for | Count |
+|---|---|---|---|
+| `micro` | **1.5** | a small adjustment inside one idea | 3 |
+| `standard` | **1.9** | a normal beat change | 11 |
+| `act` | **3.1** | a new place, a new act, or a lighting change | 20 |
+| `signature` | **3.5** | the three transformations the film is built on | 3 |
+| `return` | **3.6** | the one journey home | 1 |
+
+**Transition budget: 101.5 s over 38 transitions — 13.4 % of the 758 s runtime.**
+
+The three `signature` beats are `05a` (distance becomes time), `10a` (artifact →
+service → screen) and `11a` (through the plane). `return` is used once, for
+`13b → 14a`.
 
 ---
 
-## As built — three amendments
+## 2b. THE EASING VOCABULARY
 
-The spec above was written before implementation. Three things changed, and each
-is worth recording because the reasoning generalises.
+The camera had a grammar and the world did not. Forty-eight channel tweens used
+ten different curves, which looks varied in a grep and is not: `power2.out` was
+carrying a vessel filling, a chart appearing, a service starting and a label
+fading, so the variation was incidental rather than meaningful. Motion that eases
+the same way regardless of what is moving is the clearest tell that a film was
+assembled from a library.
 
-### 1. Lag smoothing is disabled
+Seven intents, declared once in `three/transitions.js` as `EASE` and named by
+every world tween that carries meaning:
 
-GSAP clamps large frame deltas by default, so on a machine dropping frames a
-2.2-second transition stretched to roughly **twenty seconds**. It was invisible
-on a fast machine and only surfaced when the automated capture kept
-photographing scenes mid-move.
+| Intent | Curve | What it is for |
+|---|---|---|
+| `MECH` | `power3.inOut` | something with mass moves — the path straightening into a time axis, the artifact folding into a service, the loop rising |
+| `ARRIVE` | `power4.out` | an object lands and stops. No wind-up; a long settle. Weight coming to rest, not a fade finishing |
+| `DATA` | `power2.out` | a value resolving. Crisp and short — a number has no inertia |
+| `REVEAL` | `power1.inOut` | something becomes visible without moving. Restrained; anything more assertive turns an appearance into an event |
+| `ALARM` | `power2.in` | the anomaly grammar: an accelerating departure. A state leaving its learned region does not ease politely out of it |
+| `COUNT` | `none` | linear, and only where the animation is counting real arrivals — the stack assembling from packets, the runtime lighting checkpoints, the marker crossing the dryer. Easing these would be a lie about a rate |
+| `SOLID` | `back.out(1.4)` | the one overshoot in the film, reserved for the six laboratory results, because they are the only directly measured points in it |
 
-`gsap.ticker.lagSmoothing(0)` in `Rig.jsx` makes a hitch **skip frames instead
-of stretching the scene**. For a live presentation that is the right trade: the
-presenter's pacing must not depend on the projector laptop's GPU.
+Thirty-six tweens name an intent. What deliberately does **not**: the neutral
+layer cross-fade (`ch()`), the camera (which has its own tier grammar above), the
+reduced-motion fallbacks, and a handful of fade-outs — where the curve carries no
+meaning and pretending otherwise would be worse than the default.
 
-### 2. Beats own their framing, and choreography is relative
+---
 
-Camera poses live in `state/scenes.js` — per scene, and per beat where a scene
-needs to move between beats. Anything in `transitions.js` that also moves the
-camera is expressed **relatively** (`px: '+=34'`), so it continues from the
-settled pose rather than restating an absolute one.
+## 3. LENS LANGUAGE
 
-This was learned the hard way. Absolute overrides left in `transitions.js` after
-the poses were recomposed silently won the argument, and scene 11 spent a full
-QA cycle looking at the inside of its own geometry.
+Focal length carries meaning, so it is declared once in `lib/curves.js` and
+referenced **by name** from the scene table — never as a literal. A scene changes
+lens at most once, and never at the same time as a large translation.
 
-### 3. The scene 04 arc became a drift
+| Role | FOV | Meaning |
+|---|---|---|
+| `ESTABLISH` | 40° | the hall, the plant, the return |
+| `TRAVEL` | 46° | moving along the material or along time |
+| `EQUIPMENT` | 34° | a machine understood in the round |
+| `INTERIOR` | 38° | inside the shell |
+| `SYSTEM` | 44° | architecture, manifold, runtime |
+| `EDITORIAL` | 38° | charts and evidence — fixed for the whole act |
+| `EDITORIAL_WIDE` | 36° | the roadmap rail only |
+| `MATERIAL` | 30° | the product itself |
 
-The specified 22° orbit was replaced with a slow lateral drift
-(`px: '-=9', pz: '-=6'` over 26 s). An orbit around a 22-metre horizontal drum
-swings the camera through the support structure and past the axis, which loses
-the machine's length — the one property the shot exists to establish. A drift
-holds the length and still reveals depth.
+Scenes 08 and 13 hold **one** lens across all their beats. The evidence act (09)
+and the supervision act (10) share `EDITORIAL`, so walking from the last chart to
+the operator's screen carries no focal change at all — the only thing that changes
+is where you are.
 
-### Unchanged
+---
 
-Everything else shipped as specified: the 2.2 s transition, the single timeline
-per step, the `straighten` morph as the film's longest and slowest move, the
-`back.out` overshoot reserved solely for the laboratory markers, the linear
-no-easing travel through the gap, and the total absence of cross-dissolves.
+## 4. THE TABLE
+
+`Δpos` = camera translation from the previous step · `Δtgt` = look-at translation ·
+`r` = camera-to-target radius at rest.
+
+| # | Step | Beat | Mode | Tier | s | Δpos | Δtgt | ΔFOV | r | Lens |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | **01** | Awakening | dark | `standard` | 1.9 | 0 | 0 | +0 | 39 | ESTABLISH 40° |
+| 1 | **02a** | PHOSPHORUS | focus | `act` | 3.1 | 26.8 | 49.3 | -10 | 26 | MATERIAL 30° |
+| 2 | **02b** | PLANT NUTRITION | focus | `micro` | 1.5 | 3.5 | 0 | +0 | 23 | MATERIAL 30° |
+| 3 | **02c** | SOLUBLE MAP | focus | `micro` | 1.5 | 3.5 | 0.1 | +0 | 19 | MATERIAL 30° |
+| 4 | **03a** | THE CHAIN | dark | `act` | 3.1 | 76.2 | 54.1 | +16 | 44 | TRAVEL 46° |
+| 5 | **03b** | 01 PRETREATMENT | dark | `standard` | 1.9 | 19.2 | 11.3 | +0 | 21 | TRAVEL 46° |
+| 6 | **03c** | 02 AMMONIA VAPORIZATION | dark | `standard` | 1.9 | 13.9 | 14.5 | +0 | 24 | TRAVEL 46° |
+| 7 | **03d** | 03 NEUTRALIZATION | dark | `act` | 3.1 | 12 | 11.8 | +0 | 23 | TRAVEL 46° |
+| 8 | **03e** | 04 BUFFER / STABILIZATION | dark | `standard` | 1.9 | 13.2 | 13.1 | +0 | 26 | TRAVEL 46° |
+| 9 | **03f** | 05 CRYSTALLIZATION | dark | `act` | 3.1 | 14.7 | 14.6 | +0 | 28 | TRAVEL 46° |
+| 10 | **03g** | 06 CENTRIFUGATION | dark | `standard` | 1.9 | 18.8 | 15.9 | +0 | 22 | TRAVEL 46° |
+| 11 | **03h** | INTO THE DRYER | dark | `act` | 3.1 | 30.4 | 15.3 | +0 | 48 | TRAVEL 46° |
+| 12 | **04a** | MACHINE | focus | `act` | 3.1 | 28.5 | 42.2 | -12 | 49 | EQUIPMENT 34° |
+| 13 | **04b** | PHYSICS | focus | `act` | 3.1 | 35.7 | 2.4 | +4 | 15 | INTERIOR 38° |
+| 14 | **04c** | DATA | focus | `act` | 3.1 | 36.4 | 14.3 | -4 | 47 | EQUIPMENT 34° |
+| 15 | **05a** | DISTANCE BECOMES TIME | dark | `signature` | 3.5 | 49.4 | 53.1 | +12 | 66 | TRAVEL 46° |
+| 16 | **05b** | SIX LABORATORY RESULTS | dark | `act` | 3.1 | 44.9 | 15 | +0 | 93 | TRAVEL 46° |
+| 17 | **05c** | THROUGH THE INTERVAL | dark | `act` | 3.1 | 81.6 | 31 | +0 | 31 | TRAVEL 46° |
+| 18 | **06a** | THE QUESTION | dark | `act` | 3.1 | 33.2 | 24 | +0 | 50 | TRAVEL 46° |
+| 19 | **06b** | ESTIMATE BETWEEN MEASUREMENTS | dark | `standard` | 1.9 | 34.4 | 4.5 | +0 | 81 | TRAVEL 46° |
+| 20 | **07a** | SENSORS | dark | `act` | 3.1 | 77.5 | 76.5 | -2 | 34 | SYSTEM 44° |
+| 21 | **07b** | THE STACK BUILDS | dark | `standard` | 1.9 | 27.1 | 46.1 | +0 | 53 | SYSTEM 44° |
+| 22 | **07c** | RESIDENCE-TIME ALIGNMENT | dark | `standard` | 1.9 | 29.7 | 8.2 | +0 | 42 | SYSTEM 44° |
+| 23 | **08a** | THE SPLIT | dark | `act` | 3.1 | 23.8 | 26.7 | +0 | 54 | SYSTEM 44° |
+| 24 | **08b** | QUALITY INTELLIGENCE | dark | `act` | 3.1 | 48.9 | 35.4 | +0 | 28 | SYSTEM 44° |
+| 25 | **08c** | PROCESS INTELLIGENCE | dark | `act` | 3.1 | 49.5 | 60.5 | +0 | 38 | SYSTEM 44° |
+| 26 | **09a** | MOISTURE HOLD-OUT | editorial | `act` | 3.1 | 29.7 | 18.6 | -6 | 44 | EDITORIAL 38° |
+| 27 | **09b** | WHY RIDGE | editorial | `standard` | 1.9 | 22.4 | 23.5 | +0 | 44 | EDITORIAL 38° |
+| 28 | **09c** | ANOMALY EVIDENCE | editorial | `standard` | 1.9 | 22.4 | 24 | +0 | 44 | EDITORIAL 38° |
+| 29 | **09d** | WHAT IT IS WORTH | editorial | `act` | 3.1 | 26.6 | 21.9 | +0 | 49 | EDITORIAL 38° |
+| 30 | **10a** | VALIDATION → SUPERVISION | supervision | `signature` | 3.5 | 19.7 | 30.6 | +0 | 39 | EDITORIAL 38° |
+| 31 | **10b** | WHAT THE OPERATOR READS | supervision | `micro` | 1.5 | 2.4 | 1 | +0 | 40 | EDITORIAL 38° |
+| 32 | **10c** | DIAGNOSTICS PAGE | supervision | `standard` | 1.9 | 4.5 | 2 | +0 | 40 | EDITORIAL 38° |
+| 33 | **11a** | THROUGH THE PLANE | supervision | `signature` | 3.5 | 116.2 | 44.1 | +6 | 52 | SYSTEM 44° |
+| 34 | **11b** | THE RUNTIME PATH | supervision | `act` | 3.1 | 18.2 | 10.2 | +0 | 51 | SYSTEM 44° |
+| 35 | **11c** | IT ENDS WITH A PERSON | supervision | `act` | 3.1 | 106.3 | 35.1 | +2 | 51 | TRAVEL 46° |
+| 36 | **12** | What this is worth | editorial | `act` | 3.1 | 65.9 | 60 | -8 | 42 | EDITORIAL 38° |
+| 37 | **13a** | IMPLEMENTED TODAY | editorial | `act` | 3.1 | 38.2 | 31.8 | -2 | 43 | EDITORIAL_WIDE 36° |
+| 38 | **13b** | WHAT COMES NEXT | editorial | `act` | 3.1 | 40.4 | 28 | +0 | 73 | EDITORIAL_WIDE 36° |
+| 39 | **14a** | MORE OF IT VISIBLE | dark | `return` | 3.6 | 67.2 | 20.8 | +4 | 39 | ESTABLISH 40° |
+| 40 | **14b** | QUESTIONS | dark | `standard` | 1.9 | 0 | 0 | +0 | 39 | ESTABLISH 40° |
+
+### Reading the outliers
+
+| Step | Δpos | Why it is that big |
+|---|---|---|
+| `11a` | 116.2 u | The push through the report plane **and** the relocation to the far side of the runtime, as one `signature` move. 32 u/s — travel, not a teleport. |
+| `11c` | 106.3 u | Back out in front of the plane for the handover to the operator. 34 u/s. |
+| `05c` | 81.6 u | Sets up the 6.5 s constant-velocity gap travel. Protected. |
+| `03a` | 76.2 u | Out to the head of the chain for the establishing wide. 25 u/s on an `act` tier — and it is the only big move left in scene 03. The seven that follow it are 12–19 u each, because the camera is now WALKING the chain rather than jumping between four of its seven stations. |
+| `07a` | 77.5 u | Process → architecture. Staged so the lighting has already resolved. |
+| `14a` | 67.2 u | The return. Lands on scene 01's pose exactly. Protected. |
+| `12` | 65.9 u | Rise to altitude **plus** the dark → cream chapter flip. Given the `act` tier explicitly; a scene with no beats would otherwise inherit `standard`. |
+| `14b` | **0.0 u** | **Deliberate hold, not a cut.** The closing rhyme is the ending; the world must not move again once it has landed. Only the copy changes, and idle drift keeps the frame alive. |
+
+The three `micro` moves are genuinely small adjustments inside one idea:
+`02b` and `02c` (3.5 u each) are word-level beats easing toward a still
+photograph, and `10b` (2.4 u) is a lean toward the report's KPI row while the
+five callout regions are named. `10c` keeps the `standard` tier despite moving
+only 4.5 u, because the *content* event is a full page change — narrative
+weight first, distance second.
+
+---
+
+## 5. SIZE, SCALE AND ANNOTATION RULES
+
+### Scale is a motion decision too
+
+Two things are sized to the distance the camera actually uses, not to a single
+"correct" value:
+
+* **Granules** (`granuleSize`) — 1 through the process scenes at 15-45 units,
+  **0.45** in scene 03, where the camera settles close enough to the pipe that
+  the stream otherwise reads as beads threaded on it, **2.2** on the time axis
+  at 66-93 units, **1.5** on the 05c travel at 31, and
+  **2.8** at the soft-sensor scene at 50-80. A granule at its process size
+  subtends about two pixels out on the axis, which turned the film's signature
+  reveal into a speckle. The stream represents flow; it is not a claim about
+  grain size.
+* **Value-loop labels** (scene 12) are billboarded *and* depth-compensated, so
+  the near and far side of the ring read at one size instead of a 1.75x spread
+  that implied a ranking.
+
+### Annotations face the lens
+
+In-world text that annotates an object — runtime checkpoints, architecture
+layers, ring nodes, telemetry chips, physics direction cues, chain stations —
+turns to the camera and, where it must never be occluded, draws with depth
+testing off. Text that lies in the world's own plane skews, swings out of frame
+at the edges, and can be rendered mirrored by a camera on the far side of it.
+All three happened before this rule existed — and the chain stations were still
+doing the first of them until the second pass, because the rule was written here
+and never applied there. Every equipment name in scene 03 was rendering as
+skewed italics. It is applied now.
+
+---
+
+## 6. WHAT THE MOTION IS *NOT* DOING
+
+Removed in remediation, and to stay removed:
+
+* the Ridge model's permanent rotation (a spinning crystal is the "AI black box"
+  trope the scene exists to refuse);
+* the synchronised seven-dot sensor pulse (reads as a blinking UI, not telemetry);
+* the value-ring breathing pulse, replaced by **one** signal travelling the loop
+  once — which also supplies the direction cue the ring never had;
+* the wireframe held on through scene 07, where it only added haze;
+* scene 02's `setInterval` word cycle — three presenter-driven beats now;
+* the scene-10 highlight boxes leaking into scene 11;
+* idle drift in editorial mode.
+
+Sound: **there is none, and none is to be added.** The presenter's voice is the
+soundtrack, and the 6.5 s silent travel in `05c` is where the silence does the work.

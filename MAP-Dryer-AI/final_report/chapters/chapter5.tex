@@ -1,182 +1,155 @@
-\chapter{AI Models: Moisture Prediction and Anomaly Diagnosis}
+\chapter{AI Models: Moisture Prediction and Process Novelty}
 \label{chap:models}
 
-\section{Two complementary supervision functions}
+\section{Two different questions, two different models}
 
-The project contains two principal modelling components. The supervised soft sensor estimates final moisture, while the unsupervised component examines every row of the chosen prototype replay grid for novelty relative to a reference regime. A deterministic diagnostic layer then translates an anomalous observation into physical evidence. Prediction answers ``what moisture is expected?''; novelty detection answers ``does the operating pattern resemble the reference?''; diagnosis answers ``what should be checked first?''
+A soft sensor estimates a difficult or slow-to-obtain quality variable from easier measurements. This is a common process-industry role, especially when laboratory data arrive slowly, but it also inherits problems such as multi-rate sampling, collinearity, missing data and drift \cite{kadlec2009}. In this project, the supervised branch answers: \emph{what final moisture is expected from the available context?}
 
-\section{Chosen moisture model and evidence contract}
+The second branch asks a different question: \emph{does the current process vector resemble the reference regime?} A One-Class Support Vector Machine (One-Class SVM) learns a boundary around reference observations rather than named failure classes \cite{scholkopf2001}. Its output cannot explain a cause by itself. I therefore added a separate diagnostic layer that ranks deviations and suggests what should be checked.
 
-Notebook 03 is the single source of truth for both the reported moisture experiment and the runtime soft sensor. It reads \code{data/processed/MAP\_Dryer\_Lab\_Aligned\_16.csv}, the 1,103-row handoff produced by Notebook 02 from the canonical 92-day source. The data are split chronologically into 772 TRAIN, 166 VALIDATION and 165 untouched TEST rows. The runtime subsequently computes and orders the same 16 original named features and loads the exact Notebook 03 artifact.
+\section{Soft sensor: governed experiment}
 
-The contract uses nine direct process variables, the five engineered features defined in Notebook 02, and the most recent strictly previous laboratory density and final-product-temperature values. Final moisture remains the target and is never an input. Standardization is fitted inside each training fold. Five-fold expanding \code{TimeSeriesSplit} on TRAIN tunes candidate hyperparameters, the later VALIDATION segment selects the model family, and TEST is opened once after selection and refitting on TRAIN plus VALIDATION.
+Notebook 03 is the source of truth for model selection and the runtime artifact. It receives 1,103 causally aligned rows with 16 ordered inputs: nine direct process values, five engineered interactions and the strictly previous laboratory density and product temperature. The final moisture at the current laboratory timestamp is the target. The chronological split is 772 TRAIN, 166 VALIDATION and 165 untouched TEST rows.
+
+I evaluate the candidates with mean absolute error (MAE), root mean squared error (RMSE) and the coefficient of determination ($R^2$). Together, these metrics show average error, sensitivity to larger errors and explained variation.
+
+Within TRAIN, five expanding \code{TimeSeriesSplit} folds tune each candidate. The later VALIDATION block selects the model family; TEST is opened once after that choice. This preserves chronology and avoids the optimistic mixing that random cross-validation can create in dependent series \cite{bergmeir2012}.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Audited evidence contract for the chosen Notebook 03 moisture model}
+\caption{Audited contract of the selected moisture model}
 \label{tab:moisture-provenance}
-\begin{tabularx}{\textwidth}{@{}p{0.28\textwidth}Y@{}}
+\begin{tabularx}{\textwidth}{@{}p{0.29\textwidth}Y@{}}
 \toprule
 Item & Audited value \\
 \midrule
-Dataset & \code{MAP\_Dryer\_Lab\_Aligned\_16.csv}; 1,103 laboratory-aligned rows derived from the canonical source \\
-TRAIN & 772 rows (69.99\%); 16 Apr. 2026 02:00--19 June 2026 08:00 \\
-VALIDATION & 166 rows (15.05\%); 19 June 2026 10:00--3 July 2026 04:00 \\
-TEST / replay & 165 labels (14.96\%); 3 July 2026 06:00--16 July 2026 22:00; no shuffle \\
-Selection & Five-fold expanding \code{TimeSeriesSplit} inside TRAIN; model family chosen by VALIDATION RMSE \\
-Retained pipeline & Standardization $\rightarrow$ Ridge Regression \\
-Hyperparameters & Ridge $\alpha=10$ \\
-Model size & Exactly 16 original ordered input features \\
-Artifact & \code{models/5s/quality\_moisture\_pipeline.joblib}; metadata in \code{artifacts/notebook03\_model\_evaluation.json} \\
+Source & \code{MAP\_Dryer\_Lab\_Aligned\_16.csv}; 1,103 laboratory-aligned rows. \\
+Chronology & TRAIN 772; VALIDATION 166; TEST 165; no shuffle. \\
+Selection & Expanding five-fold tuning inside TRAIN; family selected by later VALIDATION RMSE. \\
+Pipeline & Standardization followed by Ridge Regression, $\alpha=10$. \\
+Contract & Exactly 16 original ordered inputs; final moisture excluded from features. \\
+Artifact & \code{models/5s/quality\_moisture\_pipeline.joblib}. \\
 \bottomrule
 \end{tabularx}
-\source{Executed Notebook 03 and its saved evaluation record \cite{moisturenotebook}.}
+\source{Executed Notebook 03 and saved evaluation record \cite{moisturenotebook}.}
 \end{table}
 
-The chronological split is explicit and reproducible:
-
-\begin{lstlisting}[language=Python,caption={Notebook 03 chronological evidence boundaries.}]
-n_train = round(len(aligned) * 0.70)
-n_validation = round(len(aligned) * 0.85) - n_train
-train = aligned.iloc[:n_train]
-validation = aligned.iloc[n_train:n_train + n_validation]
-test = aligned.iloc[n_train + n_validation:]
-tscv = TimeSeriesSplit(n_splits=5)  # TRAIN only
-\end{lstlisting}
-
-\section{Candidate comparison and Ridge selection}
-
-Five candidates are evaluated under the same forward-looking structure. Ordinary Linear Regression provides a transparent reference. Ridge tests L2 shrinkage. Elastic Net tests combined L1/L2 regularization, while Random Forest and Gradient Boosting test nonlinear mappings. Each candidate's tuning remains inside TRAIN; its fitted best configuration is then scored once on VALIDATION.
-
-Ridge gives the lowest VALIDATION RMSE, 0.0013566 percentage points, narrowly ahead of Elastic Net at 0.0013625 and Linear Regression at 0.0013671. Selection is therefore supported by a later unseen segment, not by the final TEST score. Notebook 03 also contains separate Elastic Net training and metrics cells, matching the other baseline models. The selected tuning structure is:
-
-\begin{lstlisting}[language=Python,caption={Leakage-safe Ridge pipeline and tuning grid.}]
-ridge = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", Ridge()),
-])
-
-search = GridSearchCV(
-    ridge,
-    param_grid={"model__alpha": [0.01, 0.1, 1, 10, 100]},
-    cv=TimeSeriesSplit(n_splits=5),
-    scoring="neg_root_mean_squared_error",
-)
-\end{lstlisting}
+Five model families were compared under the same structure. Ridge obtained the lowest VALIDATION RMSE, 0.0013566 percentage points, narrowly ahead of Elastic Net at 0.0013625 and ordinary Linear Regression at 0.0013671. The Ridge/Elastic Net difference is only about 0.43\%, so I treat Ridge as the selected version for this dataset and split, not as a universal winner.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=.91\textwidth]{notebook03_candidate_validation.png}
-\caption{Later-segment VALIDATION RMSE used to select Ridge after training-only tuning.}
-\source{Executed Notebook 03 figure output \cite{moisturenotebook}.}
+\includegraphics[width=.90\textwidth]{notebook03_candidate_validation.png}
+\caption{Later-segment VALIDATION RMSE used after training-only tuning.}
+\source{Executed Notebook 03 \cite{moisturenotebook}.}
 \label{fig:moisture-candidates}
 \end{figure}
 
-The Ridge/Elastic Net margin is only about 0.43\%, so this is a versioned choice for the canonical dataset and declared split, not a universal claim of model-family superiority. The selected Ridge mean training-fold CV RMSE is 0.0014050; that diagnostic tunes its hyperparameters, while the separate later VALIDATION score governs family selection.
+\section{Holdout performance and baseline value}
 
-\section{Untouched holdout performance}
+After selection, Ridge is refitted on TRAIN plus VALIDATION and evaluated on the 165-sample TEST tail. It obtains MAE 0.0010686, RMSE 0.0014026, $R^2=0.8245295$, bias 0.0000662 and maximum absolute error 0.0056206 percentage points H$_2$O.
 
-After the model family and hyperparameters are frozen, the pipeline is refitted on the combined 938 TRAIN and VALIDATION rows and evaluated once on the 165-row TEST tail. It achieves MAE 0.001069, RMSE 0.001403, $R^2=0.824530$, bias $0.000066$ and maximum absolute error 0.005621 percentage points H$_2$O.
+A model score is more informative when compared with a simple operational alternative. I therefore added a persistence baseline that predicts the current moisture using the strictly previous laboratory moisture. On the same TEST rows, persistence gives MAE 0.0014589 and RMSE 0.0018479. Ridge reduces those errors by 26.8\% and 24.1\%, respectively.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Selected Ridge performance across the three evidence partitions}
-\label{tab:finalmetrics}
-\begin{tabular}{@{}lrrrr@{}}
+\caption{Untouched TEST comparison with the last-laboratory persistence baseline}
+\label{tab:baseline-comparison}
+\begin{tabular}{@{}lrrrrr@{}}
 \toprule
-Partition & Samples & MAE & RMSE & $R^2$ \\
+Method & $n$ & MAE & RMSE & $R^2$ & Bias \\
 \midrule
-TRAIN & 772 & 0.001087 & 0.001414 & 0.878173 \\
-VALIDATION & 166 & 0.001031 & 0.001357 & 0.895937 \\
-Untouched TEST & 165 & \textbf{0.001069} & \textbf{0.001403} & \textbf{0.824530} \\
+Previous lab moisture & 165 & 0.001459 & 0.001848 & 0.695439 & 0.000012 \\
+Selected Ridge & 165 & \textbf{0.001069} & \textbf{0.001403} & \textbf{0.824530} & 0.000066 \\
 \bottomrule
 \end{tabular}
-\source{Executed Notebook 03 \cite{moisturenotebook}; errors are moisture percentage points.}
+\source{Independent report audit using the frozen artifact and identical TEST timestamps.}
 \end{table}
 
-Error magnitude is stable across the three chronological segments: TEST RMSE is about 0.8\% below TRAIN RMSE. TEST $R^2$ is lower than TRAIN by about 0.0536, but the untouched score remains approximately 0.825; the supplied synthetic target still retains variation that the 16-feature regularized linear contract does not explain.
-
-\begin{figure}[htbp]
+\begin{figure}[p]
 \centering
 \includegraphics[width=.95\textwidth]{notebook03_test_holdout.png}
-\caption{Actual and predicted moisture over the untouched chronological TEST interval.}
-\source{Executed Notebook 03 figure outputs \cite{moisturenotebook}.}
+\caption{Measured and predicted moisture on the untouched chronological TEST interval.}
+\source{Executed Notebook 03 \cite{moisturenotebook}.}
 \label{fig:notebook-moisture-evidence}
 \end{figure}
 
-Predictions follow the moisture variation but remain smoother than the laboratory series; the small positive TEST bias indicates slight overprediction on average. The maximum error remains larger than the mean error, reinforcing that this synthetic result is a software-integration benchmark and an advisory soft sensor requiring laboratory confirmation.
+\begin{figure}[p]
+\centering
+\includegraphics[width=.96\textwidth]{soft_sensor_baseline_residuals.png}
+\caption{Persistence comparison and residual audit for the selected Ridge soft sensor.}
+\source{Independent report evidence generated from the frozen artifact.}
+\label{fig:softsensor-residuals}
+\end{figure}
 
-\section{Model interpretation and risk}
+The residual mean is 0.0000662 and the median is 0.0000550; 47.9\% of residuals are negative and 52.1\% positive. The 5th and 95th percentiles are $-0.002170$ and 0.002152. A Durbin--Watson statistic of 1.827 and lag-1 residual autocorrelation of 0.084 show limited remaining short-lag structure in this synthetic TEST sequence. Absolute residual and fitted value have correlation 0.054, so no strong level-dependent error pattern is visible. These diagnostics are useful, but 165 sparse targets from one synthetic chronology remain too little evidence for plant acceptance.
 
-The Ridge model consumes all 16 governed inputs. \Cref{fig:ridge-interpretation} reports absolute standardized coefficient magnitudes.
+Coefficient magnitude is also interpreted cautiously. Air per feed and wet-product feed have the largest absolute standardized coefficients, followed by cooler- and dryer-air temperature. The inputs are correlated, so weight can be redistributed among them; a large Ridge coefficient is not a causal effect.
+
+\section{One-Class SVM for earlier process awareness}
+
+Dryer variables evolve together, and an unusual combination can appear before the next laboratory result. I use the One-Class SVM as a process-novelty detector: it compares the current multivariate state with the learned reference region. A novel state prompts investigation; it is not a fault probability, a root-cause classification or a control command.
+
+Notebook 04 exports a radial basis function (RBF) One-Class SVM with \code{gamma='scale'} and $\nu=0.02$ \cite{anomalynotebook}. It fits 6,000 sampled rows from the canonical TRAIN period and checks a separate 20,000-row validation sample. The fraction of validation states identified as novel is 5.925\%, reported here as the \emph{validation novelty flag rate}.
+
+The raw decision function is a signed model score, not a probability. The service converts it to a zero-to-one display risk for easier reading, with 0.5 at the detector boundary and 0.8 as the visual high-risk level. These values support prioritization on the dashboard; they do not represent failure probability or confidence.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=.80\textwidth]{notebook03_selected_feature_importance.png}
-\caption{Absolute standardized coefficients of the selected Ridge pipeline.}
-\source{Executed Notebook 03 figure outputs \cite{moisturenotebook}.}
-\label{fig:ridge-interpretation}
-\end{figure}
-
-Air per feed and wet-product feed rate have the largest absolute standardized coefficients, followed by cooler-air and dryer-air temperature. Correlated inputs can redistribute weight, and coefficient magnitude does not establish causation.
-
-$R^2$ describes explained variation in this particular holdout sequence; it does not show whether errors are acceptable against an approved product specification. MAE describes average absolute deviation, RMSE penalizes larger misses, and the time/residual plots expose local behaviour. Industrial validation must also quantify analytical uncertainty, performance by campaign and grade, uncertainty coverage, drift, and errors near approved product limits.
-
-L2 shrinkage controls the correlated 16-feature contract, yet it cannot compensate for an unrepresentative dataset or extrapolation outside training support. Any real-data study must rebuild the comparison rather than assume that Ridge or this hyperparameter remains optimal.
-
-\subsection{Notebook model and dashboard runtime consistency}
-
-Notebook 03 saves \code{models/5s/quality\_moisture\_pipeline.joblib}, and the runtime loads that exact file. The artifact records the same ordered 16 feature names exposed by the schema; startup validation rejects any mismatch. The replay source is the 237,600-row TEST interval derived from the canonical source, so PostgreSQL and Power BI receive inference made by the same model evaluated above rather than a separately trained dashboard model.
-
-\section{Novelty detection and risk display}
-
-Notebook 04 is the authoritative source for the anomaly runtime export. Its final cells use a One-Class SVM with an RBF kernel, \code{gamma='scale'} and $\nu=0.02$ \cite{anomalynotebook,oneclasssvm}. It is fitted on a deterministic 6,000-row sample from the 1,111,681 process rows in the canonical TRAIN period and checked on a separate 20,000-row validation sample. The observed validation flag rate is 5.925\%. This is a novelty-rate diagnostic on supplied synthetic process patterns, not a false-positive rate or fault-detection accuracy because no confirmed plant fault labels exist \cite{trainingreport}.
-
-The raw decision function is not a probability. A logistic mapping converts it to a display risk in $[0,1]$, with 0.5 at the detector boundary and 0.8 used as a high-risk display threshold. This improves dashboard readability but does not create a statistically calibrated failure probability.
-
-\begin{lstlisting}[language=Python,caption={Final service mapping from SVM output to display risk.}]
-score = float(anomaly_model.decision_function(scaled)[0])
-anomaly_detected = int(anomaly_model.predict(scaled)[0]) == -1
-risk = 1.0 / (1.0 + math.exp(
-    min(max(score / risk_scale, -60.0), 60.0)
-))
-\end{lstlisting}
-
-For a normalized feature vector $\mathbf{x}$, the RBF One-Class SVM learns a boundary around the reference observations. The scikit-learn decision function is positive on the accepted side and negative on the novelty side; the service consequently raises the anomaly flag below zero. The parameter $\nu=0.02$ acts as a design control on training errors/support vectors rather than a guaranteed future anomaly rate \cite{oneclasssvm}. The observed validation flag rate is therefore reported, not assumed.
-
-The reference profile and SVM serve different purposes. The SVM evaluates the joint multivariate pattern. Robust univariate quantiles identify which individual features are unusual enough to explain the event. A row can be novel even when no single raw variable exceeds a percentile limit, because the combination is unusual; in that situation the service assigns low severity and states that no direct abnormal contributor was found. Conversely, a raw variable outside its 99th percentile supports a high operational-severity display only when the multivariate detector has also flagged the observation.
-
-\section{From anomaly to operator-readable diagnosis}
-
-The real-time diagnostic engine uses a train-period reference profile containing median, MAD, IQR and 1st/5th/95th/99th percentiles per feature. A robust scale is computed as the maximum of scaled MAD, scaled IQR and a numerical floor. Each feature receives a direction and variable severity: values inside the 5th--95th percentile band are normal, values between the 1st/5th or 95th/99th limits are medium deviations, and values beyond the 1st or 99th percentile are high deviations. Robust distance is multiplied by feature criticality to rank evidence.
-
-Engineered features participate in subsystem voting, while only raw process features are returned as operator-facing contributors. A feature associated with multiple subsystems divides its score among them. The selected subsystem is the one with the greatest accumulated contribution. A transparent rule map produces a cautious diagnosis and recommended verification for the leading direct contributor. Event severity is \code{LOW} when no direct abnormal contributor exists, \code{MEDIUM} for at least two medium deviations, and \code{HIGH} when at least one direct feature exceeds its 1st/99th percentile range. \code{CRITICAL} is deliberately not assigned because statistical quantiles are not approved alarm or trip limits \cite{diagnosisconfig,projectrepo}.
-
-\begin{figure}[ht]
-\centering
-\begin{tikzpicture}[node distance=7mm and 6mm]
-\node[flow] (anom) {Anomaly flag\\+ risk};
-\node[flow,right=of anom] (dev) {Robust feature\\deviations};
-\node[flow,right=of dev] (cont) {Ranked direct\\contributors};
-\node[flow,right=of cont] (sub) {Subsystem\\score};
-\node[flow,below=of sub] (diag) {Cautious probable\\diagnosis};
-\node[flow,left=of diag] (check) {Recommended\\verification};
-\node[flow,left=of check] (dash) {Dashboard\\decision support};
-\draw[arr] (anom)--(dev);\draw[arr] (dev)--(cont);\draw[arr] (cont)--(sub);\draw[arr] (sub)--(diag);\draw[arr] (diag)--(check);\draw[arr] (check)--(dash);
+\begin{tikzpicture}[node distance=4mm and 5mm,scale=.82,transform shape]
+\node[data,text width=23mm] (state) {Process\\state};
+\node[flow,text width=25mm,right=of state] (score) {One-Class SVM\\novelty score};
+\node[flow,text width=24mm,right=of score] (severity) {Anomaly state\\and severity};
+\node[flow,text width=25mm,right=of severity] (rank) {Ranked\\contributors};
+\node[data,text width=27mm,right=of rank] (subsystem) {Likely subsystem\\possible causes};
+\node[data,text width=28mm,right=of subsystem] (verify) {Recommended check\\and operator interpretation};
+\draw[arr] (state)--(score); \draw[arr] (score)--(severity); \draw[arr] (severity)--(rank);
+\draw[arr] (rank)--(subsystem); \draw[arr] (subsystem)--(verify);
 \end{tikzpicture}
-\caption{Anomaly-to-diagnosis transformation implemented for real-time supervision.}
-\source{\projectsource.}
-\label{fig:diagnosischain}
+\caption{Implemented path from process novelty to operator verification.}
+\source{Author's synthesis of the runtime and diagnostic workflow.}
+\label{fig:novelty-workflow}
 \end{figure}
 
-The broader configuration-driven diagnostic work defines eight concise rule families: insufficient drying air, insufficient thermal supply, dryer overload, reduced cooling, abnormal exhaust/pressure, possible temperature-sensor bias or jump, possible stuck sensor, and process instability or oscillation \cite{diagnosisconfig}. Air/fan evidence leads to supply and measurement checks; steam/thermal evidence leads to heating checks; feed, residence and ratio evidence leads to loading checks; and cooler, vacuum or temporal evidence directs the remaining subsystem checks. These rules informed validation scenarios, but the final replay service uses its dedicated quantile/ranking engine. This distinction prevents evidence from one implementation path being attributed to another.
+\section{Held-out process-novelty response}
 
-These rules are deliberately phrased as hypotheses. A low air-flow reading can represent a true delivery problem, a closed damper, an exhaust interaction or a biased instrument. The display therefore separates probable diagnosis, possible causes and recommended verification. In a future feedback loop, confirmed causes could be used to evaluate precision by rule; the current synthetic scenarios test logical acceptance, not empirical causal accuracy.
+The chronological TEST interval contains 237,600 rows, including 1,620 rows from three labelled synthetic disturbance episodes. The frozen detector flags 6,305 rows in total, or 2.654\% of the interval. It flags 60.25\% of rows inside the labelled episodes and 2.258\% of rows outside them. These are scenario-response and normal-period flag rates, not accuracy or plant fault probabilities.
 
-\section{Artifacts, traceability and failure behaviour}
+\begin{table}[htbp]
+\centering\small
+\caption{Frozen novelty-detector response to the three labelled TEST episodes}
+\label{tab:scenario-response}
+\begin{tabularx}{\textwidth}{@{}lrrrY@{}}
+\toprule
+Episode & Rows & Flagged & Row response & First flag / interpretation \\
+\midrule
+Feed surge & 408 & 0 & 0.0\% & No flag; peak display risk 0.360. \\
+Steam dip & 540 & 443 & 82.0\% & First raw flag after 290 s; peak risk 0.978. \\
+Airflow restriction & 672 & 533 & 79.3\% & First raw flag after 360 s; peak risk 0.950. \\
+\bottomrule
+\end{tabularx}
+\source{Independent report audit on the held-out canonical TEST interval.}
+\end{table}
 
-One governed artifact set is deliberately visible. Notebook 03 saves the selected moisture pipeline and JSON evaluation record; Notebook 04 saves the anomaly model, scaler, reference profile and its evaluation record. The runtime loads those exact governed artifacts from \code{models/5s}, while the shared schema records both ordered feature contracts. Runtime versions travel with database outputs and feature order is checked at inference. Invalid or incomplete input produces \code{DATA\_QUALITY}; insufficient shifted history produces an unavailable prediction with a reason. These are essential production-engineering behaviours: a system must reveal which compatible artifact it used and when it could not reason safely.
+The detector reacts strongly to the steam-dip and airflow-restriction departures, although sensitivity varies with disturbance type and magnitude. It does not flag the feed-surge episode. This is useful design feedback: representative operating modes and better loading-related features matter more than presenting the model as a complete fault classifier.
 
-\begin{engineeringbox}[Meaning of explainability]
-The diagnostic output is evidence localization, not proven causality. ``Likely subsystem'' means that abnormal, criticality-weighted features assigned to that subsystem dominate the current observation. ``Recommended verification'' tells the operator what to inspect; it is not a command or maintenance conclusion.
+\section{From novelty to investigation guidance}
+
+The useful contribution is the full diagnostic chain, not only the binary flag. The runtime compares a novel row with the TRAIN-period reference profile, ranks direct-variable deviations, gathers likely-subsystem evidence and presents possible causes with recommended verification. Detection, evidence localization and causal diagnosis remain separate tasks \cite{venkatasubramanian2003}.
+
+In a representative dashboard demonstration event, vacuum, air flow and fan speed are the strongest contributors. Their joint movement points to the drying-air and exhaust subsystem, so the interface suggests checking fan demand, damper position, leakage and the vacuum measurement. This is a probable diagnosis for investigation, not a confirmed root cause.
+
+The detector was developed and evaluated on deterministic synthetic process data and should therefore be interpreted as a proof of concept for process-novelty monitoring. Its operating threshold and sensitivity would need to be recalibrated using representative plant history, operating modes and confirmed events before industrial use.
+
+\begin{engineeringbox}[How the anomaly branch is used]
+The detector acts as an early-warning layer. It highlights a process state, localizes the strongest evidence and leaves verification and action to the operator using PCS 7, laboratory information and normal operating procedures.
 \end{engineeringbox}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.94\textwidth]{anomaly_holdout_validation.png}
+\caption{One-Class Support Vector Machine (OCSVM) decision function and display risk on the chronological TEST replay.}
+\source{Frozen One-Class SVM evaluated without refitting.}
+\label{fig:anomaly-holdout}
+\end{figure}
+
+\FloatBarrier

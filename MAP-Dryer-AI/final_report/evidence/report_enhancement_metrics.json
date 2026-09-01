@@ -1,0 +1,226 @@
+{
+  "created_at": "2026-08-28T18:51:08.255788",
+  "evidence_scope": "independent report audit; canonical datasets and governed model artifacts were read but not modified",
+  "soft_sensor": {
+    "split": {
+      "train_rows": 772,
+      "validation_rows": 166,
+      "test_rows": 165
+    },
+    "ridge": {
+      "n": 165,
+      "mae": 0.0010686339098063737,
+      "rmse": 0.0014026194681916787,
+      "r2": 0.8245295479034104,
+      "bias": 6.61687920356382e-05,
+      "max_abs_error": 0.005620566312520919
+    },
+    "last_lab_persistence": {
+      "n": 165,
+      "mae": 0.0014589393939393944,
+      "rmse": 0.001847884731745512,
+      "r2": 0.695439186307975,
+      "bias": 1.2236363636363594e-05,
+      "max_abs_error": 0.005424999999999999
+    },
+    "ridge_improvement_over_persistence": {
+      "mae_fraction": 0.2675268662662722,
+      "rmse_fraction": 0.24095943643261541
+    },
+    "residuals": {
+      "mean": 6.61687920356382e-05,
+      "median": 5.504219023859391e-05,
+      "standard_deviation": 0.00140532286343156,
+      "q05": -0.0021702863468099575,
+      "q95": 0.0021518359747630797,
+      "underprediction_rate": 0.47878787878787876,
+      "overprediction_rate": 0.5212121212121212,
+      "durbin_watson": 1.826516660383031,
+      "autocorrelation": {
+        "1": 0.08400024905416953,
+        "2": 0.0023179541044542075,
+        "3": 0.029302122787933513,
+        "6": 0.011285670120014671,
+        "12": 0.06991141313197555
+      },
+      "absolute_residual_fitted_correlation": 0.05417647345355752
+    },
+    "uncertainty_pilot": {
+      "method": "split-conformal pilot: TRAIN fit, VALIDATION calibration, TEST audit",
+      "model_scope": "independent uncertainty pilot; not the final refitted artifact",
+      "test_metrics": {
+        "n": 165,
+        "mae": 0.0010840521719381276,
+        "rmse": 0.00141412220964036,
+        "r2": 0.8216397155571667,
+        "bias": 8.202741839368334e-05,
+        "max_abs_error": 0.0055752325669434916
+      },
+      "intervals": {
+        "90": {
+          "nominal_coverage": 0.9,
+          "empirical_test_coverage": 0.9212121212121213,
+          "half_width_percentage_points": 0.002473483070045676,
+          "mean_width_percentage_points": 0.004946966140091352
+        },
+        "95": {
+          "nominal_coverage": 0.95,
+          "empirical_test_coverage": 0.9393939393939394,
+          "half_width_percentage_points": 0.002779180624907479,
+          "mean_width_percentage_points": 0.005558361249814958
+        }
+      }
+    }
+  },
+  "anomaly_detector": {
+    "scope": "held-out chronological TEST synthetic labels only",
+    "rows": 237600,
+    "designed_disturbance_rows": 1620,
+    "designed_episode_count": 3,
+    "raw_flag_rows": 6305,
+    "raw_flag_rate": 0.026536195286195285,
+    "normal_row_flag_rate": 0.02258242223917281,
+    "designed_row_recall": 0.6024691358024692,
+    "designed_row_precision": 0.1547977795400476,
+    "persistent_flag_rate": 0.026468855218855218,
+    "persistent_normal_row_flag_rate": 0.02251885753029918,
+    "persistent_designed_row_recall": 0.6018518518518519,
+    "persistent_designed_row_precision": 0.15503259659723326,
+    "grouped_candidate_events_30s": 123,
+    "grouped_events_overlapping_designed": 2,
+    "scenario_response": [
+      {
+        "scenario": "feed_surge",
+        "start": "2026-07-04 17:00:00",
+        "end": "2026-07-04 17:33:55",
+        "rows": 408,
+        "raw_flag_rate": 0.0,
+        "persistent_flag_rate": 0.0,
+        "first_raw_detection_delay_seconds": null,
+        "first_persistent_detection_delay_seconds": null,
+        "peak_display_risk": 0.3596281325891535
+      },
+      {
+        "scenario": "steam_dip",
+        "start": "2026-07-08 05:00:00",
+        "end": "2026-07-08 05:44:55",
+        "rows": 540,
+        "raw_flag_rate": 0.8203703703703704,
+        "persistent_flag_rate": 0.8185185185185185,
+        "first_raw_detection_delay_seconds": 290.0,
+        "first_persistent_detection_delay_seconds": 310.0,
+        "peak_display_risk": 0.9775717552846117
+      },
+      {
+        "scenario": "airflow_restriction",
+        "start": "2026-07-12 08:00:00",
+        "end": "2026-07-12 08:55:55",
+        "rows": 672,
+        "raw_flag_rate": 0.7931547619047619,
+        "persistent_flag_rate": 0.7931547619047619,
+        "first_raw_detection_delay_seconds": 360.0,
+        "first_persistent_detection_delay_seconds": 365.0,
+        "peak_display_risk": 0.9494983301139407
+      }
+    ],
+    "interpretation": "Designed synthetic disturbance recall is not plant fault recall; normal-row flags are not confirmed false alarms."
+  },
+  "nu_sensitivity": {
+    "fit_rows": 6000,
+    "validation_rows": 20000,
+    "test_sample_rows": 19800,
+    "test_sample_cadence_seconds": 60,
+    "controlled_variables": "same scaler, deterministic fit sample, RBF kernel and gamma='scale'",
+    "results": [
+      {
+        "nu": 0.005,
+        "validation_flag_rate": 0.0505,
+        "test_normal_flag_rate": 0.012051868802440885,
+        "feed_surge_recall": 0.0,
+        "steam_dip_recall": 0.6888888888888889,
+        "airflow_restriction_recall": 0.5178571428571429
+      },
+      {
+        "nu": 0.01,
+        "validation_flag_rate": 0.0508,
+        "test_normal_flag_rate": 0.013424866514111365,
+        "feed_surge_recall": 0.0,
+        "steam_dip_recall": 0.7555555555555555,
+        "airflow_restriction_recall": 0.5714285714285714
+      },
+      {
+        "nu": 0.02,
+        "validation_flag_rate": 0.05925,
+        "test_normal_flag_rate": 0.022323925756420036,
+        "feed_surge_recall": 0.0,
+        "steam_dip_recall": 0.8,
+        "airflow_restriction_recall": 0.8035714285714286
+      },
+      {
+        "nu": 0.03,
+        "validation_flag_rate": 0.0768,
+        "test_normal_flag_rate": 0.035291126366641244,
+        "feed_surge_recall": 0.0,
+        "steam_dip_recall": 0.8444444444444444,
+        "airflow_restriction_recall": 0.8392857142857143
+      },
+      {
+        "nu": 0.05,
+        "validation_flag_rate": 0.1053,
+        "test_normal_flag_rate": 0.056648868548182046,
+        "feed_surge_recall": 0.0,
+        "steam_dip_recall": 0.8444444444444444,
+        "airflow_restriction_recall": 0.8571428571428571
+      }
+    ]
+  },
+  "accelerated_analytical_replay": {
+    "scope": "batch-accelerated analytics only; excludes database, diagnosis text, Power BI, source transport and deliberate pacing",
+    "rows": 237600,
+    "moisture_predictions": 237600,
+    "anomaly_flags": 6305,
+    "chunk_size": 20000,
+    "chunks": 12,
+    "wall_seconds": 9.694701800122857,
+    "throughput_rows_per_second": 24508.231908379996,
+    "normalized_chunk_latency_ms_per_row": {
+      "mean": 0.04095613352260306,
+      "p50": 0.04051812749821693,
+      "p95": 0.050324269772046876,
+      "p99": 0.0550357357726951,
+      "max": 0.05621360227285715
+    }
+  },
+  "dataset_label_audit": {
+    "embedded_label_episode_count": 22,
+    "embedded_label_counts_by_type": {
+      "steam_dip": 5,
+      "airflow_restriction": 5,
+      "cooling_loss": 4,
+      "fan_speed_dip": 4,
+      "feed_surge": 4
+    },
+    "manifest_catalogue_count": 7,
+    "catalogue_matches_embedded_labels": false,
+    "generator_provenance": {
+      "generator_version": "user-supplied-deterministic",
+      "configuration_path": null,
+      "random_seed": null,
+      "source_filename": "MAP_Dryer_Canonical_5s_deterministic.csv"
+    },
+    "report_rule": "Use direct CSV label audit for scenario counts; treat the manifest disturbance catalogue as stale metadata and do not infer missing generator equations."
+  },
+  "dashboard_demonstration": {
+    "available": true,
+    "purpose": "dashboard demonstration/scenario replay only",
+    "source_rows": 34560,
+    "injected_episode_count": 8,
+    "normal_rows_preserved": true,
+    "laboratory_values_preserved": true,
+    "normal_period_model_flag_rate": 0.0007062146892655367,
+    "injected_period_model_flag_rate": 0.5872719734660033,
+    "episodes_with_detector_response": 7,
+    "episode_count": 8,
+    "interpretation": "Dedicated dashboard demonstration fork; not canonical TEST evidence and not a plant fault benchmark."
+  }
+}

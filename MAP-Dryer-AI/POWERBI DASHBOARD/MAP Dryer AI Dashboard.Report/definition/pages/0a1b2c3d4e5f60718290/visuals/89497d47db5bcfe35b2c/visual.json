@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "89497d47db5bcfe35b2c",
   "position": {
-    "x": 1080,
-    "y": 748,
-    "z": 6700,
-    "height": 18,
-    "width": 300,
-    "tabOrder": 6700
+    "x": 1079.5566502463055,
+    "y": 748.15270935960586,
+    "z": 4400,
+    "height": 25.492610837438423,
+    "width": 322.53694581280786,
+    "tabOrder": 4400
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -22,9 +21,9 @@
                   {
                     "value": "Recommended verification",
                     "textStyle": {
+                      "fontWeight": "bold",
                       "fontSize": "9pt",
-                      "color": "#66756F",
-                      "fontWeight": "bold"
+                      "color": "#5e706a"
                     }
                   }
                 ]
@@ -87,6 +86,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

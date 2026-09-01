@@ -24,20 +24,28 @@ web/src/
     usePresence.js            animated layer-presence channels (see below)
     Lighting.jsx              key / rim / hemisphere / process warmth / fog
     StudioEnv.jsx             procedural IBL - metals render black without it
+    Post.jsx                  GTAO ambient occlusion + ACES output pass
+    Prewarm.jsx               one offscreen frame that pays every first-use cost
+    PerfGuard.jsx             sustained frame collapse -> safe mode
     WorldText.jsx             SDF text, bundled fonts, offline glyph folding
     layers/
       Plant.jsx               ground, green steel, platforms, ducts, roof, dust
       Dryer.jsx               the hero rotary dryer (procedural)
       DryerInternals.jsx      flights, cascading bed, counter-current air, vapour
       Granules.jsx            instanced MAP stream riding flowPath
-      ProcessChain.jsx        7 upstream stations + mother-liquor recycle
+      ProcessChain.jsx        6 upstream unit operations, the material line,
+                              the mother-liquor recycle, and a key + rim that
+                              track the material down the chain
       TimeAxis.jsx            axis + 6 lab markers + the 695-point trace
       SensorNodes.jsx         telemetry board, leader-lined to the equipment
       DataPackets.jsx         instanced packets, bifurcation, the waiting packet
       Architecture.jsx        the stack the packets build
+      Residence.jsx           the residence-time lane: the physical delay, then
+                              the data shift that follows from it
       Pathways.jsx            Ridge lane + the real PCA manifold and trajectory
       Evidence.jsx            hold-out chart, candidate bars, risk trace, limits
       Dashboard.jsx           the real Power BI pages + highlight sequence
+      Handover.jsx            artifact -> service -> inference -> screen
       Runtime.jsx             SQL / Postgres / Python / replay staircase
       ValueLoop.jsx           the operational ring
       Roadmap.jsx             solid vs outlined future geometry
@@ -50,6 +58,7 @@ web/src/
     curves.js                 flowPath, the world map, layout constants
     palette.js                design tokens and the four lighting modes
     perf.js                   device probe and safe-mode budgets
+    surfaces.js               seven procedural industrial surface families
 ```
 
 Three groupings differ from the first sketch, for cohesion rather than
@@ -85,7 +94,7 @@ a mental map because the map never changes.
 |---|---|---|
 | **Plant hall** | x −40…+40, z −24…+24 | Ground plane, 12 green steel columns, overhead ducts, grating platforms |
 | **Dryer** | centred (0, 5.2, 0), axis +X | Drum L 22 m, R 2.0 m, incline −1.4°, feed end x −11 (high), discharge x +11 (low) |
-| **Upstream chain** | x −96…−16, z 0…−14 | 7 stations along a curve arriving at the feed chute |
+| **Upstream chain** | x −96…−16, z 0…−14 | 7 stations along a curve arriving at the feed chute; the 7th IS the dryer, so 6 are built here |
 | **Time axis** | x +16…+142, y 4, z 0 | 12 h of held-out TEST mapped to 126 m → **1 h = 10.5 m**, 1 lab interval = 21 m |
 | **Quality plane** | above the time axis, y 4…16 | Lab markers, prediction trace, later the evidence panels |
 | **Architecture stack** | (−6, 2…30, −44) | 8 layers built by arriving packets |
@@ -142,7 +151,7 @@ right trade for a soutenance.
 | Columns ×12 + bracing | instanced I-beam profile | ~6.0 k | 1 |
 | Platforms + handrails | merged boxes + instanced tubes | ~5.0 k | 2 |
 | Internal flights ×12 | instanced boxes | ~1.4 k | 1 |
-| Upstream stations ×7 | lathe profiles | ~9.0 k | 7 |
+| Upstream unit operations ×6 | 7 shared unit geometries, scaled per mesh | ~30 k | a few hundred, all small |
 | Granules | `InstancedMesh(icosahedron, 1)` × 2,600 | ~5.2 k | 1 |
 | Dust motes | `Points` × 1,800 | — | 1 |
 | Manifold cloud | `Points` × 2,400 + 136 | — | 2 |
@@ -279,10 +288,54 @@ specifically so that no scene stutters the first time it is reached.
 | A JSON payload fails to load | That layer renders empty and logs once; the show continues; no exception reaches the render loop |
 | A texture fails | Material falls back to flat token colour |
 | Frame rate collapses | Auto safe mode after 90 consecutive frames below 30 fps, announced only in the presenter HUD |
+| Software GL detected | Post-processing unmounts itself; rendering hands straight back to r3f |
 
 There are no uncaught errors in the render loop by construction: every layer
 guards its own data, and `App` wraps the canvas in an error boundary that
 degrades to the static fallback rather than a blank screen.
+
+### What a restored context actually has to rebuild
+
+`useShow.renderEpoch` is incremented once per restore, and three things take it
+as a dependency. `StudioEnv` regenerates the PMREM environment and `Post`
+rebuilds the composer — both hold *rendered* targets, which come back allocated
+but empty, so without this the film returns with every metal surface black and no
+occlusion. The `Rig` re-settles the world into the step the presenter is already
+on.
+
+Three things it must **not** do, all of which it used to:
+
+1. **Move the camera.** `state.current` is plain JS and survived the loss intact,
+   including however far a scene's own slow drift had travelled. Re-tweening to
+   the beat's settled pose snapped the shot back to where that drift *started*.
+2. **Replay the choreography.** `buildTransition` returns immediately on a
+   restore. Several beats own absolute timings that do not scale with the
+   transition duration, so building the beat's timeline on top of an
+   already-settled world re-ran it — a context loss during scene 10 replayed the
+   whole nine-second artifact-to-service sequence over a dashboard the presenter
+   had been talking over for a minute.
+3. **Disagree with the ordinary path about where "settled" is.** A restore sets
+   channels from `sceneChannelState`; the arrow key animates them with
+   `buildTransition`. Those two tables were written at different times and had
+   never been compared.
+
+### Proving it
+
+Two harnesses, because a reliability claim that is never exercised is a claim.
+
+`scripts/qa-restore.mjs` reaches a step by random access, records the camera
+pose, the focal length, all 68 presence channels and the environment and AO
+epochs, kills the context through `WEBGL_lose_context`, restores it, and asserts
+that the step did not move, the pose came back, every channel came back, both
+GPU-side resources were *rebuilt* rather than merely still present, and the page
+is drawing at the rate it drew at a moment earlier.
+
+`scripts/qa-channels.mjs` walks all 42 steps and diffs the live channel values
+against what a number-key jump — or a restore — would put there instead,
+classifying each disagreement by whether the owning layer is on screen. It found
+four that were: the scene-03 chain head (two tables, disagreeing on four of eight
+beats, by as much as half the chain), the scene-03 granule size, the scene-07
+value chips, and the scene-11 packet flow.
 
 
 ---

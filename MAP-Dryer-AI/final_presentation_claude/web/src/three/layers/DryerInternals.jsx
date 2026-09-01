@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import { C } from '../../lib/palette.js';
 import { DRYER } from '../../lib/curves.js';
 import { useChannel } from '../usePresence.js';
+import { applySurface } from '../../lib/surfaces.js';
+import { WMono } from '../WorldText.jsx';
 
 /**
  * What happens inside the shell: lifting flights, the cascading material bed,
@@ -16,9 +18,13 @@ import { useChannel } from '../usePresence.js';
 
 const INCLINE = THREE.MathUtils.degToRad(DRYER.incline);
 const N_FLIGHTS = 12;
-const N_BED = 900;
-const N_AIR = 420;
-const N_VAPOUR = 260;
+// Fewer, larger elements. The counts were fine; the SIZES were not — at the
+// old camera distance a bed particle subtended about 2.5 px and the air about
+// 2 px, so three separate physical claims rendered as one grey haze. The
+// camera is now inside the shell and these read as distinct populations.
+const N_BED = 620;
+const N_AIR = 300;
+const N_VAPOUR = 200;
 
 export default function DryerInternals() {
   const group = useRef();
@@ -27,11 +33,18 @@ export default function DryerInternals() {
   const air = useRef();
   const vapour = useRef();
   const presence = useChannel('internals');
+  const marks = useRef();
 
-  const flightMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: C.ring, roughness: 0.6, metalness: 0.7, transparent: true, opacity: 0,
-    side: THREE.DoubleSide,
-  }), []);
+  const flightMat = useMemo(() => {
+    const m = new THREE.MeshStandardMaterial({
+      color: C.ring, roughness: 0.6, metalness: 0.7, transparent: true, opacity: 0,
+      side: THREE.DoubleSide,
+    });
+    // Flights are wear parts. The PHYSICS beat puts the camera 10 units from
+    // them, which is the closest the film ever gets to bare steel.
+    applySurface(m, 'machined', { repeat: [12, 1] });
+    return m;
+  }, []);
 
   // Lifting flights: instanced blades on the inner wall.
   const flightMesh = useMemo(() => {
@@ -70,7 +83,7 @@ export default function DryerInternals() {
   }, []);
 
   const bedMat = useMemo(() => new THREE.PointsMaterial({
-    color: C.granule, size: 0.11, transparent: true, opacity: 0,
+    color: C.granule, size: 0.30, transparent: true, opacity: 0,
     depthWrite: false, sizeAttenuation: true,
   }), []);
 
@@ -81,7 +94,7 @@ export default function DryerInternals() {
     return g;
   }, []);
   const airMat = useMemo(() => new THREE.PointsMaterial({
-    color: C.processWarm, size: 0.085, transparent: true, opacity: 0,
+    color: C.processWarm, size: 0.22, transparent: true, opacity: 0,
     depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
   }), []);
   const airSeeds = useMemo(() => {
@@ -101,7 +114,7 @@ export default function DryerInternals() {
     return g;
   }, []);
   const vapMat = useMemo(() => new THREE.PointsMaterial({
-    color: C.dataCyan, size: 0.13, transparent: true, opacity: 0,
+    color: C.dataCyan, size: 0.26, transparent: true, opacity: 0,
     depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
   }), []);
   const vapSeeds = useMemo(() => {
@@ -181,6 +194,14 @@ export default function DryerInternals() {
       vp[i * 3 + 2] = (spread - 0.5) * 1.6 * (1 - u * 0.5);
     }
     vapGeo.attributes.position.needsUpdate = true;
+
+    if (marks.current) {
+      const m = presence.current;
+      marks.current.visible = m > 0.5;
+      marks.current.traverse((o) => {
+        if (o.fillOpacity !== undefined) o.fillOpacity = (o.userData?.base ?? 1) * m;
+      });
+    }
   });
 
   return (
@@ -191,6 +212,26 @@ export default function DryerInternals() {
       <points ref={bed} geometry={bedGeo} material={bedMat} />
       <points ref={air} geometry={airGeo} material={airMat} />
       <points ref={vapour} geometry={vapGeo} material={vapMat} />
+
+      {/* Three claims, three directions, named on screen.
+          The bed, the counter-current air and the vapour were all animated
+          correctly and all read as one grey haze: nothing in frame said which
+          way anything was going. These are drawn as overlay annotations so a
+          flight or the shell wall can never cover them. */}
+      <group ref={marks}>
+        <WMono overlay position={[-2.6, -2.9, 2.6]} fontSize={0.34} anchorX="left"
+          color={C.granule} fillOpacity={0.95} userData={{ base: 0.95 }}>
+          SOLIDS -&gt;
+        </WMono>
+        <WMono overlay position={[-2.6, 3.0, 2.6]} fontSize={0.34} anchorX="left"
+          color={C.dataCyan} fillOpacity={0.95} userData={{ base: 0.95 }}>
+          &lt;- HOT AIR
+        </WMono>
+        <WMono overlay position={[-8.5, 4.4, 1.4]} fontSize={0.34} anchorX="left"
+          color={C.lab} fillOpacity={0.95} userData={{ base: 0.95 }}>
+          MOISTURE -&gt; EXHAUST
+        </WMono>
+      </group>
     </group>
   );
 }

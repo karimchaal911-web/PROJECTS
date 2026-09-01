@@ -5,6 +5,7 @@ import { C } from '../../lib/palette.js';
 import { useChannel } from '../usePresence.js';
 import { useShow } from '../../state/useShow.js';
 import { budget } from '../../lib/perf.js';
+import { applySurface } from '../../lib/surfaces.js';
 
 /**
  * The plant hall: ground, green structural steel, platforms, handrails,
@@ -23,14 +24,28 @@ export default function Plant() {
   const safeMode = useShow((s) => s.safeMode);
   const b = budget(safeMode);
 
-  const mats = useMemo(() => ({
-    steel: new THREE.MeshStandardMaterial({ color: C.steelGreen, roughness: 0.7, metalness: 0.12, envMapIntensity: 0.6, transparent: true }),
-    dark: new THREE.MeshStandardMaterial({ color: C.steelDark, roughness: 0.82, metalness: 0.1, transparent: true }),
-    grating: new THREE.MeshStandardMaterial({ color: C.grating, roughness: 0.85, metalness: 0.15, transparent: true }),
-    rail: new THREE.MeshStandardMaterial({ color: C.handrail, roughness: 0.8, metalness: 0.2, transparent: true }),
-    duct: new THREE.MeshStandardMaterial({ color: C.duct, roughness: 0.62, metalness: 0.18, envMapIntensity: 0.9, transparent: true }),
-    ground: new THREE.MeshStandardMaterial({ color: '#2B2A24', roughness: 0.97, metalness: 0.0, transparent: true }),
-  }), []);
+  const mats = useMemo(() => {
+    const m = {
+      steel: new THREE.MeshStandardMaterial({ color: C.steelGreen, roughness: 0.7, metalness: 0.12, envMapIntensity: 0.6, transparent: true }),
+      dark: new THREE.MeshStandardMaterial({ color: C.steelDark, roughness: 0.82, metalness: 0.1, transparent: true }),
+      grating: new THREE.MeshStandardMaterial({ color: C.grating, roughness: 0.85, metalness: 0.15, transparent: true }),
+      rail: new THREE.MeshStandardMaterial({ color: C.handrail, roughness: 0.8, metalness: 0.2, transparent: true }),
+      duct: new THREE.MeshStandardMaterial({ color: C.duct, roughness: 0.62, metalness: 0.18, envMapIntensity: 0.9, transparent: true }),
+      ground: new THREE.MeshStandardMaterial({ color: '#2B2A24', roughness: 0.97, metalness: 0.0, transparent: true }),
+    };
+    // The hall is the surface the audience looks at longest — it is on screen
+    // in the opening frame and in the closing one. The floor carries the most
+    // treatment because it is the largest unbroken plane in the film and a
+    // perfectly uniform 400 x 220 slab is the single clearest "this is CAD"
+    // signal available.
+    applySurface(m.steel, 'struct', { repeat: 4 });
+    applySurface(m.dark, 'struct', { repeat: 3 });
+    applySurface(m.grating, 'grating', { repeat: 9 });
+    applySurface(m.rail, 'paint', { repeat: [10, 2] });
+    applySurface(m.duct, 'pipe', { repeat: [3, 2] });
+    applySurface(m.ground, 'concrete', { repeat: [96, 52], normal: 0.5 });
+    return m;
+  }, []);
 
   // Twelve columns on a believable industrial grid.
   const columns = useMemo(() => {

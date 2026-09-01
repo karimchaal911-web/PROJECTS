@@ -8,22 +8,37 @@ import { SCENES, STEPS } from './scenes.js';
  */
 export const useShow = create((set, get) => ({
   step: 0,
-  ready: false,
   safeMode: false,
   hud: false,
   help: false,
   started: false,
   startedAt: null,
-  // set by the Rig so the overlay can wait for a transition to finish
-  transitioning: false,
+
+  /**
+   * Incremented once every time the WebGL context is restored.
+   *
+   * A lost context takes every GPU-side resource with it, but NOT the show:
+   * `step`, the presence channels and the camera pose all live in plain JS and
+   * survive untouched. What does not survive is anything whose CONTENT was
+   * produced by rendering into a target — the PMREM studio environment and the
+   * post-processing buffers — because re-uploading a render target re-allocates
+   * it empty. Without a rebuild the film comes back with every metal surface
+   * black and no ambient occlusion.
+   *
+   * Layers that own such a resource take this as an effect dependency and
+   * rebuild. The Rig takes it too, and re-settles the CURRENT step rather than
+   * restarting the show. Nothing here is a second state system: the pose and
+   * the channel values come from the same scene table the presenter's arrow
+   * key uses.
+   */
+  renderEpoch: 0,
+  contextRestored: () => set((s) => ({ renderEpoch: s.renderEpoch + 1 })),
 
   get scene() {
     return SCENES[STEPS[get().step].scene];
   },
 
   begin: () => set({ started: true, startedAt: Date.now() }),
-  setReady: (v) => set({ ready: v }),
-  setTransitioning: (v) => set({ transitioning: v }),
 
   next: () => set((s) => ({ step: Math.min(s.step + 1, STEPS.length - 1) })),
   prev: () => set((s) => ({ step: Math.max(s.step - 1, 0) })),

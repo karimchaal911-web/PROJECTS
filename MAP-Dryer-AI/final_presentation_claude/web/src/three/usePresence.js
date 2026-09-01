@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import gsap from 'gsap';
 
 /**
  * Animated "presence" channels shared between the show state and the scene
@@ -50,11 +49,20 @@ export function setChannels(values) {
   }
 }
 
-/** Kill any tween targeting these channels — used when the presenter interrupts. */
-export function killChannels(keys) {
-  for (const key of keys) gsap.killTweensOf(channel(key));
+/**
+ * Every channel and its current value.
+ *
+ * Diagnostics only, and it exists for exactly one job: proving that a WebGL
+ * context restore puts the world back into the state the presenter was already
+ * in. The claim "the show resumes where it was" is otherwise untestable from
+ * outside the page — the camera pose is observable through `window.__CAM__`,
+ * but the thirty-odd presence channels that decide what is actually ON SCREEN
+ * are not. See scripts/qa-restore.mjs.
+ */
+export function channelSnapshot() {
+  const out = {};
+  for (const [key, ref] of channels) out[key] = +ref.current.toFixed(4);
+  return out;
 }
 
-export function allChannelKeys() {
-  return [...channels.keys()];
-}
+if (typeof window !== 'undefined') window.__CHANNELS__ = channelSnapshot;

@@ -2,7 +2,7 @@
   "model_version": "canonical_92d_v6.0",
   "feature_schema_version": "moisture_direct_16_v6.0",
   "runtime_compatibility_version": "map_runtime_v6",
-  "created_at": "2026-08-24T14:07:47",
+  "created_at": "2026-09-01T17:13:04",
   "process_interval_seconds": 5,
   "process_interval_interpretation": "prototype temporal resolution and replay cadence",
   "quality_window_minutes": 30.0,
@@ -273,5 +273,25 @@
     "risk_warning_threshold": 0.5,
     "risk_critical_threshold": 0.8,
     "is_probability": false
-  }
+  },
+  "anomaly_source_notebook": "notebooks/04_Model2_AnomalyDetection&Diagnosis.ipynb",
+  "anomaly_model_features": [
+    "dryer_air_temperature",
+    "cooler_air_temperature",
+    "air_flow_rate",
+    "wet_product_feed_rate",
+    "product_inlet_temperature",
+    "residence_time",
+    "vacuum",
+    "steam_pressure",
+    "fan_speed",
+    "air_product_delta",
+    "cooler_delta",
+    "air_per_feed",
+    "steam_per_feed",
+    "thermal_load",
+    "thermal_exposure"
+  ],
+  "anomaly_feature_count": 15,
+  "anomaly_model_artifact_sha256": "07bce32b6bf72a2adcc7196b72a7960d0fd3f46925eea291d51d1dbb6722bb61"
 }

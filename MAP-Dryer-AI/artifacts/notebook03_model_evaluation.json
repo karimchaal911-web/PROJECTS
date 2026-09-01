@@ -1,6 +1,6 @@
 {
   "notebook": "03_Model1_SoftSensor.ipynb",
-  "created_at": "2026-08-24T14:07:47",
+  "created_at": "2026-09-01T17:13:04",
   "depends_on": "artifacts\\notebook02_feature_handoff.json",
   "canonical_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
   "canonical_dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
@@ -99,13 +99,13 @@
         "model__max_depth": null,
         "model__min_samples_leaf": 5
       },
-      "time_series_cv_rmse": 0.0015830971844863061,
+      "time_series_cv_rmse": 0.0015830971844863055,
       "validation": {
-        "mae": 0.0011311832501857638,
+        "mae": 0.001131183250185764,
         "rmse": 0.0014667943392795767,
-        "r2": 0.878337363139526,
-        "bias": -0.00016728470185953842,
-        "max_abs_error": 0.004864009760204874,
+        "r2": 0.8783373631395262,
+        "bias": -0.0001672847018595442,
+        "max_abs_error": 0.004864009760204846,
         "n": 166
       }
     },

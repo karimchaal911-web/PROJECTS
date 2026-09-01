@@ -1,11 +1,24 @@
+# Notebook, analysis and test dependencies for MAP Dryer AI.
+# The replay service has its own, narrower list in realtime_pipeline/requirements.txt.
 jupyter
 matplotlib
+nbconvert
 nbformat
 numpy
-openpyxl
 pandas
 PyYAML
 scikit-learn
 scipy
 seaborn
 shap
+
+# joblib loads and saves the exported estimators in models/5s/.
+joblib
+
+# tests/test_canonical_pipeline.py imports realtime_service, which reads the
+# database configuration, so the test run needs the runtime's two extras.
+psycopg[binary]
+python-dotenv
+
+# Documented test runner (pytest.ini).
+pytest

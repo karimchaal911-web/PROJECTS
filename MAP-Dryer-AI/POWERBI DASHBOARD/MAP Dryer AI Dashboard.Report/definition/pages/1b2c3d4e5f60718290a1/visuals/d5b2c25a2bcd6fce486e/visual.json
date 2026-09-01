@@ -1,74 +1,34 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "d5b2c25a2bcd6fce486e",
   "position": {
-    "x": 1272,
-    "y": 26,
+    "x": 1253.5714285714284,
+    "y": 15.517241379310343,
     "z": 1200,
-    "height": 36,
-    "width": 130,
+    "height": 46.551724137931032,
+    "width": 141.871921182266,
     "tabOrder": 1200
   },
   "visual": {
-    "visualType": "card",
-    "drillFilterOtherVisuals": true,
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
-                    }
-                  },
-                  "Property": "Refresh Pill Label"
-                }
-              },
-              "queryRef": "vw_dryer_dashboard_powerbi.Refresh Pill Label",
-              "nativeQueryRef": "Refresh Pill Label"
-            }
-          ]
-        }
-      }
-    },
+    "visualType": "textbox",
     "objects": {
-      "categoryLabels": [
+      "general": [
         {
           "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "labels": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#66756F'"
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "PROTOTYPE · REPLAY",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontSize": "8pt",
+                      "color": "#5e706a"
                     }
                   }
-                }
+                ]
               }
-            }
+            ]
           }
         }
       ]
@@ -102,7 +62,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#F3F6F4'"
+                      "Value": "'#F4F7F5'"
                     }
                   }
                 }
@@ -133,7 +93,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E0DC'"
+                      "Value": "'#D6E2DD'"
                     }
                   }
                 }
@@ -162,6 +122,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

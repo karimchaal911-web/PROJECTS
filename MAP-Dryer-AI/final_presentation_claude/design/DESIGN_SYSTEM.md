@@ -116,7 +116,25 @@ Rules:
 * **Never more than 22 words of body copy on screen at once.**
 * Hero statements are 3–7 words and land on their own, with the world visible.
 * Numbers are always monospace with an explicit unit; moisture always shows
-  3–4 decimals and `% H₂O`.
+  3–4 decimals and `%`, with the quantity NAMED beside it — the same convention
+  the shipped Power BI report uses.
+
+**Engineering typography policy — one convention across DOM and world.**
+The in-world SDF font ships the bundled Latin subsets only, so a symbol either
+renders in *both* surfaces or is spelled out in both. Nothing is written one way
+in the overlay and another way in the scene.
+
+| Quantity | Written | Why |
+|---|---|---|
+| temperature | `°C` | U+00B0 is in the bundled subset; verified in a blocked-network capture |
+| volumetric flow | `m³/h` | U+00B3 likewise |
+| water content | named quantity + `%` | the subscript in `H₂O` has no glyph in the world subset, and `H2O` in a monospace face whose zero carries no slash is an O/0 coin toss at projector distance |
+| vacuum | `mmH2O` | kept, because the shipped report prints it that way |
+| Greek | `alpha = 10`, `nu = 0.02` | no Greek in the subset, and CSS `text-transform: uppercase` maps ν to a glyph identical to Latin N — which turned `nu = 0.02` into what reads as a sample size |
+| delta | not used | spell the interval out: `5 s tick` |
+
+`.caption` therefore carries **no** `text-transform`; caption strings are written
+already-uppercased at source.
 * No italics. No text shadow — legibility comes from a scrim, not a glow.
 
 Fallback stack: `"Inter Tight", "Inter", system-ui, "Segoe UI", sans-serif`.

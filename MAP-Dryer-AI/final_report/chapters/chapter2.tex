@@ -3,7 +3,7 @@
 
 \section{From prepared reactants to conditioned crystals}
 
-This chapter reconstructs the soluble-MAP sequence from the supplied process report \cite{souilmi}, the student's field observations \cite{fieldnotes}, selected on-site photographs, and the project-specific MAP SOLUBLE PCS7 screens. The photographs establish physical context and the screenshots establish the supervised context. Neither is presented as evidence of a live prototype connection, and no equipment identity, PCS7 tag, unit, setpoint, alarm threshold or control function is inferred beyond what is visibly supported.
+I reconstructed the soluble-MAP sequence from the supplied process report \cite{souilmi}, my field observations \cite{fieldnotes}, selected on-site photographs and the project-specific MAP SOLUBLE PCS 7 screens. The photographs establish physical context, while the screens show how the process is supervised. I used both to understand the production sequence and kept the model boundary focused on the dryer variables available in the repository.
 
 The simplified sequence in \cref{fig:mapflow} starts with phosphoric-acid pretreatment and ammonia vaporization. Neutralization forms ammonium phosphate solution, buffer reservoirs stabilize the downstream feed, concentration and vacuum crystallization form crystals, centrifugation removes mother liquor, and drying removes residual water before cooling and conditioning. Recycle streams and intermediate storage couple the stages, so a final-moisture deviation cannot automatically be attributed to one dryer component.
 
@@ -23,19 +23,19 @@ The simplified sequence in \cref{fig:mapflow} starts with phosphoric-acid pretre
 \draw[dashedarr] (cent.south) -- ++(0,-6mm) -| node[pos=.25,below,font=\scriptsize]{mother-liquor recycle} (neut.south);
 \end{tikzpicture}
 \caption{Overall soluble MAP production flow, simplified for supervision analysis.}
-\source{Author's synthesis from \cite{souilmi,fieldnotes} and the supplied MAP SOLUBLE PCS7 screens.}
+\source{Author's synthesis from \cite{souilmi,fieldnotes} and the supplied MAP SOLUBLE PCS 7 screens.}
 \label{fig:mapflow}
 \end{figure}
 
-\begin{engineeringbox}[How to read the PCS7 evidence]
-The screen title identifies the process stage; equipment symbols and line connections support a qualitative description of material flow and supervision. Numerical values are point-in-time observations photographed from PCS7. The on-site photographs are selected for clarity and technical relevance, but visual similarity alone does not establish equipment identity or a one-to-one tag mapping. The report therefore connects photographs, PCS7 and the dataset only at confirmed engineering-concept level.
+\begin{engineeringbox}[How to read the PCS 7 evidence]
+The screen title identifies the process stage, while equipment symbols and line connections support a qualitative reading of material flow and supervision. The report uses these images as process context and does not infer unverified tag mappings or operating limits from them.
 \end{engineeringbox}
 
 \section{Reactant preparation and upstream environmental control}
 
-The cited process description presents phosphoric-acid pretreatment through desulfation, dearsenation, flocculation/decantation and aluminization \cite{souilmi}. These operations influence solution composition before neutralization but are not direct inputs to the current dryer model. The project-specific PCS7 and on-site evidence therefore receive visual priority.
+The cited process description presents phosphoric-acid pretreatment through desulfation, dearsenation, flocculation/decantation and aluminization \cite{souilmi}. These operations influence solution composition before neutralization but are not direct inputs to the current dryer model. The project-specific PCS 7 and on-site evidence therefore receive visual priority.
 
-Liquid ammonia is vaporized before neutralization. The supplied PCS7 views show vaporization and acid scrubbing as separate supervised utilities, establishing phase-change and gas-handling context without justifying a tag-to-repository mapping. Both remain outside the model-input boundary.
+Liquid ammonia is vaporized before neutralization. The supplied PCS 7 views show vaporization and acid scrubbing as separate supervised utilities. Both remain outside the model-input boundary.
 
 \section{Neutralization and stabilization}
 
@@ -43,9 +43,9 @@ The principal reaction may be represented by
 \begin{equation}
 \mathrm{H_3PO_4 + NH_3 \rightleftharpoons NH_4H_2PO_4},
 \end{equation}
-with further ammoniation capable of producing diammonium phosphate depending on ratio and conditions \cite{souilmi}. Neutralization is exothermic. Acid/ammonia balance, pH, temperature, agitation and recycled mother liquor therefore belong to one interacting operating context. These concepts are supported by the process description; the current prototype has no direct neutralization columns and does not claim to reconstruct the PCS7 control loops.
+with further ammoniation capable of producing diammonium phosphate depending on ratio and conditions \cite{souilmi}. Neutralization is exothermic. Acid/ammonia balance, pH, temperature, agitation and recycled mother liquor therefore belong to one interacting operating context. These concepts are supported by the process description; the current prototype has no direct neutralization columns and does not claim to reconstruct the PCS 7 control loops.
 
-The full screen in \cref{fig:pcs7neutral} is explicitly identified by its interface title as the neutralization stage. It shows three agitated vessel symbols labelled 207A-AR-201, 207A-AR-202 and 207A-AR-203, their associated drives/pumps, interconnected process lines and labelled connections for reagent, condensate, mother-liquor and gas services. The detail crop makes the vessel train readable without translating the surrounding tag codes or treating the displayed values as limits. None of the new on-site photographs provides a sufficiently reliable identifier for these three reactors; a physical pairing is therefore deliberately not asserted.
+The full screen in \cref{fig:pcs7neutral} is identified by its interface title as the neutralization stage. It shows three agitated vessel symbols, their associated drives and pumps, and connections for reagent, condensate, mother liquor and gas services. The detail crop makes the vessel train easier to read. I did not assign the vessels to on-site photographs because the available images do not show reliable identifiers.
 
 \begin{figure}[p]
 \centering
@@ -53,24 +53,24 @@ The full screen in \cref{fig:pcs7neutral} is explicitly identified by its interf
 \vspace{2mm}
 
 \includegraphics[width=.92\textwidth,trim=70 75 70 335,clip]{pcs7_neutralization.jpeg}
-\caption{PCS7 neutralization screen (top) and detail crop centred on the three agitated vessels (bottom).}
-\source{MAP SOLUBLE PCS7 photograph supplied by the author; tags and values reproduced only as visible interface evidence.}
+\caption{PCS 7 neutralization screen (top) and detail crop centred on the three agitated vessels (bottom).}
+\source{MAP SOLUBLE PCS 7 photograph supplied by the author.}
 \label{fig:pcs7neutral}
 \end{figure}
 
-Buffer reservoirs absorb short-term variation and decouple neutralization from downstream processing. The screen in \cref{fig:pcs7-buffer} is explicitly identified by its interface title as the buffer-reservoir stage and visibly presents four agitated reservoirs with connected pumps and process lines. Its relevance is temporal: buffering delays and mixes disturbances, so an upstream change need not appear at the final product at the same timestamp.
+Buffer reservoirs absorb short-term variation and decouple neutralization from downstream processing. The screen in \cref{fig:pcs7-buffer} presents four agitated reservoirs with connected pumps and process lines. Its relevance is temporal: buffering delays and mixes disturbances, so an upstream change need not appear at the final product at the same timestamp.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.92\textwidth,trim=18 70 20 72,clip]{pcs7_buffer_tanks.jpeg}
-\caption{PCS7 buffer-reservoir synoptic used to explain process decoupling and material delay.}
-\source{MAP SOLUBLE PCS7 photograph supplied by the author; no tag-to-dataset mapping asserted.}
+\caption{PCS 7 buffer-reservoir synoptic used to explain process decoupling and material delay.}
+\source{MAP SOLUBLE PCS 7 photograph supplied by the author.}
 \label{fig:pcs7-buffer}
 \end{figure}
 
 \section{Crystallization and centrifugal separation}
 
-Crystallization requires supersaturation. In the observed process, circulation, vacuum operation and thermal exchange support concentration and crystal formation. The two supplied PCS7 views identify the 300 and 400 second-effect crystallization lines. Their side-by-side presentation in \cref{fig:pcs7-crystallization} confirms that the operating context is distributed across two labelled effects/lines rather than represented by a single vessel. No displayed value is interpreted as an approved setpoint or industrial limit.
+Crystallization requires supersaturation. In the observed process, circulation, vacuum operation and thermal exchange support concentration and crystal formation. The two supplied PCS 7 views identify the 300 and 400 second-effect crystallization lines. Their side-by-side presentation in \cref{fig:pcs7-crystallization} shows that the operating context is distributed across two lines rather than represented by a single vessel.
 
 \begin{figure}[p]
 \centering
@@ -87,16 +87,16 @@ Crystallization requires supersaturation. In the observed process, circulation, 
 \vspace{3mm}
 
 \includegraphics[width=.86\textwidth,trim=18 70 20 72,clip]{pcs7_centrifugation.jpeg}
-\caption{PCS7 evidence for the two crystallization effects (top) and centrifugal separation (bottom).}
-\source{MAP SOLUBLE PCS7 photographs supplied by the author; qualitative process evidence only.}
+\caption{PCS 7 views of the two crystallization effects (top) and centrifugal separation (bottom).}
+\source{MAP SOLUBLE PCS 7 photographs supplied by the author.}
 \label{fig:pcs7-crystallization}
 \end{figure}
 
-The suspension leaving crystallization is sent to centrifugal separation. The corresponding PCS7 screen visibly shows two centrifuge symbols, feed/service connections, motors and downstream collection. Separation removes much of the mother liquor before thermal drying. The engineering link is important even though no centrifuge tag is present in the dataset: wetter cake raises the evaporation duty imposed on the dryer, and upstream load should remain a diagnostic hypothesis rather than being mislabelled as a confirmed dryer failure.
+The suspension leaving crystallization is sent to centrifugal separation. The corresponding PCS 7 screen shows two centrifuge symbols, feed and service connections, motors and downstream collection. Separation removes much of the mother liquor before thermal drying. Wetter cake raises the evaporation duty imposed on the dryer, so upstream load remains a useful diagnostic hypothesis rather than a confirmed dryer failure.
 
 \section{Drying-stage process zoom}
 
-The dryer receives wet crystals whose residual liquid must be reduced before final handling. Hot drying air supplies heat and mass-transfer capacity, while product loading, gas-flow condition and exposure determine the achieved moisture. Cooling then reduces product temperature. \Cref{fig:dryzoom} translates this physical interpretation into the variables defined by the repository.
+The dryer receives wet crystals whose residual liquid must be reduced before final handling. Inside a cascading rotary dryer, solids movement, gas--solid contact and simultaneous heat and mass transfer determine the result; the equipment-specific flight geometry and transport behaviour also matter \cite{rousselet2016}. Hot drying air supplies the transfer potential, while wet loading, gas-flow condition and residence determine the moisture that can be removed. Cooling then reduces product temperature. \Cref{fig:dryzoom} connects this physical reading to the variables represented in the repository.
 
 \begin{figure}[ht]
 \centering
@@ -115,7 +115,7 @@ The dryer receives wet crystals whose residual liquid must be reduced before fin
 \label{fig:dryzoom}
 \end{figure}
 
-\Cref{fig:pcs7dryer} connects three levels of evidence. Two selected on-site photographs show the drying-section structure and the rotary shell; the PCS7 view shows the supervised dryer train and downstream path. The physical form and the labelled screen support a functional drying-stage pairing, but no photographed component is assigned to a PCS7 tag. The repository data dictionary remains the authority for prototype variables and units.
+\Cref{fig:pcs7dryer} connects three views of the drying stage. Two on-site photographs show the structure and rotary shell; the PCS 7 view shows the supervised dryer train and downstream path. Together they provide physical and operational context for the variables used by the prototype.
 
 \begin{figure}[p]
 \centering
@@ -132,10 +132,12 @@ The dryer receives wet crystals whose residual liquid must be reduced before fin
 \vspace{2mm}
 
 \includegraphics[width=.92\textwidth,height=7.5cm,keepaspectratio,trim=12 62 28 74,clip]{pcs7_drying.jpeg}
-\caption{Selected on-site drying evidence (top) paired with the PCS7 drying supervision screen (bottom).}
-\source{On-site photographs and MAP SOLUBLE PCS7 screen supplied by the author; functional-stage pairing only, with no tag equivalence or live connection claimed.}
+\caption{Selected on-site drying views (top) paired with the PCS 7 drying supervision screen (bottom).}
+\source{On-site photographs and MAP SOLUBLE PCS 7 screen supplied by the author.}
 \label{fig:pcs7dryer}
 \end{figure}
+
+\FloatBarrier
 
 The project defines nine fast process inputs: dryer-air temperature, cooler-air temperature, air-flow rate, wet-product feed rate, product-inlet temperature, residence time, vacuum, steam pressure and fan speed. Product density, final product temperature and final moisture are sparse two-hour quality variables in the demonstration contract \cite{datadictionary}. Engineered balances such as air per feed, temperature differences and thermal exposure encode interactions without claiming to be first-principles energy meters.
 
@@ -158,19 +160,37 @@ Downstream evidence is selected just as conservatively. \Cref{fig:downstream-pho
 \label{fig:downstream-photos}
 \end{figure}
 
+\FloatBarrier
+
 \subsection{Mass- and heat-transfer interpretation}
 
-If $\dot m_s$ is dry-solid flow and $X_{in}$ and $X_{out}$ are water-to-dry-solid ratios, the approximate evaporation demand is
+Moisture must first be expressed on a consistent basis. If $x_{wb}$ is the wet-basis mass fraction and $X_{db}$ is the dry-basis water-to-dry-solid ratio, then
+\begin{equation}
+X_{db}=\frac{x_{wb}}{1-x_{wb}}, \qquad x_{wb}=\frac{X_{db}}{1+X_{db}}.
+\end{equation}
+If $\dot m_s$ is dry-solid flow, the evaporation demand is then
 \begin{equation}
 \dot m_{evap}=\dot m_s\left(X_{in}-X_{out}\right).
 \end{equation}
-This balance is interpretive rather than an online calculation because wet-cake moisture and dry-solids flow are not present on every row of the prototype replay grid. It nevertheless explains why increased feed or wetter centrifuge cake raises demand, while insufficient heat or drying-air transfer can raise final moisture. The five-second grid used later is a deliberate simulation and visualization choice; it is not asserted as the native frequency of these plant measurements.
 
-Steam pressure and dryer-air temperature act as prototype indicators of thermal supply; air flow, fan speed and vacuum describe the air/exhaust path; wet-product feed and residence time describe loading and exposure. Changing one variable is not an automatic recommendation. Higher heat or air may affect energy use, final temperature or other constraints, while feed reduction affects production. The model therefore produces evidence and verification prompts only; PCS7 and approved OCP procedures remain authoritative.
+On the gas side, an approximate available duty could be written as
+\begin{equation}
+\dot Q_{available}=\dot m_g\left(h_{g,in}-h_{g,out}\right),
+\end{equation}
+and related to evaporation and sensible heating through
+\begin{equation}
+\dot Q_{available}\approx \dot m_{evap}\lambda_v
++\dot m_s c_{p,s}\left(T_{s,out}-T_{s,in}\right)+\dot Q_{losses}.
+\end{equation}
+This framework explains the direction of the main influences, but the current dataset does not contain inlet wet-cake moisture, dry-solids mass flow, gas humidity/enthalpy or heat losses. A defensible heat balance therefore cannot be closed. The variables called thermal load, steam--temperature interaction and thermal exposure later in the report are statistical proxies, not measured heat duty or energy consumption. Detailed rotary-dryer modelling would also require dryer-specific transport and transfer parameters followed by experimental validation \cite{rousselet2016}.
+
+The incomplete balance still clarifies the supervision problem. More feed or wetter centrifuge cake increases evaporation demand; inadequate thermal supply or gas transfer can raise final moisture; and a change in residence affects exposure. The five-second grid used later is a deliberate replay choice, not a claim about the native frequency of plant measurements.
+
+Steam pressure and dryer-air temperature act as prototype indicators of thermal supply; air flow, fan speed and vacuum describe the air/exhaust path; wet-product feed and residence time describe loading and exposure. Changing one variable is not an automatic recommendation. Higher heat or air may affect energy use, final temperature or other constraints, while feed reduction affects production. The model therefore produces evidence and verification prompts only; PCS 7 and approved OCP procedures remain authoritative.
 
 \section{From the physical process to the analytical layer}
 
-The analytical boundary is concentrated on the dryer. Neutralization, buffering, crystallization and centrifugation explain upstream chemistry, delay and wet-cake loading, but no direct tag mapping from those PCS7 screens is claimed. The implemented dataset uses verified dryer concepts: thermal supply, drying air/exhaust, product loading and exposure, cooling, and sparse final-quality observations.
+The analytical boundary is concentrated on the dryer. Neutralization, buffering, crystallization and centrifugation explain upstream chemistry, delay and wet-cake loading, but no direct tag mapping from those PCS 7 screens is claimed. The implemented dataset uses verified dryer concepts: thermal supply, drying air/exhaust, product loading and exposure, cooling, and sparse final-quality observations.
 
 \begin{figure}[htbp]
 \centering
@@ -189,7 +209,9 @@ The analytical boundary is concentrated on the dryer. Neutralization, buffering,
 \label{fig:process-data-ai}
 \end{figure}
 
-Thermal variables and air/feed conditions enter the moisture and anomaly paths; residence time also supports temporal alignment. Final moisture remains the sparse supervised target. Density and final product temperature enter the moisture model only as the most recent strictly previous laboratory results; they are not treated as five-second measurements. The diagram communicates the implemented chain without implying that every upstream stage is a model input or that a PCS7 screen tag equals a repository column.
+\FloatBarrier
+
+Thermal variables and air/feed conditions enter the moisture and anomaly paths; residence time also supports temporal alignment. Final moisture remains the sparse supervised target. Density and final product temperature enter the moisture model only as the most recent strictly previous laboratory results; they are not treated as five-second measurements. The diagram communicates the implemented chain without implying that every upstream stage is a model input or that a PCS 7 screen tag equals a repository column.
 
 \newpage
 
@@ -199,10 +221,10 @@ Final moisture is selected because it is strongly influenced during drying, is d
 
 Process monitoring also involves delay. Neutralization and crystallization disturbances do not appear instantaneously at the final product because reservoirs, circulation, crystallizers, centrifuges and the dryer mix and delay material. The available repository does not track each parcel, so the supervised alignment explicitly accounts for dryer residence time and leaves additional transport delay configurable. This corrects the most direct temporal mismatch without claiming a complete dynamic model of the plant.
 
-The PCS7 and Power BI roles are complementary. PCS7 is suited to equipment state and control-loop detail. The analytical layer combines longer time horizons, laboratory age, model validation and cross-variable evidence. When an event appears in Power BI, the operator returns to PCS7, laboratory evidence and approved field procedures for verification. The prototype neither writes to PCS7 nor changes a setpoint.
+The PCS 7 and Power BI roles are complementary. PCS 7 is suited to equipment state and control-loop detail. The analytical layer combines longer time horizons, laboratory age, model validation and cross-variable evidence. When an event appears in Power BI, the operator returns to PCS 7, laboratory evidence and approved field procedures for verification. The prototype neither writes to PCS 7 nor changes a setpoint.
 
 The laboratory closes the quality loop. A measured result is associated with sampling and analysis, while a prediction uses the residence-adjusted process snapshot and the strictly previous laboratory density and final-product-temperature results. The database preserves both values and evaluates error only at a true sample timestamp. If they disagree, the appropriate investigation covers sampling, time alignment, input quality, model support and process state; the prediction never overwrites the laboratory record.
 
 \begin{limitbox}[On-site and supervision evidence boundary]
-The selected on-site photographs document physical equipment and product handling, while the PCS7 photographs document the observed supervision context. Neither proves live prototype deployment. A photo-to-PCS7 relationship is asserted only at a verified functional stage; uncertain equipment identities and one-to-one tag mappings are explicitly withheld.
+The selected photographs document physical equipment, product handling and the observed PCS 7 supervision context. They do not prove live prototype deployment or a one-to-one mapping between photographed equipment, screen tags and repository fields.
 \end{limitbox}

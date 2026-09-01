@@ -55,30 +55,35 @@ The camera settles into a three-quarter view. Title arrives, left third:
 OCP and ENSAM marks sit at the bottom safe edge at 45 % opacity, 18 px tall.
 No title card, no logo animation, no centred layout.
 
-*Duration ≈ 50 s (mostly held silence for the opening line).*
+*Duration ≈ 34 s (mostly held silence for the opening line).*
 
 ---
 
 ## SCENE 02 — WHY THIS MATERIAL
 **Idea:** phosphorus feeds plants; soluble MAP is how it gets there.
 
-The camera pushes past the dryer and finds a single MAP granule, macro, held in
-a shaft of light — a real object, studio-lit, slowly rotating. The industrial
-world stays visible, defocused, behind it.
+The camera moves to a **photograph of the real product in storage at the site**,
+framed like a print hung in the hall — full bleed, premium crop, the copy column
+holding the left third.
 
-Three words arrive and leave, one at a time, in the same position:
+Three words arrive on **three presenter-driven beats**, each with a small easing
+push toward the print:
 
 > **PHOSPHORUS** → **PLANT NUTRITION** → **SOLUBLE MAP**
 
-Then the truthful product line, from the storage photograph:
+Then the truthful product line:
 
 > `MAP · MONOAMMONIUM PHOSPHATE · 12-61-00 · SOLUBLE IN WATER`
 
-The single granule multiplies — 1, then a handful, then a stream — and begins
-to move. **The stream is the object that carries the next ten minutes.**
+*≈ 24 s, 3 steps.*
 
-*≈ 35 s. Deliberately the shortest scene: context, then straight back to
-engineering.*
+> **Rebuilt.** This scene was a procedural macro granule: an icosahedron of
+> detail 0 scaled 46x, with the camera parked 3.59 units from a solid whose
+> circumradius is 3.91 — i.e. *inside* it. The frame contained no granule at all,
+> only a featureless grey wall of dryer shell, and the three words auto-advanced
+> on a `setInterval` the presenter could not control. The site photograph the
+> scene's own note referred to was shipped in the bundle and never referenced.
+> It is the subject now.
 
 ---
 
@@ -86,25 +91,40 @@ engineering.*
 **Idea:** continuous transformation through a coupled chain; the dryer is one
 stage of it.
 
-The camera tracks the granule stream along a curving path through seven
-volumetric stations, each a simplified credible vessel form, dim until the
-stream is inside it, then lit:
+The camera tracks the granule stream along a curving path through the verified
+sequence, and STOPS at every stage:
 
 `acid pretreatment · ammonia vaporization · neutralization · buffer /
 stabilization · concentration & crystallization · centrifugation · DRYING ·
 cooling & conditioning`
 
-The mother-liquor recycle leaves centrifugation as a thin returning line and
-rejoins neutralization behind the camera — visible for two seconds, enough to
-establish that the chain is coupled.
+Each station carries the silhouette of the KIND of machine the operation needs
+— a receiver feeding two horizontal shell-and-tube vaporizers, a train of three
+agitated reactors, a row of agitated buffer tanks, a crystalliser with an
+external forced-circulation loop and a vapour condenser, two parallel
+horizontal centrifuges on a skid. A key and a rim light ride the material down
+the chain, so the stage the material is in is the stage that is lit.
+
+Each stage is named ONCE, by a small screen-facing index and label on a leader
+line anchored to the equipment. Never all seven at once, never in world-space
+type that skews with the camera.
+
+The mother-liquor recycle leaves centrifugation as a painted pipe running low
+and behind, parallel to the material line and in the opposite direction, and
+rejoins neutralization. It is labelled where it leaves.
 
 One caption holds throughout, monospace, bottom-left:
 `H₃PO₄ + NH₃ ⇌ NH₄H₂PO₄`
 
-At the drying station the camera slows. Everything upstream falls into fog.
+The last beat looks BACK up the whole chain from the dryer end, because the
+idea it carries is about the whole chain rather than about the last object in
+it.
 
-*≈ 60 s. No PFD. No labels on every vessel. The audience should feel a journey,
-not read a diagram.*
+*≈ 78 s, 8 steps — the camera travels WITH the material and settles at every
+stage. Four stops for seven stations meant the audience was flown past
+pretreatment, ammonia vaporization, the buffer tanks and centrifugation. The
+audience should feel a journey, not read a diagram — but they should also be
+able to name every machine they passed.*
 
 ---
 
@@ -129,13 +149,13 @@ steam pressure            8.33 bar
 air flow rate           24,351 m³/h
 wet product feed rate     26.59 m³/h
 residence time            24.47 min
-vacuum                    48.60 mmH₂O
+vacuum                    48.60 mmH2O
 fan speed                1,344.8 rpm
 ```
 
-Then the output side, in `--lab` white: `FINAL MOISTURE — % H₂O`.
+Then the output side, in `--lab` white: `FINAL MOISTURE / % / LABORATORY ONLY`.
 
-*≈ 75 s. The longest scene, because it is the one the whole argument stands on.*
+*≈ 72 s. The longest scene, because it is the one the whole argument stands on.*
 
 ---
 
@@ -153,28 +173,28 @@ dark. Six bright vertical markers stand on it, exactly two hours apart, at the
 six real laboratory samples:
 
 ```
-00:00  0.0742 % H₂O
-02:00  0.0796 % H₂O
-04:00  0.0804 % H₂O
-06:00  0.0806 % H₂O
-08:00  0.0812 % H₂O
-10:00  0.0800 % H₂O
+00:00  0.0742 %
+02:00  0.0796 %
+04:00  0.0804 %
+06:00  0.0806 %
+08:00  0.0812 %
+10:00  0.0800 %
 ```
 
 The camera drops to axis level and **travels down the dark interval** between
 the first two markers. A monospace counter runs `+00:00 … +02:00`. The granules
 keep streaming past. Nothing else is known.
 
-> **THE PROCESS NEVER STOPS.**
+> **TWO HOURS.**
 > *(hold)*
-> **LAB VISIBILITY DOES.**
+> **NO MEASUREMENT.**
 
 `LAB Δt ≈ 2 h` sits small beside the markers.
 
 Closing line, quiet: between those two results the product actually moved by
-`0.0054 % H₂O`, and nothing measured it.
+`0.0054 %`, and nothing measured it.
 
-*≈ 80 s. The jury must feel the interval, so the travel through it is played at
+*≈ 76 s. The jury must feel the interval, so the travel through it is played at
 real reading pace and not hurried.*
 
 ---
@@ -184,7 +204,7 @@ real reading pace and not hurried.*
 
 Same space, no reset. The camera is still inside the gap.
 
-> **HOW DO WE SEE BETWEEN MEASUREMENTS?**
+> **HOW DO WE SEE IN BETWEEN?**
 
 Process signals rise from the dryer at the origin — thin teal lines, one per
 variable — and travel down the time axis into the dark. As they arrive, the
@@ -197,14 +217,16 @@ six solid measurements.
 
 Two statements, staged:
 
-> **PREDICT QUALITY BETWEEN MEASUREMENTS.**
+> **ESTIMATE MOISTURE BETWEEN SAMPLES.**
 > **DETECT ABNORMAL BEHAVIOUR EARLIER.**
 >
 > **TWO QUESTIONS. ONE SUPERVISION SYSTEM.**
 
 Guard rail on screen: `LABORATORY ANALYSIS REMAINS THE REFERENCE`.
 
-*≈ 60 s.*
+*≈ 40 s, 2 steps. The third beat — TWO QUESTIONS. ONE SUPERVISION SYSTEM. —
+was cut: scene 08 opens on exactly that idea 80 s later, with the models on
+screen, and the beat parked the camera at the farthest pose in the film.*
 
 ---
 
@@ -231,12 +253,38 @@ SUPERVISE    Power BI · DirectQuery · ~5 s refresh
 OPERATOR     advisory decision
 ```
 
-One packet is followed individually through the ALIGN layer: it **waits**
-`24.5 min` before joining, and the caption explains why — the product being
-measured now left the dryer then. This is the one piece of the method that
-cannot be shown any other way.
+### Residence-time alignment gets two beats, not one
 
-*≈ 70 s.*
+It is two claims and they are different kinds of claim, so compressing them into
+one sentence over a glowing slab meant the jury had to take the most defensible
+idea in the project on trust.
+
+**Beat 3 — THE DELAY IS PHYSICAL.** The camera leaves the stack and comes to a
+lane in front of it. A marker enters at `MATERIAL ENTERS`, crosses at constant
+speed — no easing, because this is a machine with a length, not a UI element —
+and arrives at `SAMPLE TAKEN`. The span is labelled `RESIDENCE TIME 24.5 min`,
+and under it, `MEASURED PER SAMPLE — 24.15 to 24.89 min`, because residence time
+is one of the nine measured variables and not a constant anybody assumed. No data
+claim is made in this beat at all.
+
+**Beat 4 — ALIGN THE DATA TO THE PRODUCT.** Two rails appear against a three-hour
+clock: process variables above, laboratory quality below. The naive pairing is
+drawn **first**, straight down at the same timestamp, dashed, in the film's fault
+colour — because an unshown mistake is not a correction. Then the process block
+slides back by the residence time and the link turns to the prediction colour,
+labelled `SHIFTED BACK 24.5 min`. A dimmer, backward-pointing dashed link then
+reaches to the previous laboratory sample two hours earlier, which is where the
+density and product-temperature features come from. Finally the `ALIGN` layer of
+the stack behind the lane lights, and the marked packet inside it waits: the lane
+is an explanation *of* the stack, so the stack acknowledges it.
+
+The lane runs on a **three-hour** clock rather than a tighter one specifically so
+the two offsets stay on the same honest scale — a 24.5-minute shift and a
+two-hour-old reference. Cropping the window to make the shift look bigger would
+have made the geometry lie about the proportion between them.
+
+*≈ 78 s. This is the one scene that got longer in the final pass; every second of
+it came out of scenes 04, 05, 12 and 14.*
 
 ---
 
@@ -248,7 +296,7 @@ The packet stream splits into two lanes in space.
 **Lane A — QUALITY INTELLIGENCE** (left)
 16 aligned features enter a compact solid form; one continuous value leaves it.
 `RIDGE · α = 10 · selected on validation RMSE`.
-> **WHAT IS THE LIKELY FINAL MOISTURE NOW?**
+> **WHAT IS THE MOISTURE NOW?**
 
 **Lane B — PROCESS INTELLIGENCE** (right)
 The camera moves into an actual 3-D point cloud: **2,400 real TRAIN process
@@ -260,13 +308,15 @@ A single moving point enters: the current process state, following the real
 recorded trajectory. It orbits inside the cloud calmly — then, over 44 minutes
 of replay, **it leaves**. Distance from the learned region grows, the point
 turns amber then red, and the contributing variables name themselves.
-> **IS THE PROCESS BEHAVING UNUSUALLY?**
+> **IS THIS PROCESS STATE UNUSUAL?**
 
 The lanes converge into one word: **SUPERVISION**.
 
 Explicit on screen: `NO ANOMALY LABEL IS USED IN TRAINING`.
 
-*≈ 80 s. No brains, no neural nets, no robots — the model is shown as the
+*≈ 68 s, 3 steps — the trajectory is a sub-reveal inside PROCESS INTELLIGENCE,
+not a fourth beat reached by six units of camera. No brains, no neural nets, no
+robots — the model is shown as the
 geometry it actually is.*
 
 ---
@@ -283,7 +333,7 @@ becomes the first evidence panel.
 **Panel A — moisture soft sensor.** Actual vs predicted, 165 chronological
 held-out laboratory targets, drawn point by point.
 
-> **R² 0.8245** · **MAE 0.00107 % H₂O** · **RMSE 0.00140 % H₂O**
+> **R² 0.8245** · **MAE 0.00107 %** · **RMSE 0.00140 %**
 > `HELD-OUT TEST · n = 165 · 2026-07-03 → 2026-07-16 · CHRONOLOGICAL`
 
 Beside it, small: candidate comparison. Ridge `0.001357`, Elastic Net
@@ -302,16 +352,60 @@ shades in behind it.
 `SYNTHETIC PROTOTYPE DATA · DISTURBANCE LABELS ARE GENERATOR GROUND TRUTH,
 USED FOR DISPLAY ONLY · CHRONOLOGICAL HOLD-OUT · ADVISORY · NOT PLANT VALIDATION`
 
-*≈ 90 s.*
+*≈ 104 s. The evidence act was the most rushed in the deck and is now the most
+generous; each beat also has its own spatial relationship rather than a third
+identical vertical drop.*
 
 ---
 
-## SCENE 10 — VALIDATION BECOMES SUPERVISION
-**Idea:** the evidence is not a report; it is already an operator's screen.
+## SCENE 10 — THE MODEL LEAVES THE NOTEBOOK
+**Idea:** the same two models, now answering into an operator's screen.
 
-The camera pulls back from Panel A. Its frame thickens, gains a title bar, a
-legend, a card edge — **it has become a Power BI visual.** The real dashboard
-assembles around it, card by card, in reading order, from the actual capture:
+### The signature sequence: artifact → service → inference → screen
+
+The beat that carries the film's biggest headline used to be a two-second
+cross-fade. It is now the one transformation in the project that is *true*, and
+it is checkable rather than asserted:
+
+```
+  0.4 s   TRAINED ARTIFACT resolves and is read
+          quality_moisture_pipeline.joblib · anomaly_model.joblib
+          sha256 b525c7b8 · notebooks/03_Model1_SoftSensor.ipynb
+  3.2 s   the words leave, then the card tips and folds
+  3.6 s   realtime_service.py — LOADED ONCE · 9 ms AVERAGE CYCLE,
+          pulsing on the project's own five-second tick
+  5.4 s   inference travels the corridor toward the plane
+  6.4 s   the report resolves BECAUSE the stream arrived
+  7.4 s   the corridor dissolves into the page it feeds
+```
+
+Three properties make it defensible rather than decorative:
+
+1. **It is verifiable.** `models/model_registry.json` carries the artifact's
+   SHA-256 and `runtime_uses_exact_notebook03_artifact: true`;
+   `realtime_service.py::load_artifacts()` joblib-loads that exact path once at
+   start and never re-fits. The file the notebook wrote **is** the file the
+   service loads, and the caption says where to check.
+2. **It has a continuity object.** The cube the artifact folds into is the same
+   geometry, colour and material as the runtime checkpoints in scene 11, where
+   the camera meets it again as `PYTHON INFERENCE`. It is the only object in the
+   film that survives a change of environment — which is the point: the model was
+   not re-implemented on the way to an operator's screen, it was loaded.
+3. **It claims nothing it should not.** No deployment, no control action, no
+   closed loop. The stream ends at a screen, the guard line in the script says
+   *handover, not deployment*, and the corridor is gone by the time the page is
+   legible — nothing shares the frame with the deliverable.
+
+The camera **arrives** rather than cutting: the beat opens nine units further
+back and settles onto the scene's own pose, so the report grows into the frame as
+it resolves. Because the move ends exactly where the settled pose already was, it
+cannot crop the page.
+
+### The report itself
+
+The camera arrives in front of the real report, which is **legible from the first
+frame it is on screen**. Five regions are then named in reading order, about 1.3 s
+each:
 
 1. predicted final moisture
 2. latest laboratory moisture
@@ -322,44 +416,84 @@ assembles around it, card by card, in reading order, from the actual capture:
 7. critical process variables
 8. diagnosis context and operator guidance
 
-The `PROTOTYPE · REPLAY` pill and the advisory footer are visible because they
-are on the real screen. The lighting warms: dashboard light spilling into a
-dark control room.
+The freshness pill, the refresh cadence and the advisory footer are visible
+because they are on the real screen.
 
-*≈ 65 s. Nothing is invented — every highlighted element exists in the shipped
+*≈ 76 s. Nothing is invented — every highlighted element exists in the shipped
 report.*
+
+> **Two things changed here, and both were credibility, not polish.**
+>
+> The claim was `THE SAME CHART. AN OPERATOR'S SCREEN.` over a crossfade in which
+> the scene-09 hold-out scatter stayed legible across the top of the Power BI
+> capture. They are different charts of different windows — a 165-point 13-day
+> scatter and a smooth 8-hour rolling trend — so the assertion was contradicted
+> by the image carrying it. The claim is now `THE MODEL LEAVES THE NOTEBOOK`,
+> which is true, and the evidence layer is driven to **zero** on entry so there
+> is no ghost.
+>
+> The capture itself was re-taken. The old one announced `DATA · STALE`, `STALE`
+> on every process tile and `ingested 8525 min ago` — under an eyebrow about
+> real-time supervision — and it was captured in its null state, so the diagnosis
+> scene had nothing to show. The current capture is a live replay state taken
+> inside an injected disturbance: `LIVE DATA`, anomaly 0.95, severity HIGH,
+> ranked contributors and operator guidance populated. It was also introduced at
+> 30 % opacity; it now reaches full legibility as the headline does.
 
 ---
 
-## SCENE 11 — THROUGH THE DASHBOARD
+## SCENE 11 — BEHIND THE DASHBOARD
 **Idea:** end-to-end integration, proved by travelling through it.
 
-Instead of an architecture slide, the camera **pushes through the dashboard
-plane**. Behind it, in depth:
+Instead of an architecture slide, the camera **passes through the report plane**
+and comes to rest ACROSS the runtime — five checkpoints on one rising line,
+watched from the side so they separate cleanly, and walked **in data-flow order**:
 
 ```
-POWER BI     DirectQuery · ~5 s automatic page refresh · reads views only
-   ↓
-SQL          5 semantic views
-             vw_dryer_dashboard_powerbi · vw_dryer_contributors_powerbi
-             vw_dryer_lab_samples · vw_dryer_anomaly_events
-             vw_dryer_overview_trends_powerbi
-   ↓
-POSTGRESQL   dryer_map · dryer_model_outputs · dryer_abnormal_variables
-   ↓
-PYTHON       realtime_service.py · loads the exact notebook artifacts once
-             9 ms average inference cycle, 47 ms maximum
-   ↓
-REPLAY       held-out TEST · 237,600 rows · Δt = 5 s
+REPLAY               held-out TEST · one row every 5 s · 237,600 rows
+   →
+PYTHON INFERENCE     realtime_service.py · the exact notebook artifacts, once
+                     9 ms average inference cycle, 47 ms maximum
+   →
+POSTGRESQL           dryer_map · dryer_model_outputs · dryer_abnormal_variables
+   →
+FIVE SEMANTIC VIEWS  vw_dryer_dashboard_powerbi · vw_dryer_contributors_powerbi
+                     vw_dryer_lab_samples · vw_dryer_anomaly_events
+                     vw_dryer_overview_trends_powerbi
+   →
+POWER BI             DirectQuery · reads views only
+   →
+OPERATOR             advisory decision
 ```
 
-The replay stream leaves the last slab — and **runs back to the dryer**, which
-is still turning in the distance. The loop closes in one continuous camera move
-and the whole system is visible in a single frame.
+The camera then comes back out in front of the plane: the report above, the
+operator terminal below it, and the route arriving from behind both. The packet
+stream **terminates at the operator**.
 
 `POWER BI NEVER LOADS A MODEL AND NEVER RUNS INFERENCE.`
+`NOTHING IN THIS SYSTEM WRITES BACK TO THE PROCESS.`
 
-*≈ 65 s.*
+*≈ 66 s.*
+
+> **Rebuilt twice over.**
+>
+> It was a second stack of translucent labelled slabs — the same metaphor scene
+> 07 already owns — ordered so the camera met POWER BI first and REPLAY last,
+> i.e. backwards to the narration, with four of five labels occluded by the slab
+> in front. It also carried a measured **677.8 ms** frame stall, because the
+> layer's materials had never been rendered before that moment.
+>
+> The path fixed the ordering, and then broke differently: walking it from the
+> deep end put the camera on the far side of every +Z-facing label, so REPLAY,
+> POSTGRESQL and POWER BI all rendered **mirrored**, and the report showed its
+> reversed back face. Labels now turn to the lens; the report is front-faced with
+> a real dark back plate; the route is compact and viewed from across.
+>
+> The loop-close packets used to run **back into the dryer**, which reads as
+> closed-loop control two scenes before scene 13 says it does not exist. They end
+> at an operator terminal — which was itself invisible at first, drawn
+> *underneath* the plant's 400 x 220 ground plane, because that plane writes
+> depth even at 5 % opacity.
 
 ---
 
@@ -385,7 +519,8 @@ And immediately, in the same weight:
 > No ROI is claimed. No control action is taken. The laboratory remains the
 > reference and the operator remains the decision-maker.
 
-*≈ 50 s.*
+*≈ 30 s. Three claims, not four; six ring nodes matching a six-word headline;
+one signal travelling the loop once as the direction cue.*
 
 ---
 
@@ -411,7 +546,9 @@ plainly:
 
 > `CLOSED-LOOP CONTROL DOES NOT EXIST IN THIS PROJECT.`
 
-*≈ 55 s.*
+*≈ 52 s. The rail is TRAVELLED rather than framed all at once — twelve labelled
+stages cannot exceed ~16 px in a single 16:9 framing, which is why the honesty
+slide used to render at ~9 px.*
 
 ---
 
@@ -426,7 +563,7 @@ But the world now carries a calm digital layer: sensor nodes glow softly,
 signal lines move along the flow path, a faint prediction trace runs above the
 product line. Nothing flashes. The dryer keeps turning.
 
-> **THE PHYSICAL PROCESS NEVER STOPPED.**
+> **THE PROCESS NEVER STOPPED.**
 > **DIGITALIZATION MADE MORE OF IT VISIBLE.**
 >
 > *(hold, the world alone)*
@@ -440,7 +577,8 @@ The camera drifts. Then, small, bottom-left, in the eyebrow style:
 
 No "thank you". No summary slide. No credits.
 
-*≈ 45 s.*
+*≈ 40 s, 2 steps. The two micro-dollies that used to follow the return were cut:
+they walked the camera off the opening pose four seconds after landing on it.*
 
 ---
 
@@ -448,18 +586,35 @@ No "thank you". No summary slide. No credits.
 
 | Act | Scenes | Target |
 |---|---|---|
-| I — Purpose | 01–02 | 1 min 25 s |
+| I — Purpose | 01–02 | 0 min 51 s |
 | II — Industry | 03–04 | 2 min 15 s |
-| III — The gap | 05–06 | 2 min 20 s |
-| IV — Digitalization | 07–08 | 2 min 30 s |
-| V — Evidence & supervision | 09–11 | 3 min 40 s |
-| VI — Value & future | 12–14 | 2 min 30 s |
-| | | **≈ 14 min 40 s** |
+| III — The gap | 05–06 | 1 min 34 s |
+| IV — Digitalization | 07–08 | 2 min 26 s |
+| V — Evidence & supervision | 09–11 | 3 min 54 s |
+| VI — Value & future | 12–14 | 1 min 38 s |
+| | | **12 min 38 s** |
 
-That is the upper bound with full pauses. The speaker notes provide a marked
-**12-minute path** (compressing 02, 12 and holding fewer beats in 04 and 09) and
-a **10-minute emergency path**. The presenter controls every advance, so the
-experience contracts and expands without any edit to the build.
+*(Act figures are the scene table's own `seconds` fields; the total is exact, not
+an estimate. Transition time is inside those figures — the tiers run 101.5 s over
+38 transitions.)*
+
+**The final pass took 48 s out and put 16 s back.** Out: the push across the
+machine (13 s → 8.4 s), the settle after the time axis forms, 1.3 s off the truck
+down the axis, the loop signal in scene 12, and the `QUESTIONS` card, which had
+been budgeted as though the Q&A that follows it were part of the film. In: two
+beats that were carrying more argument than they had room for — residence-time
+alignment and the artifact-to-service handover. Net −26 s, which leaves roughly
+fifty seconds of slack inside a 13 min 30 s slot for a jury that interrupts.
+
+**The pacing was inverted before this pass.** Scenes 01, 02, 03 and 12 held about
+165 s of near-static frame — 19 % of the runtime — while the densest act, the one
+carrying the evidence and the deliverable, was the most rushed. Roughly 110 s were
+recovered by tightening 01, 02, 03 and 12 and cutting four redundant beats, and
+redistributed into scenes 09 and 10.
+
+The speaker notes provide a marked **12-minute path** and a **10-minute emergency
+path**. The presenter controls every advance, so the experience contracts and
+expands without any edit to the build.
 
 ---
 

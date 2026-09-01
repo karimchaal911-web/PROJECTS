@@ -17,6 +17,7 @@ import { budget } from '../../lib/perf.js';
  * transition works.
  */
 
+const NO_AO = { noAO: true };
 const _o = new THREE.Object3D();
 const _p = new THREE.Vector3();
 
@@ -25,7 +26,6 @@ export default function Granules() {
   const presence = useChannel('granules');
   const straighten = useChannel('straighten');
   const speed = useChannel('flowSpeed', 1);
-  const heroScale = useChannel('heroGranule', 1);
   const safeMode = useShow((s) => s.safeMode);
   const count = budget(safeMode).granules;
 
@@ -40,6 +40,18 @@ export default function Granules() {
   }), []);
 
   const geo = useMemo(() => new THREE.IcosahedronGeometry(0.085, 0), []);
+
+  /**
+   * How large a granule is drawn, per scene.
+   *
+   * At the process scenes the camera is 15-45 units away and 0.085 is right.
+   * On the time axis it is 31-80 units away, where a granule subtends about
+   * TWO PIXELS — so the film's signature reveal, the material path straightening
+   * into a time axis, was a hairline speckle that read as dust. The stream is a
+   * representation of flow, not a measurement of grain size, so it is drawn at
+   * the size that makes the flow legible from where the camera actually is.
+   */
+  const gsize = useChannel('granuleSize', 1);
 
   const seeds = useMemo(() => {
     const s = new Float32Array(count * 3);
@@ -63,7 +75,7 @@ export default function Granules() {
     offset.current = (offset.current + dt * 0.020 * speed.current) % 1;
 
     const st = straighten.current;
-    const hero = heroScale.current;
+    const gs = gsize.current;
     const t = state.clock.elapsedTime;
 
     for (let i = 0; i < count; i += 1) {
@@ -80,15 +92,11 @@ export default function Granules() {
         _p.z + jitter * spread
       );
 
-      const s = seeds[i * 3 + 2];
-      if (i === 0 && hero > 1.05) {
-        // The hero granule of scene 02 parks in front of the lens and grows.
-        // It is a real instance from the same stream, not a separate prop.
-        _o.position.set(-11.6, 5.7, 4.4);
-        _o.scale.setScalar(hero);
-      } else {
-        _o.scale.setScalar(s);
-      }
+      // Scene 02's "hero granule" is gone. Scaling one instance to 46x put the
+      // camera between that solid's inradius and its circumradius — inside its
+      // own subject — so the frame showed a featureless wall. The product is
+      // now a photograph of the real material (Material.jsx).
+      _o.scale.setScalar(seeds[i * 3 + 2] * gs);
       _o.rotation.set(t * 0.4 + i, t * 0.3 + i * 0.7, 0);
       _o.updateMatrix();
       mesh.current.setMatrixAt(i, _o.matrix);
@@ -97,12 +105,17 @@ export default function Granules() {
   });
 
   return (
+    /* `noAO`: 2 600 free-flying 8 cm solids are the one thing in the world
+       that must NOT write the AO g-buffer. They occlude each other from every
+       angle, which is high-frequency noise rather than contact — exactly the
+       artefact that makes screen-space AO look like a game. */
     <instancedMesh
       ref={mesh}
       args={[geo, mat, count]}
       castShadow={false}
       receiveShadow={false}
       frustumCulled={false}
+      userData={NO_AO}
     />
   );
 }

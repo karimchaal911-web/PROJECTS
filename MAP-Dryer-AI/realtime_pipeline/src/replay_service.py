@@ -828,6 +828,18 @@ def run_replay_service() -> None:
 
 
 def main() -> None:
+    if os.getenv("ENABLE_LEGACY_1MIN_REPLAY", "false").strip().lower() != "true":
+        print(
+            "replay_service.py is the superseded one-minute writer. Its rows "
+            "are incompatible with the five-second dashboard schema and are "
+            "filtered out of every Power BI view. The supported service "
+            "is realtime_pipeline/src/realtime_service.py, started by "
+            "RUN_FINAL_DEMO.ps1. "
+            "Set ENABLE_LEGACY_1MIN_REPLAY=true to run it anyway.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
     try:
         run_replay_service()
 

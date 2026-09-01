@@ -24,8 +24,11 @@ a row in this document.
 **Cadence language is constrained.** The audit itself records the interval
 interpretation as *"prototype temporal resolution and replay cadence; not a
 proven PCS7 historian acquisition interval."* On-screen the presentation must
-therefore say **`PROTOTYPE REPLAY Δt = 5 s`**, never "the plant samples every
-five seconds".
+therefore say **`PROTOTYPE REPLAY - 5 s TICK`**, never "the plant samples every
+five seconds". Three distinct five-second things must not be conflated: the
+replay writes one row every 5 s, the report page auto-refreshes on a 60 s cycle
+(`AUTO 60 SEC` on the screen), and **no physical instrument sampled at 5 s** —
+that is the prototype historian grid.
 
 ---
 
@@ -47,8 +50,8 @@ five seconds".
 
 | Metric | Value |
 |---|---|
-| MAE | `0.0010686339` % H₂O |
-| RMSE | `0.0014026195` % H₂O |
+| MAE | `0.0010686339` % moisture |
+| RMSE | `0.0014026195` % moisture |
 | R² | `0.8245295479` |
 | bias | `+0.0000661688` |
 | max abs error | `0.0056205663` |
@@ -60,8 +63,9 @@ Gradient Boosting `0.001430` · Random Forest `0.001467`.
 → The honest story is *the simple regulariser won*, not *we used AI*.
 
 **Scale trap.** Final moisture is on a **percentage-point** scale:
-`0.075` means `0.075 % H₂O`, not `7.5 %`. All on-screen figures use 3–4
-decimals with an explicit `% H₂O` unit.
+`0.075` means `0.075 %` moisture, not `7.5 %`. All on-screen figures use 3–4
+decimals and name the quantity beside the `%`, matching the shipped Power BI
+report — see the engineering typography policy in `DESIGN_SYSTEM.md`.
 
 ### Anomaly detector
 * Family: **One-Class SVM**, `nu = 0.02`, `gamma = "scale"` (fitted γ ≈ 0.06654).
@@ -93,12 +97,12 @@ from the exact artifacts. Reproducible, not fabricated.
 ### 3.1 The visibility gap has a real shape
 Held-out window **2026-07-05 00:00 → 12:00**: 8,640 process rows,
 **6 laboratory samples**. Real lab moisture: `0.0742, 0.0796, 0.0804, 0.0806,
-0.0812, 0.0800 % H₂O`. The continuous soft-sensor trace over the same window
+0.0812, 0.0800 %`. The continuous soft-sensor trace over the same window
 (695 points, runtime residence-time alignment reproduced exactly) ranges
 `0.0754 → 0.0806`.
 
 > Between the 00:00 and 02:00 laboratory results the true product moved by
-> `0.0054 % H₂O` — and nothing measured it. That is the gap, drawn from data.
+> `0.0054 %` moisture — and nothing measured it. That is the gap, drawn from data.
 
 ### 3.2 The unsupervised detector lands on a labelled disturbance
 Peak-risk 24-hour held-out window: **2026-07-07 06:00 → 2026-07-08 06:00**.
@@ -215,7 +219,8 @@ charts are native, animatable and projector-legible, while the numbers are
 byte-identical to the notebooks.
 
 ### 6.4 Inspiration references
-`design/moodboard/`
+`resources/presentation_resources/screenshots/` (project root) — the single
+canonical copy of the reference captures.
 
 | Reference | Extracted principle | Rejected |
 |---|---|---|
@@ -228,8 +233,8 @@ byte-identical to the notebooks.
 
 | Token | Hex | Sampled from |
 |---|---|---|
-| OCP green | `#007830` | `branding/ocp.png` dominant |
-| OCP lime | `#84B40C` | `branding/ocp.png` secondary |
+| OCP green | `#007830` | `assets/original/ocp.png` dominant |
+| OCP lime | `#84B40C` | `assets/original/ocp.png` secondary |
 | Deep forest | `#003C30` | Power BI sidebar, dominant |
 | Warm ivory | `#FCF0D8` | Power BI card ground |
 | Plant steel green | `#2E4A34` | `drying_section_structure.jpeg` |

@@ -4,10 +4,10 @@
   "position": {
     "x": 110,
     "y": 884,
-    "z": 6900,
+    "z": 4600,
     "height": 14,
     "width": 1474,
-    "tabOrder": 6900
+    "tabOrder": 4600
   },
   "visual": {
     "visualType": "textbox",
@@ -20,10 +20,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Decision support only \u2014 model diagnostics are advisory evidence, not confirmed root cause and not automatic process control.",
+                    "value": "Decision support only — model diagnostics are advisory evidence, not confirmed root cause and not automatic process control.",
                     "textStyle": {
                       "fontSize": "7pt",
-                      "color": "#66756F"
+                      "color": "#5E706A"
                     }
                   }
                 ]

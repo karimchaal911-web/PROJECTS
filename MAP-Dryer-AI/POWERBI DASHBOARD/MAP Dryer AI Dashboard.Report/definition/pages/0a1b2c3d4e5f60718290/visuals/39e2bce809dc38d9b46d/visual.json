@@ -4,10 +4,10 @@
   "position": {
     "x": 1064,
     "y": 572,
-    "z": 6200,
+    "z": 3900,
     "height": 312,
     "width": 520,
-    "tabOrder": 6200
+    "tabOrder": 3900
   },
   "visual": {
     "visualType": "basicShape",
@@ -50,7 +50,7 @@
             "roundEdge": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "10D"
                 }
               }
             },
@@ -59,7 +59,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E0DC'"
+                      "Value": "'#D6E2DD'"
                     }
                   }
                 }

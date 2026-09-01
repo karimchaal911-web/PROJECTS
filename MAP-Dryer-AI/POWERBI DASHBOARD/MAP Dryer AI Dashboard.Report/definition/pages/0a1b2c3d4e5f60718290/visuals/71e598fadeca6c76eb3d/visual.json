@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "71e598fadeca6c76eb3d",
   "position": {
-    "x": 126,
-    "y": 606,
-    "z": 4600,
-    "height": 18,
-    "width": 400,
-    "tabOrder": 4600
+    "x": 126.35467980295566,
+    "y": 606.2807881773399,
+    "z": 2800,
+    "height": 25.492610837438423,
+    "width": 400.1231527093596,
+    "tabOrder": 2800
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -20,10 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Latest values, short-term direction and status",
+                    "value": "Latest values and rolling 8-hour trends; color = state",
                     "textStyle": {
                       "fontSize": "8pt",
-                      "color": "#66756F"
+                      "color": "#5E706A"
                     }
                   }
                 ]
@@ -86,6 +85,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

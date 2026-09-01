@@ -6,7 +6,7 @@
 \usepackage[a4paper,top=21mm,bottom=22mm,left=25mm,right=21mm,headheight=22pt]{geometry}
 \usepackage{microtype}
 \usepackage{graphicx}
-\usepackage{booktabs,tabularx,array,multirow}
+\usepackage{booktabs,tabularx,array,multirow,longtable}
 \usepackage{amsmath,amssymb}
 \usepackage{siunitx}
 \usepackage{xcolor}
@@ -24,6 +24,8 @@
 \usepackage{cleveref}
 \usepackage{ragged2e}
 \usepackage{setspace}
+\usepackage{pdflscape}
+\usepackage{placeins}
 
 \definecolor{ENSAMTeal}{HTML}{0D9488}
 \definecolor{DeepBlue}{HTML}{063D34}
@@ -43,6 +45,7 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5pt plus 1pt minus 1pt}
 \setstretch{1.17}
+\raggedbottom
 \setlist{nosep,leftmargin=5mm,topsep=3pt}
 \captionsetup{font=small,labelfont={bf,color=OCPGreen},textfont={color=Ink},justification=centering,skip=5pt}
 \graphicspath{{figures/}{figures/plots/}{figures/screenshots/}{figures/branding/}{figures/reference/}{figures/process_photos/}}
@@ -75,6 +78,11 @@
 \setlength{\cftbeforefigskip}{0pt}
 \renewcommand{\cftfigfont}{\footnotesize}
 \renewcommand{\cftfigpagefont}{\footnotesize\color{DeepBlue}}
+\renewcommand{\cfttabpresnum}{Table~}
+\setlength{\cfttabnumwidth}{2.15cm}
+\setlength{\cftbeforetabskip}{0pt}
+\renewcommand{\cfttabfont}{\footnotesize}
+\renewcommand{\cfttabpagefont}{\footnotesize\color{DeepBlue}}
 
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
 \newcolumntype{C}{>{\centering\arraybackslash}X}
@@ -101,11 +109,16 @@
 \begin{document}
 \pagenumbering{gobble}
 \input{frontmatter}
-\setcounter{tocdepth}{0}
+\setcounter{tocdepth}{1}
 \tableofcontents
 \clearpage
 \addcontentsline{toc}{chapter}{List of Figures}
 \listoffigures
+\clearpage
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+\clearpage
+\input{abbreviations}
 \clearpage
 \pagenumbering{arabic}
 \input{general_introduction}
@@ -118,5 +131,7 @@
 \input{chapters/chapter7}
 \input{chapters/chapter8}
 \input{general_conclusion}
+\appendix
+\input{appendices}
 \input{bibliography/references}
 \end{document}

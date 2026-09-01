@@ -1,0 +1,301 @@
+{
+  "audit_version": "dashboard_demo_v1.0",
+  "created_at": "2026-08-28T13:07:49",
+  "purpose": "dashboard demonstration/scenario replay only",
+  "original_source_dataset": "data\\raw\\MAP_Dryer_Canonical_5s_deterministic.csv",
+  "dashboard_fork": "resources\\dashboard_demo\\MAP_Dryer_Dashboard_Demo_5s.csv",
+  "warmup_context": "resources\\dashboard_demo\\MAP_Dryer_Dashboard_Warmup_5s.csv",
+  "scenario_sidecar": "resources\\dashboard_demo\\MAP_Dryer_Dashboard_Demo_Scenarios.csv",
+  "source_metadata": {
+    "source_start": "2026-07-15 00:00:00",
+    "source_end": "2026-07-16 23:59:55",
+    "source_rows": 34560,
+    "canonical_scenario_types": [
+      "airflow_restriction",
+      "cooling_loss",
+      "fan_speed_dip",
+      "feed_surge",
+      "steam_dip"
+    ],
+    "canonical_episode_count": 22,
+    "canonical_episode_counts_by_type": {
+      "airflow_restriction": 5,
+      "cooling_loss": 4,
+      "fan_speed_dip": 4,
+      "feed_surge": 4,
+      "steam_dip": 5
+    },
+    "existing_episodes": [],
+    "existing_episode_count_in_source_period": 0,
+    "normal_process_rows_preserved": true,
+    "laboratory_values_preserved": true
+  },
+  "warmup_validation": {
+    "purpose": "in-memory soft-sensor context only; never replayed or persisted",
+    "row_count": 2160,
+    "timestamp_start": "2026-07-14 21:00:00",
+    "timestamp_end": "2026-07-14 23:59:55",
+    "ends_before_visible_replay": true,
+    "prior_complete_lab_rows": 1,
+    "first_visible_timestamp": "2026-07-15 00:00:00",
+    "first_visible_prediction_available": true,
+    "first_visible_predicted_moisture": 0.07189143369315304,
+    "hidden_rows_written_to_database": false,
+    "sha256": "fc9d110f6e07b38126493e7b594cb571822f74e1acc8cf4b66575b93e8f7ff36"
+  },
+  "dataset_validation": {
+    "row_count": 34560,
+    "column_count": 17,
+    "timestamp_start": "2026-07-15 00:00:00",
+    "timestamp_end": "2026-07-16 23:59:55",
+    "timestamp_interval_seconds": 5,
+    "duplicate_timestamps": 0,
+    "unexpected_intervals": 0,
+    "required_features_present": true,
+    "feature_order_matches_canonical": true,
+    "process_missing_values": 0,
+    "values_outside_canonical_envelope": {},
+    "episodes": [
+      {
+        "scenario_type": "steam_dip",
+        "start_timestamp": "2026-07-15 05:00:00",
+        "end_timestamp": "2026-07-15 05:24:55",
+        "duration_minutes": 25.0,
+        "rows": 300
+      },
+      {
+        "scenario_type": "airflow_restriction",
+        "start_timestamp": "2026-07-15 08:00:00",
+        "end_timestamp": "2026-07-15 08:35:55",
+        "duration_minutes": 36.0,
+        "rows": 432
+      },
+      {
+        "scenario_type": "fan_speed_dip",
+        "start_timestamp": "2026-07-15 14:00:00",
+        "end_timestamp": "2026-07-15 15:07:55",
+        "duration_minutes": 68.0,
+        "rows": 816
+      },
+      {
+        "scenario_type": "feed_surge",
+        "start_timestamp": "2026-07-15 17:00:00",
+        "end_timestamp": "2026-07-15 18:08:55",
+        "duration_minutes": 69.0,
+        "rows": 828
+      },
+      {
+        "scenario_type": "steam_dip",
+        "start_timestamp": "2026-07-16 05:00:00",
+        "end_timestamp": "2026-07-16 05:44:55",
+        "duration_minutes": 45.0,
+        "rows": 540
+      },
+      {
+        "scenario_type": "cooling_loss",
+        "start_timestamp": "2026-07-16 09:00:00",
+        "end_timestamp": "2026-07-16 09:51:55",
+        "duration_minutes": 52.0,
+        "rows": 624
+      },
+      {
+        "scenario_type": "fan_speed_dip",
+        "start_timestamp": "2026-07-16 14:00:00",
+        "end_timestamp": "2026-07-16 15:12:55",
+        "duration_minutes": 73.0,
+        "rows": 876
+      },
+      {
+        "scenario_type": "feed_surge",
+        "start_timestamp": "2026-07-16 18:00:00",
+        "end_timestamp": "2026-07-16 18:33:55",
+        "duration_minutes": 34.0,
+        "rows": 408
+      }
+    ],
+    "episode_count": 8,
+    "physics_checks_passed": 8,
+    "minimum_normal_gap_minutes": 112.0,
+    "injected_rows": 4824,
+    "injected_row_percentage": 13.958333333333334,
+    "normal_row_percentage": 86.04166666666667
+  },
+  "model_validation": {
+    "model_version": "canonical_92d_v6.0",
+    "feature_schema_version": "moisture_direct_16_v6.0",
+    "anomaly_feature_count": 15,
+    "inference_rows": 34560,
+    "overall_model_flag_rate": 0.08258101851851851,
+    "normal_period_model_flag_rate": 0.0007062146892655367,
+    "injected_period_model_flag_rate": 0.5872719734660033,
+    "episodes_with_detector_response": 7,
+    "episode_count": 8,
+    "episode_metrics": [
+      {
+        "scenario_id": "DEMO_01_STEAM_MILD",
+        "scenario_type": "steam_dip",
+        "severity": "mild",
+        "rows": 300,
+        "model_flag_rate": 0.56,
+        "peak_anomaly_risk": 0.9007188216124866,
+        "minimum_decision_score": -6.167821412141519,
+        "detector_responded": true
+      },
+      {
+        "scenario_id": "DEMO_02_AIRFLOW_MODERATE",
+        "scenario_type": "airflow_restriction",
+        "severity": "moderate",
+        "rows": 432,
+        "model_flag_rate": 0.7986111111111112,
+        "peak_anomaly_risk": 0.9700526244633894,
+        "minimum_decision_score": -9.727352705362737,
+        "detector_responded": true
+      },
+      {
+        "scenario_id": "DEMO_03_FAN_MODERATE",
+        "scenario_type": "fan_speed_dip",
+        "severity": "moderate",
+        "rows": 816,
+        "model_flag_rate": 0.7953431372549019,
+        "peak_anomaly_risk": 0.9733308674107277,
+        "minimum_decision_score": -10.061046671025643,
+        "detector_responded": true
+      },
+      {
+        "scenario_id": "DEMO_04_FEED_MODERATE",
+        "scenario_type": "feed_surge",
+        "severity": "moderate",
+        "rows": 828,
+        "model_flag_rate": 0.0,
+        "peak_anomaly_risk": 0.39751463933857345,
+        "minimum_decision_score": 1.163038228825453,
+        "detector_responded": false
+      },
+      {
+        "scenario_id": "DEMO_05_STEAM_SEVERE",
+        "scenario_type": "steam_dip",
+        "severity": "severe",
+        "rows": 540,
+        "model_flag_rate": 0.7537037037037037,
+        "peak_anomaly_risk": 0.9735666818347682,
+        "minimum_decision_score": -10.08656498450834,
+        "detector_responded": true
+      },
+      {
+        "scenario_id": "DEMO_06_COOLING_MODERATE",
+        "scenario_type": "cooling_loss",
+        "severity": "moderate",
+        "rows": 624,
+        "model_flag_rate": 0.7483974358974359,
+        "peak_anomaly_risk": 0.857947472067743,
+        "minimum_decision_score": -5.0297887091991385,
+        "detector_responded": true
+      },
+      {
+        "scenario_id": "DEMO_07_FAN_SEVERE",
+        "scenario_type": "fan_speed_dip",
+        "severity": "severe",
+        "rows": 876,
+        "model_flag_rate": 0.8059360730593608,
+        "peak_anomaly_risk": 0.9652025717915078,
+        "minimum_decision_score": -9.29351448544383,
+        "detector_responded": true
+      },
+      {
+        "scenario_id": "DEMO_08_FEED_SEVERE",
+        "scenario_type": "feed_surge",
+        "severity": "severe",
+        "rows": 408,
+        "model_flag_rate": 0.22303921568627452,
+        "peak_anomaly_risk": 0.6538389343187733,
+        "minimum_decision_score": -1.778705948769277,
+        "detector_responded": true
+      }
+    ],
+    "moisture_predictions_available": 8,
+    "moisture_prediction_checks": [
+      {
+        "scenario_id": "DEMO_01_STEAM_MILD",
+        "timestamp": "2026-07-15 05:12:30",
+        "prediction_available": true,
+        "predicted_moisture": 0.07724299186406793,
+        "reason": null
+      },
+      {
+        "scenario_id": "DEMO_02_AIRFLOW_MODERATE",
+        "timestamp": "2026-07-15 08:18:00",
+        "prediction_available": true,
+        "predicted_moisture": 0.0792474977565607,
+        "reason": null
+      },
+      {
+        "scenario_id": "DEMO_03_FAN_MODERATE",
+        "timestamp": "2026-07-15 14:34:00",
+        "prediction_available": true,
+        "predicted_moisture": 0.08127387482458977,
+        "reason": null
+      },
+      {
+        "scenario_id": "DEMO_04_FEED_MODERATE",
+        "timestamp": "2026-07-15 17:34:30",
+        "prediction_available": true,
+        "predicted_moisture": 0.07801724290124885,
+        "reason": null
+      },
+      {
+        "scenario_id": "DEMO_05_STEAM_SEVERE",
+        "timestamp": "2026-07-16 05:22:30",
+        "prediction_available": true,
+        "predicted_moisture": 0.07812506150316675,
+        "reason": null
+      },
+      {
+        "scenario_id": "DEMO_06_COOLING_MODERATE",
+        "timestamp": "2026-07-16 09:26:00",
+        "prediction_available": true,
+        "predicted_moisture": 0.07917224588073209,
+        "reason": null
+      },
+      {
+        "scenario_id": "DEMO_07_FAN_SEVERE",
+        "timestamp": "2026-07-16 14:36:30",
+        "prediction_available": true,
+        "predicted_moisture": 0.07879337978143518,
+        "reason": null
+      },
+      {
+        "scenario_id": "DEMO_08_FEED_SEVERE",
+        "timestamp": "2026-07-16 18:17:00",
+        "prediction_available": true,
+        "predicted_moisture": 0.07562207517353388,
+        "reason": null
+      }
+    ],
+    "model_inference_pass": true
+  },
+  "protected_hashes_before": {
+    "data\\raw\\MAP_Dryer_Canonical_5s_deterministic.csv": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+    "data\\processed\\MAP_Dryer_Canonical_5s.csv": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+    "data\\processed\\MAP_Dryer_TEST_Replay_5s.csv": "cec99e6a984a11440bfa06230b877f6231299bc9213bd5acb77cfe605553b2c2",
+    "notebooks\\01_Data_Exploration.ipynb": "4c55d8d4adb7d13e5e7585edad9d119f24619300816192347c057799848e915c",
+    "notebooks\\02_Feature_Engineering.ipynb": "dd72de8deff6ff56a58a235a5f947d5b6db66adb00f00ed78b1345deb2de999e",
+    "notebooks\\03_Model1_SoftSensor.ipynb": "7a8f8417e397b5923b4315a51d97872f98db0c8bb12e825b2e69f7f4ac772f6c",
+    "notebooks\\04_Model2_AnomalyDetection&Diagnosis.ipynb": "a5c99708e1b9dd95da34caeecc53be80e29d0827a75dbe946e65bd18effec27f"
+  },
+  "protected_hashes_after": {
+    "data\\raw\\MAP_Dryer_Canonical_5s_deterministic.csv": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+    "data\\processed\\MAP_Dryer_Canonical_5s.csv": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
+    "data\\processed\\MAP_Dryer_TEST_Replay_5s.csv": "cec99e6a984a11440bfa06230b877f6231299bc9213bd5acb77cfe605553b2c2",
+    "notebooks\\01_Data_Exploration.ipynb": "4c55d8d4adb7d13e5e7585edad9d119f24619300816192347c057799848e915c",
+    "notebooks\\02_Feature_Engineering.ipynb": "dd72de8deff6ff56a58a235a5f947d5b6db66adb00f00ed78b1345deb2de999e",
+    "notebooks\\03_Model1_SoftSensor.ipynb": "7a8f8417e397b5923b4315a51d97872f98db0c8bb12e825b2e69f7f4ac772f6c",
+    "notebooks\\04_Model2_AnomalyDetection&Diagnosis.ipynb": "a5c99708e1b9dd95da34caeecc53be80e29d0827a75dbe946e65bd18effec27f"
+  },
+  "protected_assets_unchanged": true,
+  "notebooks_modified": false,
+  "canonical_datasets_modified": false,
+  "model_retraining_performed": false,
+  "model_evaluation_metrics_recomputed": false,
+  "quality_reference_values_modified": false,
+  "model_outputs_written_to_demo_csv": false
+}

@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "9d8f0d77da0ee4dbf543",
   "position": {
-    "x": 860,
-    "y": 480,
+    "x": 860.09852216748766,
+    "y": 479.92610837438423,
     "z": 3200,
-    "height": 22,
-    "width": 400,
+    "height": 37.684729064039409,
+    "width": 400.1231527093596,
     "tabOrder": 3200
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -22,9 +21,9 @@
                   {
                     "value": "Cause analysis and verification",
                     "textStyle": {
+                      "fontWeight": "bold",
                       "fontSize": "12pt",
-                      "color": "#17231F",
-                      "fontWeight": "bold"
+                      "color": "#17231f"
                     }
                   }
                 ]
@@ -87,6 +86,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

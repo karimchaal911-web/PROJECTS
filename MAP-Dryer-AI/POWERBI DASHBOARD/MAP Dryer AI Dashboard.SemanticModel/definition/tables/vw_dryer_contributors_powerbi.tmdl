@@ -114,6 +114,7 @@ table vw_dryer_contributors_powerbi
 			    'vw_dryer_contributors_powerbi'[Contributor Name]
 			)
 		dataType: string
+		lineageTag: e2d9f9d8-43de-4e1f-bbf6-a311f5b9811d
 		summarizeBy: none
 
 	partition vw_dryer_contributors_powerbi = m

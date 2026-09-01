@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { C } from '../../lib/palette.js';
 import { DRYER, FEED_END, DISCHARGE_END } from '../../lib/curves.js';
 import { useChannel } from '../usePresence.js';
+import { applySurface } from '../../lib/surfaces.js';
 
 /**
  * The hero rotary dryer.
@@ -49,6 +50,19 @@ export default function Dryer({ layerKey = 'dryer' }) {
       color: C.dataTeal, wireframe: true, transparent: true, opacity: 0,
       depthWrite: false,
     });
+
+    // Four different fabrications, four different surfaces. The shell is a
+    // welded plate cylinder, the rings and gear are ground steel, the plinths
+    // and drive housing are painted section, the ducts are rolled sheet. Until
+    // this line they were four numbers apart and read as one plastic.
+    // Repeats are chosen against the real size of each part: the shell tiles
+    // three times along a 24-unit drum, which puts a course seam roughly every
+    // 2.7 units, the spacing plate actually comes in.
+    applySurface(shell, 'paint', { repeat: [6, 3] });
+    applySurface(ring, 'machined', { repeat: [8, 2] });
+    applySurface(steel, 'struct', { repeat: 3 });
+    applySurface(duct, 'pipe', { repeat: [3, 1] });
+
     return { shell, ring, steel, duct, wire };
   }, []);
 
@@ -86,11 +100,14 @@ export default function Dryer({ layerKey = 'dryer' }) {
 
     const { shell, ring, steel, duct } = materials;
     const wireAmount = wireCh.current;
-    shell.opacity = p * (1 - wireAmount * 0.82);
-    ring.opacity = p * (1 - wireAmount * 0.6);
-    steel.opacity = p * (1 - wireAmount * 0.5);
-    duct.opacity = p * (1 - wireAmount * 0.6);
-    materials.wire.opacity = p * wireAmount * 0.5;
+    // The shell used to fall to 18 % under the wireframe, which turned a
+    // steel machine into a glass tube and let the whole plant ghost through
+    // it. A section view still has to read as a section OF SOMETHING SOLID.
+    shell.opacity = p * (1 - wireAmount * 0.55);
+    ring.opacity = p * (1 - wireAmount * 0.35);
+    steel.opacity = p * (1 - wireAmount * 0.3);
+    duct.opacity = p * (1 - wireAmount * 0.4);
+    materials.wire.opacity = p * wireAmount * 0.65;
   });
 
   return (

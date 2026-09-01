@@ -4,10 +4,10 @@
   "position": {
     "x": 110,
     "y": 218,
-    "z": 2700,
-    "height": 254,
+    "z": 2100,
+    "height": 340,
     "width": 940,
-    "tabOrder": 2700
+    "tabOrder": 2100
   },
   "visual": {
     "visualType": "lineChart",
@@ -21,13 +21,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
                   "Property": "Timestamp"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Timestamp",
+              "queryRef": "vw_dryer_overview_trends_powerbi.Timestamp",
               "nativeQueryRef": "Timestamp",
               "active": true
             }
@@ -40,70 +40,70 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
-                  "Property": "Predicted Moisture (Model)"
+                  "Property": "Overview Predicted Moisture"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Predicted Moisture (Model)",
-              "nativeQueryRef": "Predicted Moisture (Model)"
+              "queryRef": "vw_dryer_overview_trends_powerbi.Overview Predicted Moisture",
+              "nativeQueryRef": "Predicted moisture"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
-                  "Property": "Moisture Lab Markers"
+                  "Property": "Overview Lab Markers"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Moisture Lab Markers",
-              "nativeQueryRef": "Moisture Lab Markers"
+              "queryRef": "vw_dryer_overview_trends_powerbi.Overview Lab Markers",
+              "nativeQueryRef": "Laboratory measurement"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
-                  "Property": "Predicted Moisture (Anomalous)"
+                  "Property": "Overview Predicted Moisture (Anomalous)"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Predicted Moisture (Anomalous)",
-              "nativeQueryRef": "Predicted Moisture (Anomalous)"
+              "queryRef": "vw_dryer_overview_trends_powerbi.Overview Predicted Moisture (Anomalous)",
+              "nativeQueryRef": "Anomalous prediction"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
-                  "Property": "Target Band Low"
+                  "Property": "Overview Target Band Low"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Target Band Low",
-              "nativeQueryRef": "Target Band Low"
+              "queryRef": "vw_dryer_overview_trends_powerbi.Overview Target Band Low",
+              "nativeQueryRef": "Lower target"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
-                  "Property": "Target Band High"
+                  "Property": "Overview Target Band High"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Target Band High",
-              "nativeQueryRef": "Target Band High"
+              "queryRef": "vw_dryer_overview_trends_powerbi.Overview Target Band High",
+              "nativeQueryRef": "Upper target"
             }
           ]
         }
@@ -115,7 +115,7 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "vw_dryer_dashboard_powerbi"
+                    "Entity": "vw_dryer_overview_trends_powerbi"
                   }
                 },
                 "Property": "Timestamp"
@@ -199,7 +199,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Moisture Lab Markers"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Lab Markers"
           }
         },
         {
@@ -227,7 +227,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Predicted Moisture (Anomalous)"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Predicted Moisture (Anomalous)"
           }
         },
         {
@@ -255,7 +255,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Target Band Low"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Target Band Low"
           }
         },
         {
@@ -283,7 +283,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Target Band High"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Target Band High"
           }
         }
       ],
@@ -295,7 +295,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#087C5B'"
+                      "Value": "'#0F766E'"
                     }
                   }
                 }
@@ -303,7 +303,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Predicted Moisture (Model)"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Predicted Moisture"
           }
         },
         {
@@ -313,7 +313,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#1B918E'"
+                      "Value": "'#0D9488'"
                     }
                   }
                 }
@@ -321,7 +321,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Moisture Lab Markers"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Lab Markers"
           }
         },
         {
@@ -331,7 +331,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#DF5558'"
+                      "Value": "'#D64545'"
                     }
                   }
                 }
@@ -339,25 +339,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Predicted Moisture (Anomalous)"
-          }
-        },
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#BFD8CE'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Target Band Low"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Predicted Moisture (Anomalous)"
           }
         },
         {
@@ -375,7 +357,25 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Target Band High"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Target Band Low"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#BFD8CE'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Target Band High"
           }
         }
       ],
@@ -401,7 +401,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -439,7 +439,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -481,7 +481,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'DRYING PERFORMANCE & PROCESS-RISK TREND \u2014 PREDICTED %H2O, LAB SAMPLES & TARGET BAND'"
+                  "Value": "'MOISTURE & PROCESS-RISK TREND — ROLLING 8 HOURS'"
                 }
               }
             },
@@ -490,7 +490,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -552,7 +552,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E0DC'"
+                      "Value": "'#D6E2DD'"
                     }
                   }
                 }
@@ -561,7 +561,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "10D"
                 }
               }
             }

@@ -52,15 +52,15 @@ async function freePort() {
 }
 
 async function startServer(PORT) {
-  const proc = spawn(
-    process.platform === 'win32' ? 'npx.cmd' : 'npx',
-    ['vite', 'preview', '--host', '127.0.0.1', '--port', String(PORT), '--strictPort'],
-    { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], shell: process.platform === 'win32' }
-  );
+  // Not `npx vite preview`: on Windows that is a shim which exits at once and
+  // leaves the real server running detached, so the harness cannot stop what it
+  // started. Orphaned preview servers then hold the ports the next run needs.
+  const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/serve.mjs'), String(PORT)],
+    { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
   await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('preview server did not start')), 30000);
+    const timer = setTimeout(() => reject(new Error('static server did not start')), 30000);
     proc.stdout.on('data', (d) => {
-      if (String(d).includes('Local')) { clearTimeout(timer); resolve(); }
+      if (String(d).includes('READY')) { clearTimeout(timer); resolve(); }
     });
     proc.stderr.on('data', (d) => process.stderr.write(String(d)));
   });
@@ -117,7 +117,13 @@ async function main() {
   page.on('requestfailed', (r) => errors.push(`requestfailed: ${r.url()}`));
   page.on('response', (r) => { if (r.status() >= 400) errors.push(`http ${r.status()}: ${r.url()}`); });
 
-  await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'networkidle0', timeout: 60000 });
+  // `degrade=off` stops the auto-degrade guard from firing. This harness runs
+  // through SwiftShader, which is slow enough to trip the guard honestly, so
+  // every "standard" capture used to be a safe-mode capture wearing the wrong
+  // label. `capture=1` hides presenter-only chrome that is not part of the
+  // audience frame.
+  const q = `?capture=1${SAFE ? '' : '&degrade=off'}`;
+  await page.goto(`http://127.0.0.1:${PORT}/${q}`, { waitUntil: 'networkidle0', timeout: 60000 });
   await page.waitForFunction(
     () => !document.querySelector('.boot__start')?.disabled,
     { timeout: 60000 }
@@ -167,9 +173,18 @@ async function main() {
     await page.keyboard.press('ArrowRight');
   }
 
+  // The mode that actually ran, not the one that was requested.
+  const ranSafe = await page.evaluate(() => Boolean(window.__SAFE__));
+  if (ranSafe !== SAFE) errors.push(`mode drift: requested safe=${SAFE}, ran safe=${ranSafe}`);
+
   await writeFile(
     path.join(OUT, 'manifest.json'),
-    JSON.stringify({ capturedAt: new Date().toISOString(), width: WIDTH, height: HEIGHT, safe: SAFE, steps: manifest, errors }, null, 2)
+    JSON.stringify({
+      capturedAt: new Date().toISOString(),
+      width: WIDTH, height: HEIGHT,
+      safeRequested: SAFE, safeActual: ranSafe,
+      steps: manifest, errors,
+    }, null, 2)
   );
 
   console.log(`\n${manifest.length} stills → ${OUT}`);

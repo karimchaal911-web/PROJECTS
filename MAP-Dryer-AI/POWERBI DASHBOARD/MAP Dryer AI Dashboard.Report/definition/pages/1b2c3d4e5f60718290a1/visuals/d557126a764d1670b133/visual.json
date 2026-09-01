@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "d557126a764d1670b133",
   "position": {
     "x": 110,
@@ -11,7 +11,6 @@
   },
   "visual": {
     "visualType": "tableEx",
-    "drillFilterOtherVisuals": true,
     "query": {
       "queryState": {
         "Values": {
@@ -113,13 +112,12 @@
                     "Entity": "vw_dryer_anomaly_events"
                   }
                 },
-                "Property": "Peak Timestamp"
+                "Property": "Diagnosis"
               }
             },
-            "direction": "Descending"
+            "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": true
+        ]
       }
     },
     "objects": {
@@ -183,7 +181,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -249,7 +247,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'RECENT ABNORMAL EVENTS \u2014 ROW SELECTION UPDATES THE EVENT, CONTRIBUTOR AND CAUSE VISUALS'"
+                  "Value": "'RECENT ABNORMAL EVENTS — SELECT A ROW FOR DETAILS'"
                 }
               }
             },
@@ -258,7 +256,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -320,7 +318,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E0DC'"
+                      "Value": "'#D6E2DD'"
                     }
                   }
                 }
@@ -329,7 +327,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "10D"
                 }
               }
             }
@@ -349,6 +347,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

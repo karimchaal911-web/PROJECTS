@@ -1,6 +1,6 @@
 {
   "notebook": "02_Feature_Engineering.ipynb",
-  "created_at": "2026-08-24T13:57:44",
+  "created_at": "2026-09-01T17:11:42",
   "depends_on": "artifacts\\notebook01_canonical_audit.json",
   "source_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
   "source_dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",

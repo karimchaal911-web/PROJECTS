@@ -3,11 +3,11 @@
   "name": "d7db2fad3fce8ec1e0e1",
   "position": {
     "x": 678,
-    "y": 778,
-    "z": 5800,
-    "height": 78,
+    "y": 750,
+    "z": 3600,
+    "height": 106,
     "width": 172,
-    "tabOrder": 5800
+    "tabOrder": 3600
   },
   "visual": {
     "visualType": "lineChart",
@@ -21,13 +21,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
                   "Property": "Timestamp"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Timestamp",
+              "queryRef": "vw_dryer_overview_trends_powerbi.Timestamp",
               "nativeQueryRef": "Timestamp",
               "active": true
             }
@@ -40,14 +40,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
-                  "Property": "Air Flow (Trend)"
+                  "Property": "Overview Air Flow Rate"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Air Flow (Trend)",
-              "nativeQueryRef": "Air Flow (Trend)"
+              "queryRef": "vw_dryer_overview_trends_powerbi.Overview Air Flow Rate",
+              "nativeQueryRef": "Overview Air Flow Rate"
             }
           ]
         }
@@ -59,7 +59,7 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "vw_dryer_dashboard_powerbi"
+                    "Entity": "vw_dryer_overview_trends_powerbi"
                   }
                 },
                 "Property": "Timestamp"
@@ -127,7 +127,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#087C5B'"
+                      "Value": "'#0F766E'"
                     }
                   }
                 }
@@ -135,7 +135,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Air Flow (Trend)"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Air Flow Rate"
           }
         }
       ],
@@ -161,7 +161,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -199,7 +199,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }

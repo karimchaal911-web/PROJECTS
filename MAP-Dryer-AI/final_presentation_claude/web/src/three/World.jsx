@@ -11,12 +11,19 @@ import TimeAxis from './layers/TimeAxis.jsx';
 import SensorNodes from './layers/SensorNodes.jsx';
 import DataPackets from './layers/DataPackets.jsx';
 import Architecture from './layers/Architecture.jsx';
+import Residence from './layers/Residence.jsx';
 import Pathways from './layers/Pathways.jsx';
 import Evidence from './layers/Evidence.jsx';
 import Dashboard from './layers/Dashboard.jsx';
+import Handover from './layers/Handover.jsx';
 import Runtime from './layers/Runtime.jsx';
 import ValueLoop from './layers/ValueLoop.jsx';
 import Roadmap from './layers/Roadmap.jsx';
+import Material from './layers/Material.jsx';
+import Prewarm from './Prewarm.jsx';
+import PerfGuard from './PerfGuard.jsx';
+import Post from './Post.jsx';
+import { useShow } from '../state/useShow.js';
 
 /**
  * The persistent world.
@@ -26,12 +33,14 @@ import Roadmap from './layers/Roadmap.jsx';
  * opening pose in scene 14 and find the same machine still turning.
  */
 export default function World() {
+  const safeMode = useShow((s) => s.safeMode);
   return (
     <>
       <StudioEnv />
       <Lighting />
       <Rig />
       <Suspense fallback={null}>
+        <Material />
         <Plant />
         <Dryer />
         <DryerInternals />
@@ -41,13 +50,20 @@ export default function World() {
         <SensorNodes />
         <DataPackets />
         <Architecture />
+        <Residence />
         <Pathways />
         <Evidence />
         <Dashboard />
+        <Handover />
         <Runtime />
         <ValueLoop />
         <Roadmap />
+        <Prewarm />
       </Suspense>
+      <PerfGuard />
+      {/* Post-processing is the first thing safe mode gives up. Unmounting it
+          hands rendering straight back to r3f, mid-show, with no reload. */}
+      {!safeMode && <Post />}
     </>
   );
 }

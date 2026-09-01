@@ -1,128 +1,97 @@
-\chapter{Real-Time Prototype Architecture: Python, PostgreSQL and Simulation}
+\chapter{Real-Time Prototype Architecture}
 \label{chap:architecture}
 
-\section{Repository structure and technical responsibilities}
+\section{From notebooks to one governed runtime}
 
-The implementation is organized so that experimentation, runtime logic and presentation remain traceable. Notebooks 01--04 form an executable dependency chain: canonical audit, residence-aware 16-feature handoff, chronological moisture-model selection/export, then anomaly/diagnosis export. Reusable modules under \code{src/multirate} implement preprocessing, instant features, temporal alignment and the wider window-feature engine, while \code{src/canonical\_pipeline.py} governs the shared data and model contracts. \code{src/diagnosis} contains the configurable diagnostic work. The \code{realtime\_pipeline} directory contains database bootstrap scripts, the held-out replay/inference service and verification utilities. The PBIP project and its TMDL semantic model are stored under \code{POWERBI DASHBOARD} \cite{projectrepo}.
+The repository separates experimentation from execution. Notebooks 01--04 audit the canonical source, build the causal handoff, select the moisture model and export the anomaly artifacts. Reusable modules under \code{src} implement alignment, instant features and diagnosis. The \code{realtime\_pipeline} loads the saved artifacts and writes PostgreSQL records. The Power BI project remains a visualization client of that backend \cite{projectrepo}.
 
-This separation supports traceability without duplicating the models. Notebook 03 exports the moisture artifact and Notebook 04 exports the anomaly artifacts that the service loads. SQL views stabilize the contract presented to Power BI. Tests exercise the modules without requiring the dashboard, while the live backend validator compares SQL view columns with the physical \code{sourceColumn} bindings in TMDL.
+This structure avoids a common prototype failure: showing one model in a notebook and running another in the dashboard. Startup checks compare the ordered feature schemas and model versions. The service loads the same Ridge pipeline and One-Class SVM artifacts evaluated in Chapter~\ref{chap:models}.
 
-\section{Prototype replay and inference loop}
+\section{Two replay modes with separate purposes}
 
-In the plant context, process variables are available continuously through the monitoring and control environment. The service does not reproduce the native acquisition layer: it replays the canonical held-out TEST interval containing 237,600 rows from 3--16 July 2026. Its default pacing represents one event every five seconds, while bounded verification can disable waiting without changing event timestamps. At each cycle it validates the row, selects the direct process snapshot at the residence-adjusted time, carries only the most recent strictly previous density/product-temperature result into the 16-feature moisture contract, runs the Notebook 03 moisture model and Notebook 04 anomaly artifacts, and stores the outputs. Laboratory fields remain blank except at 165 configured sparse sample timestamps. Model, feature schema and source are tied together by version and SHA-256 metadata.
+The project now uses two explicit sources. The canonical TEST interval supports model and analytical evaluation. It contains 237,600 five-second rows and 165 sparse laboratory observations from 3--16 July 2026. The default jury presentation uses \code{resources/dashboard\_demo/MAP\_Dryer\_Dashboard\_Demo\_5s.csv}, a two-day, 34,560-row fork containing eight disclosed injected episodes. Its normal rows and sparse laboratory values are preserved from the source; the injections make short-session dashboard state changes visible.
 
-\begin{figure}[ht]
+The distinction is strict. Canonical TEST metrics assess frozen-model behaviour. Dashboard-demo response assesses whether a scripted presentation sequence reaches the intended views. Injected demo episodes are never counted as independent validation evidence.
+
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[node distance=4.5mm and 12mm]
 \node[data,minimum width=92mm,text width=86mm] (read)
-  {\textbf{1. Acquire event}\\read the next prototype row and its event timestamp};
+  {\textbf{1. Read event} -- source row, event timestamp and source version};
 \node[decision,below=7mm of read,minimum width=34mm,minimum height=13mm] (valid)
   {required inputs\\valid and finite?};
 \node[flow,minimum width=92mm,text width=86mm,below=7mm of valid] (features)
-  {\textbf{2. Build state}\\residence-adjusted process snapshot + strictly previous laboratory inputs};
+  {\textbf{2. Build state} -- causal process snapshot, prior laboratory context and ordered instant features};
 \node[flow,minimum width=92mm,text width=86mm,below=of features] (infer)
-  {\textbf{3. Run compatible artifacts}\\novelty decision + display risk + available quality estimate};
+  {\textbf{3. Run Python models} -- moisture estimate, novelty decision and display risk};
 \node[flow,minimum width=92mm,text width=86mm,below=of infer] (diag)
-  {\textbf{4. Translate evidence}\\severity, ranked direct contributors, subsystem and cautious guidance};
+  {\textbf{4. Translate evidence} -- severity, contributors, subsystem and verification guidance};
 \node[flow,minimum width=92mm,text width=86mm,below=of diag] (write)
-  {\textbf{5. Commit one logical cycle}\\idempotent process, model and contributor writes in one transaction};
+  {\textbf{5. Commit transaction} -- process, output and contributor records with versions};
 \node[data,minimum width=92mm,text width=86mm,below=of write] (observe)
-  {\textbf{6. Observe and pace}\\record versions/latency, advance source position, then wait or wrap};
+  {\textbf{6. Pace or accelerate} -- wait for presentation rhythm or continue analytical replay};
 \node[data,draw=AlertAmber,minimum width=42mm,text width=37mm,right=of valid] (dq)
-  {\textbf{DATA\_QUALITY}\\write explicit unavailable state and reason};
-
-\draw[arr] (read)--(valid);
-\draw[arr] (valid)--node[right,font=\scriptsize]{yes}(features);
-\draw[arr] (features)--(infer);
-\draw[arr] (infer)--(diag);
-\draw[arr] (diag)--(write);
-\draw[arr] (write)--(observe);
-\draw[arr] (valid)--node[above,font=\scriptsize]{no}(dq);
-\draw[arr] (dq.south)|-(write.east);
-\draw[arr] (observe.west)--++(-16mm,0)|-node[pos=.20,left,font=\scriptsize,align=right]{next event\\or paced wait}(read.west);
+  {\textbf{DATA\_QUALITY}\\store an unavailable state and reason};
+\draw[arr] (read)--(valid); \draw[arr] (valid)--node[right,font=\scriptsize]{yes}(features);
+\draw[arr] (features)--(infer); \draw[arr] (infer)--(diag); \draw[arr] (diag)--(write); \draw[arr] (write)--(observe);
+\draw[arr] (valid)--node[above,font=\scriptsize]{no}(dq); \draw[arr] (dq.south)|-(write.east);
 \end{tikzpicture}
-\caption{Event-level workflow paced at the selected five-second prototype interval.}
-\source{\projectsource.}
+\caption{Event workflow used by both canonical audit and dashboard demonstration modes.}
+\source{Author's work.}
 \label{fig:simworkflow}
 \end{figure}
 
-The executable loop keeps inference, persistence and pacing separate:
+The five-second cadence belongs to event timestamps and, when enabled, to presentation pacing. An accelerated audit can process those same timestamps without sleeping. Removing the wait changes wall-clock duration, not process chronology or feature alignment.
 
-\begin{lstlisting}[language=Python,caption={Core replay, inference and pacing sequence.}]
-cycle_started = time.monotonic()
-source_row = source.iloc[next_position].copy()
-new_row = source_row[["Timestamp", *PROCESS_VARIABLES]].to_frame().T
-buffer = pd.concat([buffer, new_row], ignore_index=True).tail(buffer_rows)
-inference = run_row_inference(source_row, buffer, artifacts, config)
-latency_ms = (time.monotonic() - cycle_started) * 1000.0
-connection = persist_with_retry(
-    connection, source_row, inference, artifacts, latency_ms
-)
+\section{PostgreSQL as traceability boundary}
 
-elapsed = time.monotonic() - cycle_started
-target = config.poll_interval_seconds / config.replay_speed
-time.sleep(max(0.0, target - elapsed))
-\end{lstlisting}
+The database stores process records, model outputs and ranked contributors under the same event time. Upsert functions use the date/time key so that a retried delivery updates the logical event rather than creating duplicates. One transaction covers the related writes. If persistence fails after inference, the partial cycle can be rolled back.
 
-The buffer is long enough to locate the residence-adjusted process row and retain the most recent strictly previous laboratory density and product-temperature result. Missing residence time, a missing shifted process row or unavailable prior laboratory inputs produces an unavailable moisture estimate rather than an improvised value. Database upserts make a retried timestamp safe, and each cycle records latency against the selected five-second demonstration budget.
-
-\section{PostgreSQL persistence layer}
-
-The database is a traceability and integration boundary. \code{dryer\_map} stores the date/time key, nine process fields and three nullable quality fields. \code{dryer\_model\_outputs} stores prediction, anomaly score/risk, status, severity, subsystem, diagnosis, causes, verification, model/schema versions and inference latency. \code{dryer\_abnormal\_variables} stores ranked contributor evidence. Stored functions wrap quoted legacy identifiers and implement \code{ON CONFLICT} upserts keyed by date and time \cite{sqlschema}.
-
-\begin{table}[ht]
+\begin{table}[htbp]
 \centering\small
-\caption{Principal database objects and dashboard roles}
+\caption{Principal PostgreSQL objects and their dashboard roles}
 \label{tab:dbobjects}
-\begin{tabularx}{\textwidth}{@{}p{0.34\textwidth}Y@{}}
+\begin{tabularx}{\textwidth}{@{}p{0.36\textwidth}Y@{}}
 \toprule
-Object & Purpose \\
+Object & Role \\
 \midrule
-\code{dryer\_map} & Process and sparse laboratory observations; composite timestamp key prevents duplicates.\\
-\code{dryer\_model\_outputs} & Versioned prediction, novelty, diagnosis and latency output per processed timestamp.\\
-\code{dryer\_abnormal\_variables} & Direct contributor rank, deviation, reference limits and variable severity.\\
-\code{vw\_dryer\_dashboard\_powerbi} & Joined current-grain facts plus latest-lab as-of context and validated error.\\
-\code{vw\_dryer\_lab\_samples} & Only true lab rows, with prediction-at-sample and error.\\
-\code{vw\_dryer\_overview\_trends\_powerbi} & Lightweight latest eight-hour trend for frequent dashboard queries.\\
-\code{vw\_dryer\_anomaly\_events} & Groups anomalous rows separated by no more than 30 seconds into operator events.\\
-\code{vw\_dryer\_contributors\_powerbi} & Dashboard-facing contributor evidence.\\
+\code{dryer\_map} & Nine process fields and three nullable laboratory fields at event grain. \\
+\code{dryer\_model\_outputs} & Prediction, risk, state, diagnosis, versions and inference latency. \\
+\code{dryer\_abnormal\_variables} & Ranked direct contributor evidence. \\
+\code{vw\_dryer\_dashboard\_powerbi} & Joined current-grain facts with latest-lab context and validated error. \\
+\code{vw\_dryer\_overview\_trends\_powerbi} & Lightweight recent trend for frequent overview queries. \\
+\code{vw\_dryer\_lab\_samples} & True laboratory rows and prediction-at-sample error. \\
+\code{vw\_dryer\_anomaly\_events} & Consecutive anomalous rows grouped into candidate events. \\
+\code{vw\_dryer\_contributors\_powerbi} & Contributor evidence exposed to the diagnostic page. \\
 \bottomrule
 \end{tabularx}
-\source{Database bootstrap and prototype-grid upgrade scripts \cite{sqlschema}.}
+\source{Database bootstrap and dashboard-view scripts \cite{sqlschema}.}
 \end{table}
 
-The main dashboard view uses a lateral as-of lookup to expose the latest preceding lab result and its age. This is semantically useful but relatively expensive over long trends; the separate overview view therefore restricts itself to the latest eight hours and avoids repeating the as-of query for every chart point. Timestamp and model-version indexes support the frequent filters. This is a performance decision derived from dashboard workload, not a generic database embellishment.
+The overview uses a restricted recent-trend view because an as-of laboratory lookup across every historical point is unnecessarily expensive for a page that refreshes frequently. This is a workload-driven design choice. Stable SQL column names also insulate the Power BI semantic model from implementation details in the base tables.
 
-\begin{lstlisting}[language=SQL,caption={Simplified event grouping used by the anomaly-events view.}]
-CASE WHEN ts - LAG(ts) OVER (ORDER BY ts) <= INTERVAL '30 seconds'
-     THEN 0 ELSE 1 END AS is_new_event
--- cumulative sum of is_new_event gives one event identifier
-\end{lstlisting}
+\FloatBarrier
 
-The service writes one logical cycle inside a transaction. If model inference succeeds but a later database operation fails, the transaction can be rolled back rather than leaving incomplete process/model pairs. Credentials are read from an environment file and are not reproduced in this report.
+\section{What the timing evidence actually proves}
 
-\section{Power BI-facing semantic layer}
+Two performance checks answer different questions. First, an independent accelerated analytical audit ran both frozen models and feature construction over all 237,600 canonical TEST rows. It produced 237,600 moisture predictions and 6,305 anomaly flags in 2.037 s, equivalent to about 116,626 rows/s. Normalized chunk latency averaged 0.00858 ms per row and its 95th percentile was 0.00873 ms per row.
 
-Five DirectQuery tables are generated in the semantic model: dashboard, contributors, lab samples, anomaly events and overview trends. Relationships connect contributor/event context and laboratory context while measures provide current values, state, age and formatted labels. The connection remains query-based, so the active Power BI page requests current rows from PostgreSQL at each refresh rather than importing a scheduled snapshot.
+This batch result measures numerical processing only. It excludes database writes, per-row diagnostic text generation, Power BI queries, transport, concurrent users and deliberate pacing. It establishes that the model calculations are not the likely bottleneck; it does not qualify an end-to-end plant service.
 
-Microsoft documents automatic page refresh as a DirectQuery feature and notes that effective cadence depends on query duration, data-source load and service capacity settings \cite{powerbiautorefresh}. The PBIP configures a five-second fixed interval in Desktop as the visualization target for this prototype. It is neither a claim about plant measurement frequency nor a guarantee for every Power BI Service workspace; deployment requires gateway, capacity and load qualification.
+Second, the recorded PostgreSQL smoke test processed 1,500 canonical TEST rows and two sparse laboratory observations. Average and maximum cycle latency were 9 ms and 47 ms. That bounded run confirms artifact loading, prior-lab state, transactional writes and SQL-view compatibility. It is not evidence that all 237,600 rows were replayed through PostgreSQL under production load \cite{runtimelog}.
 
-\section{Prototype execution evidence}
+\section{Power BI contract and refresh behaviour}
 
-The final backend smoke test processed the first 1,500 rows of the held-out TEST replay and its two sparse laboratory observations. It loaded model version \code{canonical\_92d\_v6.0}, produced no anomaly flags in this initial interval, and measured 9/47 ms average/maximum cycle latency. The service then stopped at the configured \code{MAX\_CYCLES} bound. This deliberately bounded run establishes model loading, causal prior-laboratory state, transactional writes and live Power BI view compatibility; it is not a claim that the entire 237,600-row TEST replay was executed against PostgreSQL or that deployment performance is qualified \cite{runtimelog}.
+The semantic model uses six DirectQuery tables, including a lightweight latest-state view. Power BI sends queries to PostgreSQL at refresh; it does not execute the Ridge or One-Class SVM. Microsoft documents automatic page refresh for DirectQuery and notes that effective cadence depends on query duration, source load, gateway and capacity settings \cite{powerbiautorefresh}. The configured interval is therefore a presentation target, not a guaranteed service-level agreement.
 
-These numbers measure Python/database processing under prototype conditions. They exclude a live PCS7 connector, plant network delays, concurrent Power BI user load, service-capacity throttling and production resilience. The correct conclusion is that the implementation has substantial timing margin for controlled replay, not that a future industrial system is already performance-qualified.
+The latest launcher opens the jury dashboard in a presentation-oriented full-screen workflow and keeps the replay service separate from Power BI rendering. If the user selects a shorter two-second visual interval, source queries can overlap or queue and make the report slower rather than faster. Smoothness depends on completing each query cycle before the next request, so the five-second setting is the stable default.
 
-\section{Failure handling, observability and deployment concerns}
+\section{Failure visibility and deployment concerns}
 
-The service rejects missing or non-finite inputs and records \code{DATA\_QUALITY} instead of forcing a model result. An unavailable shifted snapshot or prior laboratory input carries a reason, transactions keep related writes consistent, and cycle latency, source position and model state are logged. This separates ``the process looks abnormal'' from ``the analytics could not evaluate the process.''
+Missing or non-finite inputs produce \code{DATA\_QUALITY}. Missing shifted history or prior laboratory context produces an unavailable moisture reason. Logs retain event time, source position, model/schema version, state and latency without storing credentials. This makes ``the process appears unusual'' visibly different from ``the analytical chain cannot evaluate the row.''
 
-The hardened prototype uses environment-provided credentials, structured connection parameters, explicit SSL mode, finite replay and documented example roles for a runtime writer and read-only Power BI consumer. It retains naïve plant-local timestamps only for compatibility. Industrialization must still add managed secrets, network/security approval, UTC ingestion and governed display conversion, buffering/retry limits, recoverable PostgreSQL operation and model rollback. Qualification should measure source age, p95/p99 inference/write/query latency and concurrency through the gateway, then test disconnects, reordered or duplicate events and delayed laboratory results. The five-second visualization target is retained only if the complete deployed chain remains stable and makes interruption visible.
+The prototype keeps plant-local timestamps for compatibility. Industrialization would need Coordinated Universal Time (UTC) handling, approved read-only interfaces, managed secrets, network segmentation, recovery procedures and model rollback. Qualification should also measure source age and end-to-end latency under concurrent dashboard load, then test delayed, reordered and missing events.
 
-\subsection{End-to-end traceability checks}
-
-An accepted cycle should be traceable from source to display. The source timestamp and values are first validated against the CSV/process contract. The feature builder records the schema version and constructs the ordered vector. Model outputs carry model version, inference timestamp and latency. PostgreSQL stores the process and model rows under the same date/time key and the contributor rows under the event timestamp. Views then expose a stable set of names and grains to TMDL; Power BI measures locate the latest eligible timestamp and display freshness.
-
-This chain supports practical audit questions. If a card appears stale, one can compare latest process timestamp with inference and query time. If a diagnosis looks implausible, one can retrieve the direct contributors and reference limits at that event. If a prediction changes after retraining, the model/schema version identifies the generating artifacts. If a lab error card changes, the lab-sample view reveals the exact sample and prediction pair. Traceability therefore reduces both debugging time and the risk of silently comparing incompatible states.
-
-Final repository validation covers service logic, bounded held-out replay, idempotent SQL/views and live Power BI physical bindings. Production validation must add full-volume source reconciliation, restarts, duplicate or reordered messages, delayed laboratory arrival, failover, gateway interruption and report concurrency, each with a defined stale/data-quality response. Operational logs retain event time, state transition, model version, latency and error category while excluding credentials, connection strings and personal account names. The chain is executable; the remaining industrialization work lies at the interfaces, governance and validation layers.
+\begin{engineeringbox}[Architecture conclusion]
+The complete canonical TEST interval is computationally tractable in accelerated analytical mode, and the bounded database path is coherent. End-to-end five-second operation in an OCP environment remains a future load, resilience and governance test.
+\end{engineeringbox}

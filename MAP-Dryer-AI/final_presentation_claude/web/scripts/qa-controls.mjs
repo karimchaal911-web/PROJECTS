@@ -43,9 +43,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
   const port = await freePort();
-  const server = spawn('npx.cmd', ['vite', 'preview', '--host', '127.0.0.1', '--port', String(port)],
-    { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], shell: true });
-  await new Promise((resolve) => server.stdout.on('data', (d) => String(d).includes('Local') && resolve()));
+  // One process this script actually owns — see scripts/shot.mjs for why
+  // `npx vite preview` could not be stopped on Windows.
+  const server = spawn(process.execPath, [path.join(ROOT, 'scripts/serve.mjs'), String(port)],
+    { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
+  await new Promise((resolve) => server.stdout.on('data', (d) => String(d).includes('READY') && resolve()));
 
   const browser = await puppeteer.launch({
     executablePath: CHROME, headless: 'new',
@@ -74,22 +76,37 @@ async function main() {
   check('starts on scene 01', (await railN()) === '01', await railN());
 
   // --- direct scene recovery ------------------------------------------------
-  for (const [key, expect] of [['5', '05'], ['9', '09'], ['0', '10'], ['1', '01']]) {
+  // Go-to-scene is a G PREFIX plus a key. Bare digits and Shift+digit were
+  // removed deliberately (a mistyped key threw the show mid-sentence, and the
+  // Shift mapping assumed a US layout), so this walks what the app actually
+  // binds. See App.jsx and README "Controls".
+  const goTo = async (key) => {
+    await page.keyboard.press('KeyG');
+    await sleep(120);
     await page.keyboard.press(key);
     await sleep(700);
+  };
+
+  for (const [key, expect] of [['Digit5', '05'], ['Digit9', '09'], ['Digit0', '10'], ['Digit1', '01']]) {
+    await goTo(key);
     const n = await railN();
-    check(`number key "${key}" jumps to scene ${expect}`, n === expect, n);
+    check(`G then "${key.replace('Digit', '')}" jumps to scene ${expect}`, n === expect, n);
   }
 
-  await page.keyboard.down('Shift');
-  await page.keyboard.press('Digit4');
-  await page.keyboard.up('Shift');
+  await goTo('KeyC');
+  check('G then C jumps to scene 14', (await railN()) === '14', await railN());
+
+  // Escape must disarm the prefix rather than leaving it hanging.
+  await page.keyboard.press('KeyG');
+  await sleep(120);
+  await page.keyboard.press('Escape');
+  await sleep(200);
+  await page.keyboard.press('Digit1');
   await sleep(700);
-  check('Shift+4 jumps to scene 14', (await railN()) === '14', await railN());
+  check('Escape cancels an armed G', (await railN()) === '14', await railN());
 
   // --- forward / backward ---------------------------------------------------
-  await page.keyboard.press('Digit4');
-  await sleep(700);
+  await goTo('Digit4');
   const beforeFwd = await beatsOn();
   await page.keyboard.press('ArrowRight');
   await sleep(900);
@@ -147,12 +164,12 @@ async function main() {
   await sleep(1200);
 
   // --- boundary badge on model-result scenes --------------------------------
-  await page.keyboard.press('Digit9');
-  await sleep(900);
+  await goTo('Digit9');
+  await sleep(200);
   check('boundary badge shown on the evidence scene',
     await page.evaluate(() => !!document.querySelector('.boundary')), '');
-  await page.keyboard.press('Digit2');
-  await sleep(900);
+  await goTo('Digit2');
+  await sleep(200);
   check('boundary badge hidden where no model result is shown',
     await page.evaluate(() => !document.querySelector('.boundary')), '');
 

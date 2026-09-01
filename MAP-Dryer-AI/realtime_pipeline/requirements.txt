@@ -1,7 +1,7 @@
-# Add pandas
+# Runtime dependencies for the five-second replay and inference service.
+joblib
 numpy
+pandas
 psycopg[binary]
 python-dotenv
-joblib
 scikit-learn
-openpyxl

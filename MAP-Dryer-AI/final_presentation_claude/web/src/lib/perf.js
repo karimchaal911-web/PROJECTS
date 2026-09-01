@@ -10,7 +10,7 @@ export const BUDGET = {
     shadows: true,
     shadowMap: 2048,
     granules: 2600,
-    dust: 1800,
+    dust: 700,
     manifold: 2400,
     packets: 900,
     antialias: true,
@@ -43,6 +43,13 @@ export function prefersReducedMotion() {
 /**
  * Watches frame time and reports a sustained collapse so the app can auto-enter
  * safe mode. Only fires once.
+ *
+ * Wired into the render loop by <PerfGuard> in World.jsx. It was written,
+ * exported and documented but never called, which meant the only degrade path
+ * in the whole application was a boot-time heuristic requiring BOTH <= 4 cores
+ * AND <= 4 GB memory. A typical 8-core laptop with weak integrated graphics,
+ * or any machine that throttles ten minutes into a defence, would never
+ * degrade no matter how badly it was running.
  */
 export function makeFpsWatch(onSlow, { threshold = 30, frames = 90 } = {}) {
   let bad = 0;

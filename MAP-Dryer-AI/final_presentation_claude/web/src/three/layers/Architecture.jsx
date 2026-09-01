@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { C } from '../../lib/palette.js';
 import { ARCH_LAYERS, ARCH_ORIGIN, ARCH_STEP } from '../../lib/curves.js';
@@ -20,11 +20,22 @@ const H = 1.5;
 const D = 7;
 
 export default function Architecture() {
+  const { camera } = useThree();
   const group = useRef();
   const labels = useRef();
   const presence = useChannel('arch');
   const build = useChannel('archBuild', 0);
   const align = useChannel('alignPause', 0);
+  const labelCh = useChannel('archLabels', 0);
+  const labelRefs = useRef([]);
+  // Each name turns to face the lens.
+  //
+  // The labels used to lie in the stack's own plane, so at any oblique beat
+  // camera they skewed and swung: the bottom layer's sub-label ran off the
+  // right AND bottom edges while the top layer's ran off the top, and no
+  // amount of pulling back fixed it because the distortion is geometric, not
+  // a framing problem.
+  const billboards = useRef([]);
   const refs = useRef([]);
 
   const mats = useMemo(
@@ -57,7 +68,14 @@ export default function Architecture() {
     }
     const b = build.current;
     edgeMat.opacity = p * 0.45;
-    // Labels are legible or absent — never a ghost over another scene.
+
+    for (const bb of billboards.current) {
+      if (bb) bb.quaternion.copy(camera.quaternion);
+    }
+    // Labels used to be gated all-or-nothing on presence, so for the whole
+    // 7 s build up to eight names floated beside empty space and the
+    // label-to-layer mapping — the entire point of the scene — was unreadable.
+    // Each name now resolves with its own slab.
     if (labels.current) labels.current.visible = p > 0.4;
 
     ARCH_LAYERS.forEach((_, i) => {
@@ -70,7 +88,21 @@ export default function Architecture() {
       g.visible = local > 0.005;
       m.opacity = p * local;
       // The ALIGN layer glows while the followed packet waits inside it.
-      m.emissiveIntensity = i === 2 ? 0.05 + align.current * 0.4 : 0.05;
+      // The ALIGN layer answers the residence lane in front of it. That lane's
+      // two beats hold the stack at 13 % presence so its slabs stop competing
+      // with the lane's own horizontals, and at that opacity a 0.7 emissive
+      // rise is invisible — so the acknowledgement is carried by emission,
+      // which is not multiplied down by the slab's transparency.
+      m.emissiveIntensity = i === 2 ? 0.05 + align.current * 1.35 : 0.05;
+
+      const lg = labelRefs.current[i];
+      if (lg) {
+        const lit = THREE.MathUtils.clamp(local * labelCh.current, 0, 1);
+        lg.visible = lit > 0.03;
+        lg.traverse((o) => {
+          if (o.fillOpacity !== undefined) o.fillOpacity = lit * (o.userData?.base ?? 0.9);
+        });
+      }
     });
   });
 
@@ -89,13 +121,17 @@ export default function Architecture() {
 
       <group ref={labels}>
         {ARCH_LAYERS.map((layer, i) => (
-          <group key={layer.id} position={[0, i * ARCH_STEP, 0]}>
-            <WLabel position={[W / 2 + 1.1, 0.36, 0]} fontSize={0.78} color={C.dustBright} fillOpacity={0.92}>
-              {layer.label}
-            </WLabel>
-            <WMono position={[W / 2 + 1.1, -0.48, 0]} fontSize={0.46} color={C.dataTeal} fillOpacity={0.65}>
-              {layer.sub}
-            </WMono>
+          <group key={layer.id} position={[0, i * ARCH_STEP, 0]}
+            ref={(el) => { labelRefs.current[i] = el; }}>
+            <group position={[W / 2 + 1.4, 0, 0]}
+              ref={(el) => { billboards.current[i] = el; }}>
+              <WLabel position={[0, 0.36, 0]} fontSize={0.86} color={C.dustBright} fillOpacity={0.92}>
+                {layer.label}
+              </WLabel>
+              <WMono position={[0, -0.48, 0]} fontSize={0.46} color={C.dataTeal} fillOpacity={0.65}>
+                {layer.sub}
+              </WMono>
+            </group>
           </group>
         ))}
       </group>

@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { C } from '../../lib/palette.js';
-import { ARCH_ORIGIN, ARCH_STEP, ARCH_LAYERS, DRYER } from '../../lib/curves.js';
+import { ARCH_ORIGIN, ARCH_STEP, ARCH_LAYERS, RUNTIME_NODES, OPERATOR_NODE } from '../../lib/curves.js';
 import { useChannel } from '../usePresence.js';
 import { useShow } from '../../state/useShow.js';
 import { budget } from '../../lib/perf.js';
@@ -15,14 +15,17 @@ import { budget } from '../../lib/perf.js';
  * audience must see one input being split into two questions, not two separate
  * streams appearing.
  *
- * In scene 11 the same instances run the loop closed, from the replay slab back
- * to the dryer they describe.
+ * In scene 11 the same instances travel the runtime path and TERMINATE AT THE
+ * OPERATOR. They used to run from the replay slab back into the dryer, which is
+ * the visual grammar of closed-loop control — a thing this project does not
+ * implement and explicitly disclaims two scenes later. Nothing in this system
+ * writes back to the process, so nothing in this animation may appear to.
  */
 
 const _o = new THREE.Object3D();
-const _a = new THREE.Vector3();
 const _b = new THREE.Vector3();
 const _c = new THREE.Vector3();
+const _d = new THREE.Vector3();
 
 const SOURCES = [
   [-9.6, 3.4, 0.2], [12.4, 2.4, 2.4], [-8.6, 13.6, 0], [-12.9, 10.8, 0],
@@ -32,7 +35,22 @@ const SOURCES = [
 const ARCH_TOP = ARCH_ORIGIN.y + ARCH_STEP * (ARCH_LAYERS.length - 1);
 const LANE_A = new THREE.Vector3(-26, 14, -78);
 const LANE_B = new THREE.Vector3(28, 15, -78);
-const REPLAY_SLAB = new THREE.Vector3(76, 10, -40);
+
+/**
+ * The runtime hand-off, as a polyline in data-flow order:
+ * replay → inference → PostgreSQL → semantic views → Power BI → operator.
+ * The packets walk the same checkpoints the camera walks, in the same
+ * direction, and the last vertex is a person.
+ */
+const RUNTIME_LINE = [...RUNTIME_NODES.map((n) => new THREE.Vector3(...n.pos)),
+  new THREE.Vector3(...OPERATOR_NODE.pos)];
+const RUNTIME_SEGS = RUNTIME_LINE.length - 1;
+
+function runtimeAt(u, out) {
+  const t = THREE.MathUtils.clamp(u, 0, 1) * RUNTIME_SEGS;
+  const i = Math.min(RUNTIME_SEGS - 1, Math.floor(t));
+  return out.copy(RUNTIME_LINE[i]).lerp(RUNTIME_LINE[i + 1], t - i);
+}
 
 export default function DataPackets() {
   const mesh = useRef();
@@ -48,7 +66,7 @@ export default function DataPackets() {
     color: C.dataCyan, transparent: true, opacity: 0, depthWrite: false,
     blending: THREE.AdditiveBlending,
   }), []);
-  const geo = useMemo(() => new THREE.BoxGeometry(0.13, 0.13, 0.32), []);
+  const geo = useMemo(() => new THREE.BoxGeometry(0.13, 0.13, 0.34), []);
 
   const seeds = useMemo(() => {
     const s = new Float32Array(count * 4);
@@ -63,12 +81,12 @@ export default function DataPackets() {
 
   const phase = useRef(0);
 
-  useFrame((state, dt) => {
+  useFrame((_state, dt) => {
     const p = presence.current;
-    if (mesh.current) {
-      mesh.current.visible = p > 0.01;
-      if (p <= 0.01) return;
-    }
+    if (!mesh.current) return;
+    mesh.current.visible = p > 0.01;
+    if (p <= 0.01) return;
+
     mat.opacity = p * 0.85;
     phase.current += dt * 0.16 * (0.25 + flow.current);
 
@@ -76,53 +94,59 @@ export default function DataPackets() {
     const al = align.current;
     const lp = loop.current;
 
-    for (let i = 0; i < count; i += 1) {
+    /**
+     * One packet's position at a given progress along its own route.
+     * Sampling it twice — now, and a little ahead — is what lets each instance
+     * point in the direction it is actually travelling. Every packet used to
+     * be oriented straight up regardless of where it was going, so the stream
+     * rendered as scattered vertical tick-marks with no directional read.
+     */
+    const placeAt = (i, u, out) => {
       const src = SOURCES[seeds[i * 4 + 1]];
-      let u = (seeds[i * 4] + phase.current * seeds[i * 4 + 3]) % 1;
-
-      _a.set(src[0], src[1], src[2]);
 
       // Stage 1 — up into the architecture stack.
-      const archY = ARCH_ORIGIN.y + u * (ARCH_TOP - ARCH_ORIGIN.y);
-      _b.set(
+      out.set(
         THREE.MathUtils.lerp(src[0], ARCH_ORIGIN.x, Math.min(1, u * 1.6)),
-        archY,
+        ARCH_ORIGIN.y + u * (ARCH_TOP - ARCH_ORIGIN.y),
         THREE.MathUtils.lerp(src[2], ARCH_ORIGIN.z, Math.min(1, u * 1.6))
       );
 
-      // The waiting packet: residence-time alignment made visible. One packet
-      // stops at the ALIGN layer for 24.5 minutes of replay while the rest dim.
+      // The waiting packet: residence-time alignment made visible. A marked
+      // packet stops at the ALIGN layer for 24.5 minutes of replay while the
+      // rest keep moving, so the wait is something the presenter can point at.
       if (al > 0.01 && i % 97 === 0) {
         const hold = ARCH_ORIGIN.y + ARCH_STEP * 2;
-        _b.y = THREE.MathUtils.lerp(_b.y, hold, al);
-        _b.x = THREE.MathUtils.lerp(_b.x, ARCH_ORIGIN.x + 2.2, al);
+        out.y = THREE.MathUtils.lerp(out.y, hold, al);
+        out.x = THREE.MathUtils.lerp(out.x, ARCH_ORIGIN.x + 2.2, al);
       }
 
       // Stage 2 — the stream bifurcates into two lanes.
       if (sp > 0.01) {
-        const toB = seeds[i * 4 + 2] > 0.516; // 15 of 31 go right
-        const lane = toB ? LANE_B : LANE_A;
-        _c.copy(_b);
+        const lane = seeds[i * 4 + 2] > 0.516 ? LANE_B : LANE_A; // 15 of 31 go right
+        _c.copy(out);
         _c.x = THREE.MathUtils.lerp(_c.x, lane.x, u);
         _c.y = THREE.MathUtils.lerp(_c.y, lane.y, u);
         _c.z = THREE.MathUtils.lerp(_c.z, lane.z, u);
-        _b.lerp(_c, sp);
+        out.lerp(_c, sp);
       }
 
-      // Stage 3 — the loop closes: replay slab back to the dryer.
+      // Stage 3 — the runtime path, ending at the operator.
       if (lp > 0.01) {
-        _c.set(
-          THREE.MathUtils.lerp(REPLAY_SLAB.x, DRYER.x, u),
-          THREE.MathUtils.lerp(REPLAY_SLAB.y, DRYER.y + 1.5, u),
-          THREE.MathUtils.lerp(REPLAY_SLAB.z, DRYER.z, u)
-        );
-        _b.lerp(_c, lp);
+        runtimeAt(u, _c);
+        out.lerp(_c, lp);
       }
+      return out;
+    };
+
+    for (let i = 0; i < count; i += 1) {
+      const u = (seeds[i * 4] + phase.current * seeds[i * 4 + 3]) % 1;
+      placeAt(i, u, _b);
+      placeAt(i, Math.min(1, u + 0.008), _d);
+      if (_d.distanceToSquared(_b) < 1e-8) _d.set(_b.x, _b.y + 1, _b.z);
 
       _o.position.copy(_b);
-      _o.lookAt(_b.x, _b.y + 1, _b.z);
-      const s = al > 0.01 && i % 97 === 0 ? 1.9 : 1.0;
-      _o.scale.setScalar(s);
+      _o.lookAt(_d);
+      _o.scale.setScalar(al > 0.01 && i % 97 === 0 ? 1.9 : 1.0);
       _o.updateMatrix();
       mesh.current.setMatrixAt(i, _o.matrix);
     }

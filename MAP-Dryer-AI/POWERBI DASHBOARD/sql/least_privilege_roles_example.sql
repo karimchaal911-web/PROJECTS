@@ -29,10 +29,10 @@ GRANT SELECT ON
     public.vw_dryer_overview_trends_powerbi,
     public.vw_dryer_lab_samples,
     public.vw_dryer_anomaly_events,
-    public.vw_dryer_contributors_powerbi
+    public.vw_dryer_contributors_powerbi,
+    public.vw_dryer_latest
 TO map_dryer_powerbi_readonly;
 
 -- A database administrator may create separate LOGIN roles and grant one of
 -- these group roles. Supply passwords through the organization's secret
 -- mechanism; never add them to this repository.
-

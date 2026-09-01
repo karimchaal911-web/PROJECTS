@@ -1,56 +1,76 @@
-\chapter{Technical Traceability Summary}
+\chapter{Evidence and Reproduction Appendices}
+\label{app:evidence}
 
-\section{Principal generated artifacts}
+\section{Claim-to-artifact traceability}
 
-\begin{table}[ht]
-\centering\small
-\caption{Model and integration artifacts required to reproduce the prototype path}
-\begin{tabularx}{\textwidth}{@{}p{0.39\textwidth}Y@{}}
+\begin{longtable}{@{}p{0.27\textwidth}p{0.34\textwidth}p{0.31\textwidth}@{}}
+\caption{Principal claims and reproducible evidence}\label{tab:evidence-matrix}\\
 \toprule
-Artifact & Function \\
+Claim & Primary artifact & Independent report check \\
 \midrule
-\code{data/processed/MAP\_Dryer\_Canonical\_5s.manifest.json} & Version, hash, cadence, dates, row counts and implemented relationships.\\
-\code{data/processed/MAP\_Dryer\_Lab\_Aligned\_16.csv} & Notebook 02 handoff with 1,103 lab-aligned rows and exactly 16 inputs.\\
-\code{artifacts/notebook03\_model\_evaluation.json} & Audited split, candidates, parameters and moisture metrics used in the report.\\
-\code{artifacts/notebook04\_anomaly\_evaluation.json} & Audited Notebook 04 anomaly training, validation and runtime-artifact provenance.\\
-\code{models/5s/quality\_moisture\_pipeline.joblib} & Selected Notebook 03 Ridge model loaded unchanged by the replay service.\\
-\code{models/5s/quality\_density\_pipeline.joblib} & Retained Gradient Boosting density model.\\
-\code{models/5s/quality\_product\_temp\_pipeline.joblib} & Retained Ridge product-temperature model.\\
-\code{models/5s/anomaly\_model.joblib} / \code{anomaly\_scaler.joblib} & Notebook 04 One-Class SVM novelty artifacts loaded unchanged by the replay service.\\
-\code{models/5s/feature\_schema.json} & Ordered features, timing and model/schema versions.\\
-\code{models/5s/reference\_profile.json} & Robust training reference for real-time contributors.\\
-\code{models/5s/training\_report.json} & Candidate parameters, chronological metrics and residuals.\\
-\code{realtime\_pipeline/src/realtime\_service.py} & Replay, validation, inference, diagnosis and database writes.\\
-\code{POWERBI DASHBOARD/*.pbip} & Power BI project entry point, report and semantic model.\\
+\endfirsthead
+\toprule Claim & Primary artifact & Independent report check \\
+\midrule
+\endhead
+Canonical row count, cadence and sparse lab count & \code{data/processed/MAP\_Dryer\_Canonical\_5s.csv} & \code{report\_enhancement\_metrics.json} and direct timestamp audit. \\
+Causal 16-input moisture contract & \code{MAP\_Dryer\_Lab\_Aligned\_16.csv}; \code{feature\_schema.json} & First lab row excluded; strictly previous laboratory lookup verified by tests. \\
+Ridge selection and TEST metrics & \code{notebook03\_model\_evaluation.json}; frozen pipeline & Recomputed predictions, persistence baseline and residual audit. \\
+One-Class SVM configuration & \code{notebook04\_anomaly\_evaluation.json}; frozen model/scaler & Validation flag rate, held-out episode response and artifact provenance. \\
+Dashboard-demo disclosure & \code{MAP\_Dryer\_Dashboard\_Demo\_Audit.json} & Normal/injected rows, lab preservation and episode response checked. \\
+Runtime/database contract & \code{realtime\_service.py}; SQL bootstrap/views & Bounded smoke log and live six-view TMDL comparison. \\
+Power BI field integrity & Power BI report and semantic-model definitions & 86 visuals, 114 references, 303 fields, six tables. \\
 \bottomrule
-\end{tabularx}
-\end{table}
+\end{longtable}
 
-\section{Diagnostic subsystem map}
+Key SHA-256 identifiers at the time of this report are: canonical CSV \code{AE9216518E73...}, moisture artifact \code{B525C7B8598E...}, anomaly model \code{07BCE32B6BF7...} and anomaly scaler \code{AF28219037FD...}. Full hashes remain in the manifest, model metadata and repository audit output.
 
-\begin{table}[ht]
+\section{Source-label audit}
+
+\begin{table}[htbp]
 \centering\small
-\caption{Subsystems and principal raw evidence used in operator-facing diagnosis}
-\begin{tabularx}{\textwidth}{@{}p{0.25\textwidth}p{0.30\textwidth}Y@{}}
+\caption{Manifest catalog versus direct canonical label audit}
+\label{tab:manifest-audit}
+\begin{tabularx}{\textwidth}{@{}p{0.28\textwidth}p{0.22\textwidth}Y@{}}
 \toprule
-Subsystem & Principal evidence & Example verification direction \\
+Evidence & Count & Treatment in this report \\
 \midrule
-Thermal system & Dryer-air temperature, steam pressure & Heater/steam availability, temperature measurement and thermal demand.\\
-Drying air/exhaust & Air flow, fan speed, vacuum & Fan/damper condition, flow measurement and exhaust restriction.\\
-Feed/loading & Wet-product feed, inlet temperature, residence time & Upstream stability, load relative to heat/air, residence calculation.\\
-Cooling system & Cooler-air and final-product temperature & Cooler operation, air supply and thermal carry-over.\\
-Instrumentation & Persistent, stuck or sudden sensor behaviour & Compare independent indication, wiring and transmitter status.\\
+Manifest disturbance catalog & 7 entries & Retained as supplied metadata; identified as stale/incomplete. \\
+Distinct embedded scenario episodes & 22 episodes & Used for actual counts after direct timestamp/label audit. \\
+Episodes in held-out TEST & 3 episodes & Used for frozen-detector scenario response. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \section{Reproduction commands}
 
-The following minimal commands correspond to the verified repository workflow. They require the documented Python/PostgreSQL environment and do not expose credentials.
+The report-specific audit is read-only with respect to canonical data and model artifacts. From the project root:
 
 \begin{lstlisting}[language=bash]
-python tools/run_canonical_notebooks.py
-python realtime_pipeline/src/bootstrap_database.py
-python realtime_pipeline/src/realtime_service.py
-$env:PYTHONPATH="src"; python -m pytest -q
+$env:PYTHONPATH="src"
+python tools/generate_report_enhancement_evidence.py
+python -m pytest -q
+python tools/validate_report_fields.py
+python realtime_pipeline/src/verify_powerbi_views.py
 \end{lstlisting}
+
+The first command regenerates the JavaScript Object Notation (JSON) metrics audit, the soft-sensor evidence, the anomaly holdout evidence and the synchronized dashboard captures. The last command requires the configured local PostgreSQL instance. The report itself is compiled repeatedly with \code{pdflatex} so references and contents are resolved.
+
+\section{Principal paths}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Minimum artifact set needed to inspect the reported workflow}
+\begin{tabularx}{\textwidth}{@{}p{0.43\textwidth}Y@{}}
+\toprule
+Path & Purpose \\
+\midrule
+\code{final\_report/evidence/report\_enhancement\_metrics.json} & Independent numerical audit used in the enhanced report. \\
+\code{artifacts/notebook03\_model\_evaluation.json} & Chronological soft-sensor selection and metrics. \\
+\code{artifacts/notebook04\_anomaly\_evaluation.json} & One-Class SVM export provenance and validation flag rate. \\
+\code{models/5s/feature\_schema.json} & Ordered moisture and anomaly feature contracts. \\
+\code{resources/dashboard\_demo/*Audit.json} & Disclosure and response audit for jury-only injections. \\
+\code{realtime\_pipeline/src/realtime\_service.py} & Replay, inference, diagnosis and transactional persistence. \\
+\code{POWERBI DASHBOARD/*.pbip} & Power BI project entry point. \\
+\bottomrule
+\end{tabularx}
+\end{table}

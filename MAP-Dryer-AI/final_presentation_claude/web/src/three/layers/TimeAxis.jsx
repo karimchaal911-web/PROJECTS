@@ -71,7 +71,6 @@ function Axis({ ticks }) {
   const lineRef = useRef();
   const presence = useChannel('axis');
   const draw = useChannel('axisDraw', 0);
-  const matRef = useRef();
 
   const pts = useMemo(() => [
     new THREE.Vector3(AXIS.x0, AXIS.y, 0),
@@ -89,7 +88,6 @@ function Axis({ ticks }) {
       // the axis extends as the flow line straightens
       lineRef.current.scale.x = Math.max(0.001, draw.current);
     }
-    if (matRef.current) matRef.current.opacity = p * 0.045;
   });
 
   return (
@@ -106,19 +104,6 @@ function Axis({ ticks }) {
         />
       </group>
 
-      {/* the quality plane: visible as an emptiness, not as a surface */}
-      <mesh position={[(AXIS.x0 + AXIS.x1) / 2, AXIS.y + 5.4, -0.05]}>
-        <planeGeometry args={[AXIS_LEN, 10.8]} />
-        <meshBasicMaterial
-          ref={matRef}
-          color={C.dataTeal}
-          transparent
-          opacity={0}
-          depthWrite={false}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
       {ticks.map((t) => (
         <group key={t.label} position={[t.x, AXIS.y, 0]}>
           <Line points={[[0, -0.45, 0], [0, 0.45, 0]]} color={C.outline} lineWidth={1} transparent opacity={0.4} />
@@ -128,9 +113,6 @@ function Axis({ ticks }) {
         </group>
       ))}
 
-      <WMono position={[AXIS.x0, AXIS.y - 3.4, 0]} fontSize={0.86} color={C.outline} fillOpacity={0.55}>
-        HELD-OUT TEST · 2026-07-05 · 12 HOURS · PROTOTYPE REPLAY
-      </WMono>
     </group>
   );
 }

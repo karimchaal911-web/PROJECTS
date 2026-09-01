@@ -115,7 +115,9 @@ canvas { display: block; outline: none; }
 .hero {
   font-family: var(--sans);
   font-weight: 600;
-  font-size: clamp(2.5rem, 4.6vw, 4.6rem);
+  /* --hero-fit is set by the overlay from the longest line, so a headline can
+     never re-break into a stack taller than the machine behind it. */
+  font-size: calc(clamp(2.5rem, 4.6vw, 4.6rem) * var(--hero-fit, 1));
   line-height: 0.99;
   letter-spacing: -0.032em;
   margin: 0;
@@ -123,7 +125,10 @@ canvas { display: block; outline: none; }
 }
 .is-editorial .hero { color: var(--ink-editorial); }
 .hero__line { display: block; }
-.hero--steps { min-height: 1.1em; }
+/* The closing QUESTIONS frame stays on screen for the whole defence; it used
+   to be set in the smallest type in the film. */
+.hero--xl { font-size: clamp(3.6rem, 7.4vw, 7.6rem); letter-spacing: -0.04em; }
+
 
 .sub {
   font-size: clamp(0.95rem, 1.18vw, 1.16rem);
@@ -155,9 +160,11 @@ canvas { display: block; outline: none; }
 
 .caption {
   font-family: var(--mono);
-  font-size: clamp(0.64rem, 0.76vw, 0.76rem);
+  font-size: clamp(0.68rem, 0.8vw, 0.8rem);
   letter-spacing: 0.13em;
-  text-transform: uppercase;
+  /* NO text-transform. CSS uppercase maps Greek nu to a glyph identical to
+     Latin N, which turned "nu = 0.02" into "N = 0.02" — read by a jury as a
+     sample size. Captions are written already-uppercased at source. */
   color: var(--warn);
   margin: 1.5rem 0 0;
   opacity: 0.92;
@@ -181,15 +188,28 @@ canvas { display: block; outline: none; }
   background: var(--ocp-green);
 }
 
-/* Entrance: 0.7 s, power3.out-ish, y +14px, blur 4→0, 0.06 s stagger. */
-.anim {
-  animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(var(--i, 0) * 0.06s);
+/* Entrance: 0.62 s, power3.out-ish, y +10px, blur 3→0, 0.055 s stagger.
+   Exit: 0.34 s, y −8px, blur 0→3 — the copy LEAVES before the world moves, so
+   two scenes are never legible at once. The overlay schedules the swap; these
+   two states are all the CSS needs to know. */
+.copy.is-in .anim {
+  animation: rise 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.055s);
+}
+.copy.is-out {
+  animation: sink 0.34s cubic-bezier(0.4, 0, 0.7, 0.2) both;
 }
 @keyframes rise {
-  from { opacity: 0; transform: translateY(14px); filter: blur(4px); }
+  from { opacity: 0; transform: translateY(10px); filter: blur(3px); }
   to   { opacity: 1; transform: none; filter: blur(0); }
 }
+@keyframes sink {
+  from { opacity: 1; filter: blur(0); }
+  to   { opacity: 0; filter: blur(3px); }
+}
+/* copy--left/right are absolutely positioned with a transform already; the
+   exit must not fight it, so the exit animates opacity and blur only. */
+.copy.is-out.copy--bottom { transform: none; }
 
 /* -------------------------------------------------------------- identity --- */
 
@@ -197,13 +217,15 @@ canvas { display: block; outline: none; }
   position: absolute;
   left: var(--safe);
   bottom: calc(var(--safe) + 2.6rem);
-  display: flex; align-items: center; gap: 1.05rem;
-  opacity: 0.5;
+  display: flex; align-items: center; gap: 1.15rem;
+  /* 0.5 made the institutional lockup an unreadable smudge on a projector,
+     which is the opposite of what an identity mark is for. */
+  opacity: 0.9;
 }
 .identity img {
-  height: 24px; width: auto;
+  height: 30px; width: auto;
   filter: brightness(0) invert(1);
-  opacity: 0.85;
+  opacity: 0.92;
 }
 .is-editorial .identity img { filter: none; opacity: 1; }
 .identity__rule { width: 1px; height: 20px; background: currentColor; opacity: 0.4; }
@@ -222,7 +244,12 @@ canvas { display: block; outline: none; }
 }
 .rail.is-bright { opacity: 0.72; }
 .rail__track { flex: 1; height: 1px; background: currentColor; opacity: 0.28; position: relative; }
-.rail__fill { position: absolute; inset: 0 auto 0 0; background: var(--ocp-lime); opacity: 0.9; }
+.rail__fill {
+  position: absolute; inset: 0 auto 0 0;
+  background: var(--ocp-lime); opacity: 0.9;
+  /* the only chrome on screen at all times should not snap while the world eases */
+  transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .rail__beats { display: flex; gap: 0.32rem; }
 .rail__beats i { width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: 0.3; }
 .rail__beats i.on { opacity: 1; background: var(--ocp-lime); }
@@ -230,9 +257,19 @@ canvas { display: block; outline: none; }
 .boundary {
   position: fixed; z-index: 4;
   left: var(--safe); bottom: calc(var(--safe) * 0.62 + 1.5rem);
-  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em;
-  color: var(--warn); opacity: 0.72; pointer-events: none;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.15em;
+  color: var(--warn); opacity: 0.85; pointer-events: none;
 }
+
+/* Editorial (cream) variants. The rail and the honesty badge used --dust and
+   --warn, which are near-invisible on #F5F2E4 — so in scenes 09, 12 and 13 the
+   only permanently visible chrome, and the honesty contract, both disappeared.
+   Same position, same restraint, legible ground. */
+.is-light .rail { color: #4A5D55; opacity: 0.5; }
+.is-light .rail.is-bright { opacity: 0.85; }
+.is-light .rail__fill { background: var(--ocp-green); }
+.is-light .rail__beats i.on { background: var(--ocp-green); }
+.is-light .boundary { color: #9A6410; opacity: 1; }
 
 /* ------------------------------------------------------------------- hud --- */
 
@@ -281,10 +318,49 @@ canvas { display: block; outline: none; }
 .boot {
   position: fixed; inset: 0; z-index: 10;
   background: var(--ink-void);
-  display: grid; place-items: center;
-  transition: opacity 0.9s ease;
+  display: grid; align-items: center; justify-items: start;
+  transition: opacity 0.8s ease;
+  overflow: hidden;
 }
-.boot__inner { max-width: 42rem; padding: 0 var(--safe); }
+/* The gate used to be unmounted on click, so the show hard-cut into scene 01
+   from a full-screen black panel. It now fades, and the fade is what unmounts
+   it. */
+.boot.is-leaving { opacity: 0; pointer-events: none; }
+
+/* The title card stands on THE ACTUAL DRYER this project supervises.
+   `dryer_hero_plate.jpg` is a Nano Banana Pro relight of the site photograph
+   `rotary_dryer_shell.jpg`, checked element by element against the original:
+   same viewpoint, same shell and weld seams, same riding-ring band, same
+   lagged ducts and elbow, same green columns, same dust-caked handrail. No
+   equipment, person or sign was added — see higgsfield/MODEL_SELECTION.md §7.2.
+   The alternate 21:9 candidate was rejected for inventing plinths and a
+   trunnion assembly that exist in neither reference.
+   Only exposure is trimmed here; the plate arrives already graded. */
+.boot__plate {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: 50% 46%;
+  filter: brightness(0.86) saturate(0.92);
+  transform: scale(1.02);
+}
+.boot__plate::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg,
+      rgba(5, 16, 13, 0.97) 0%,
+      rgba(5, 16, 13, 0.9) 34%,
+      rgba(5, 16, 13, 0.42) 70%,
+      rgba(5, 16, 13, 0.62) 100%),
+    radial-gradient(140% 105% at 62% 44%,
+      rgba(5, 16, 13, 0) 26%, rgba(5, 16, 13, 0.82) 100%),
+    linear-gradient(0deg, rgba(0, 60, 48, 0.2), rgba(0, 60, 48, 0.2));
+}
+.boot__inner {
+  position: relative;
+  max-width: 40rem;
+  padding: 0 var(--safe);
+  margin-left: max(var(--safe), 3vw);
+}
 .boot h1 {
   font-family: var(--sans); font-weight: 600;
   font-size: clamp(2rem, 3.6vw, 3.2rem); line-height: 1.03;
@@ -311,5 +387,40 @@ canvas { display: block; outline: none; }
 .recover .mono { font-family: var(--mono); font-size: 0.78rem; color: var(--outline); }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim { animation-duration: 0.25s; animation-delay: 0s; }
+  .copy.is-in .anim { animation-duration: 0.25s; animation-delay: 0s; }
+  .copy.is-out { animation-duration: 0.15s; }
+  .rail__fill { transition: none; }
+}
+
+
+/* ------------------------------------------------------ presenter safety --- */
+
+/* Advancing is a keyboard action. Window-wide click-to-advance meant a
+   trackpad tap, a click to focus the window or a click to dismiss a
+   notification all skipped a beat, live, with no undo but the left arrow.
+   This strip is deliberate to hit and impossible to hit by accident. */
+.tapzone {
+  position: fixed; z-index: 5;
+  left: 0; right: 0; bottom: 0; height: 3.2vh;
+  border: 0; padding: 0; margin: 0;
+  background: transparent; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.tapzone:focus-visible { outline: 1px solid var(--outline); }
+
+.fsnotice {
+  position: fixed; z-index: 8; right: 1.2rem; bottom: 1.2rem;
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em;
+  color: var(--warn); opacity: 0.55; pointer-events: none;
+}
+
+.gohint {
+  position: fixed; z-index: 8;
+  left: 50%; bottom: 12vh; transform: translateX(-50%);
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.16em;
+  color: var(--ocp-lime);
+  background: rgba(4, 14, 11, 0.9);
+  border: 1px solid rgba(132, 180, 12, 0.4);
+  padding: 0.5rem 1.1rem;
+  pointer-events: none;
 }

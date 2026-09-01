@@ -1,9 +1,9 @@
 \chapter{Industrial Context and Internship Mission}
 \label{chap:context}
 
-\section{OCP and Jorf Lasfar in project context}
+\section{OCP Jorf Lasfar and the project setting}
 
-OCP Group operates an integrated phosphate value chain spanning extraction, transformation and plant-nutrition products. For this project, the relevant context is the coordination of material, energy, equipment, quality and logistics rather than corporate history. Jorf Lasfar is an integrated industrial platform combining fertilizer and acid production with utilities, storage and port interfaces \cite{ocpwho,ocpindustrial}. Disturbances can therefore propagate across connected operations, making timely and traceable supervision an Industrial Engineering concern.
+OCP Group operates an integrated phosphate value chain, from extraction to transformation and plant-nutrition products. At Jorf Lasfar, production units interact with acid and fertilizer facilities, utilities, storage and port logistics \cite{ocpwho,ocpindustrial}. For this internship, the relevant point is not the corporate scale itself. It is the need to coordinate material, energy, equipment condition and quality information across a continuous industrial system.
 
 \begin{figure}[htbp]
 \centering
@@ -22,22 +22,24 @@ OCP Group operates an integrated phosphate value chain spanning extraction, tran
 \label{fig:jorf-context}
 \end{figure}
 
-The internship focuses on the soluble monoammonium phosphate (MAP) installation. Its production sequence includes reactant preparation, neutralization, buffering, crystallization, centrifugal separation, drying, cooling and final handling. The supplied PCS7 screens confirm an established industrial monitoring environment across these stages. They informed process understanding, but the prototype has no live connection to PCS7 and does not reproduce its control logic.
+My fieldwork focused on the soluble MAP installation. I followed the production sequence from reactant preparation and neutralization to crystallization, centrifugal separation, drying, cooling and handling. The PCS 7 screens provided a useful view of how these stages are supervised. They informed the process analysis in this report, but the prototype has no live PCS 7 connection and does not reproduce its control logic.
 
-\section{Operational problem and digital relevance}
+\section{Observed supervision problem}
 
-Process variables are continuously available through the industrial control and monitoring environment, while the relevant laboratory quality results are available approximately every two hours. The last laboratory result is therefore an authoritative historical measurement, but it cannot by itself describe every change occurring before the next sample. The project addresses this information-latency gap by combining a moisture estimate, anomaly awareness and an operator-oriented diagnostic view.
+Process variables are available continuously in the control environment, whereas final moisture, density and product temperature are confirmed by periodic laboratory analysis. The last laboratory value is authoritative for the sampled material, but it becomes progressively older while the process continues to change. This is the gap addressed by the project.
 
-Digitalization is useful here only when provenance remains visible. The dashboard must distinguish a process measurement, a laboratory measurement, a model prediction and a diagnostic hypothesis. It must also show freshness, model/schema version and unavailable states. These requirements prevent a carried-forward result or model output from being mistaken for a new plant measurement.
+The useful digital response is not to hide that age. The interface must state whether a number is a current process observation, a laboratory measurement, a model estimate or a diagnostic interpretation. Timestamp, data freshness and model version are therefore part of the functional design, not optional technical metadata.
 
-\section{Internship mission and system boundary}
+\section{Mission, contribution and boundary}
 
-The mission is to design and demonstrate an intelligent supervision architecture for soluble MAP production, with detailed implementation around dryer moisture and abnormal-operation visibility. Python handles data validation, time alignment, feature construction and inference; PostgreSQL provides traceable persistence; and Power BI brings process, quality and model evidence into one supervision interface.
+The mission was to design and demonstrate an intelligent supervision architecture around dryer moisture and abnormal-operation visibility. I carried out the process-to-data translation, causal time alignment, feature design, model comparison, anomaly interpretation, database integration, runtime checks and dashboard information design. Python performs the analytical work, PostgreSQL provides traceable persistence, and Power BI presents the result.
 
-The internship deliverable is a controlled proof of concept. It does not connect to live PCS7, write to equipment, automate a conformity decision, replace laboratory control or claim industrial-scale accuracy. Production personnel and approved OCP procedures retain authority. A future deployment would additionally require approved historian access, cybersecurity review, tag and clock validation, representative historical data, shadow-mode trials and jointly owned response procedures.
+During the internship, I built the prototype layer around the existing process, PCS 7 supervision context and laboratory practice. My work covered the process-to-data translation, model workflow, traceable storage and operator-facing dashboard. A convincing interface should still not be mistaken for a deployed plant system.
 
-\begin{engineeringbox}[Industrial requirements carried into the design]
-Every displayed value must retain its provenance and timestamp; stale or incomplete data must remain visible; anomaly evidence must lead to a cautious verification prompt; model and feature versions must be traceable; and the analytical layer must remain outside the control loop.
+The deliverable remains a controlled proof of concept. It does not write to equipment, automate conformity decisions, replace laboratory control or claim industrial-scale accuracy. Future use would require approved historian access, tag and clock reconciliation, representative campaigns, cybersecurity review, shadow validation and operating procedures jointly owned by OCP stakeholders.
+
+\begin{engineeringbox}[Design requirements taken from the mission]
+Every displayed value retains a timestamp and provenance; stale or incomplete states remain visible; anomaly evidence leads to a verification prompt; model and feature versions are traceable; and the complete analytical layer remains outside the control loop.
 \end{engineeringbox}
 
-The next chapter develops the physical process basis for these requirements and explains why drying variables, material delay and sparse laboratory moisture must be interpreted together.
+The following chapter develops the process basis behind these requirements, with particular attention to the dryer, its material delay and the measurements available to the prototype.

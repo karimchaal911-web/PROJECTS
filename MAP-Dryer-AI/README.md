@@ -14,7 +14,7 @@ system or a substitute for operator judgment.
 - Estimates final product moisture between sparse laboratory measurements.
 - Detects unusual process behavior from process variables only.
 - Ranks abnormal variables and maps them to likely subsystems and checks.
-- Replays the held-out TEST period at one row every five seconds.
+- Replays a separate two-day dashboard demonstration fork at one row every five seconds.
 - Writes process values, predictions, risks, and diagnoses to PostgreSQL.
 - Presents the latest state, trends, events, and contributors in Power BI.
 
@@ -30,7 +30,7 @@ system or a substitute for operator judgment.
         │                         │
         │                    models/5s/
         │                         │
-        └── held-out TEST replay ─┴─> realtime_service.py
+        └── dashboard demo fork ────> realtime_service.py
                                           │
                          moisture + anomaly + diagnosis
                                           │
@@ -42,11 +42,12 @@ system or a substitute for operator judgment.
                               Power BI operations dashboard
 ```
 
-The runtime reads the existing raw canonical CSV and starts database output at
-the TEST boundary (`2026-07-03 06:00:00`). Three hours of earlier rows are
-loaded **in memory only** to satisfy residence-time and prior-laboratory
-alignment, so valid moisture predictions are available from the first replayed
-row. Warm-up rows are never written to PostgreSQL.
+The runtime reads `resources/dashboard_demo/MAP_Dryer_Dashboard_Demo_5s.csv`,
+an isolated copy of July 15–16 enriched with eight traceable occurrences of
+scenario families already present in the canonical data. The canonical
+dataset, chronological splits, notebooks, trained artifacts, and reported
+metrics remain unchanged. The dashboard fork is demonstration data, never a
+new test set.
 
 ## Data and modeling contract
 
@@ -84,15 +85,39 @@ open Power BI Desktop window and run from the repository root:
 ```
 
 The launcher validates the environment, clears only runtime/demo tables,
-starts a fresh five-second TEST replay, verifies the Power BI SQL views, and
-opens the canonical dashboard. The simulation continues while Power BI is
-open and stops when Power BI closes or when `Ctrl+C` is pressed.
+starts a fresh five-second dashboard-demo replay, verifies the Power BI SQL views, and
+opens the canonical dashboard directly in a borderless, edge-to-edge
+presentation view. The live report canvas stays interactive while the Power BI
+editor chrome and Windows taskbar remain outside the display. Press `F11` to
+toggle presentation mode or `Esc` to return to the editor. The simulation
+continues while Power BI is open and stops when Power BI closes or when
+`Ctrl+C` is pressed.
+
+To deliberately start in the normal Power BI editor window:
+
+```powershell
+.\RUN_FINAL_DEMO.ps1 -Windowed
+```
+
+You can still press `F11` from that window to enter presentation mode.
 
 To keep existing runtime rows and resume after the newest stored timestamp:
 
 ```powershell
 .\RUN_FINAL_DEMO.ps1 -Resume
 ```
+
+To accelerate the five-second source replay without making page navigation
+fight a two-second visual refresh cycle:
+
+```powershell
+.\RUN_FINAL_DEMO.ps1 -ReplaySeconds 2
+```
+
+This advances one source row every two wall-clock seconds while Power BI keeps
+its smooth five-second display refresh. The older `-RefreshSeconds 2` spelling
+remains supported. `-PageRefreshSeconds` is available as
+an explicit override, but values below five seconds are intentionally warned.
 
 The launcher never retrains models, regenerates datasets, executes notebooks,
 or rebuilds the report.
@@ -116,8 +141,18 @@ jupyter notebook
 4. `04_Model2_AnomalyDetection&Diagnosis.ipynb` trains and evaluates the
    process-only novelty detector and diagnosis workflow.
 
+To execute the same four notebooks unattended, in order, saving their
+outputs in place:
+
+```powershell
+python tools/run_canonical_notebooks.py
+```
+
 Notebook execution is the reproducibility path, not a prerequisite for the
 final demo. Machine-readable notebook results are retained in `artifacts/`.
+Notebook 03 rewrites `models/5s/reference_profile.json`, whose integrity record
+is re-issued by Notebook 04, so run the four notebooks as a set rather than
+individually.
 
 ## Runtime and dashboard layers
 
@@ -150,7 +185,10 @@ pytest -q
 ```
 
 The suite covers feature metadata, scoring, attribution, diagnosis rules,
-temporal behavior, artifact compatibility, and runtime helpers. The latest
+temporal behavior, artifact compatibility, and runtime helpers. Two checks need
+the git-ignored `data/processed/MAP_Dryer_TEST_Replay_5s.csv` and skip with an
+explanatory message until the notebooks have regenerated it, so a fresh clone
+reports 75 passed and 2 skipped. The latest
 full implementation record is `artifacts/FINAL_VALIDATION_2026-08-24.md`; the
 complete technical narrative is in
 `final_report/MAP_Dryer_AI_Internship_Report.pdf`.
@@ -158,20 +196,38 @@ complete technical narrative is in
 ## Repository map
 
 ```text
-artifacts/             machine-readable audits, metrics, and validation record
-config/                data dictionary, thresholds, subsystems, diagnosis rules
-data/raw/               supplied canonical 92-day dataset
-data/processed/         canonical analytical handoffs and manifest
-figures/                notebook-generated analytical figures
-final_report/           LaTeX sources and final internship report
-models/5s/              active moisture, anomaly, scaler, schema, and profile
-notebooks/              four-stage analytical workflow
-POWERBI DASHBOARD/      PBIP report, TMDL model, PBIR pages, and SQL definitions
-realtime_pipeline/      environment, database utilities, and replay service
-src/                    reusable data, feature, model, anomaly, and diagnosis code
-tests/                  automated behavioral and integration contracts
-RUN_FINAL_DEMO.ps1      canonical one-command presentation launcher
+artifacts/                machine-readable audits, metrics, and validation record
+config/                   data dictionary, thresholds, subsystems, diagnosis rules
+data/raw/                 supplied canonical 92-day dataset (kept local, see .gitignore)
+data/processed/           canonical manifest and the versioned Notebook 02 handoff
+figures/                  notebook-generated analytical figures
+final_presentation_claude/ Three.js soutenance keynote, exports, speaker notes and QA
+final_report/             LaTeX sources and final internship report
+models/5s/                active moisture, anomaly, scaler, schema, and profile
+notebooks/                four-stage analytical workflow
+POWERBI DASHBOARD/        PBIP report, TMDL model, PBIR pages, and SQL definitions
+realtime_pipeline/        environment, database utilities, and replay service
+resources/dashboard_demo/ the two-day replay fork the runtime reads
+resources/presentation_resources/ process and site reference material
+src/                      reusable data, feature, model, anomaly, and diagnosis code
+tests/                    automated behavioral and integration contracts
+tools/                    dashboard-demo, Power BI, report and notebook generators
+conftest.py               test import paths for src/ and realtime_pipeline/src/
+.gitattributes            byte-stable checkout for the hash-verified artifacts
+RUN_FINAL_DEMO.ps1        canonical one-command dashboard launcher
+RUN_PRESENTATION.ps1      canonical one-command soutenance keynote launcher
 ```
+
+## Final deliverables
+
+| Deliverable | Location |
+|---|---|
+| Internship report | `final_report/MAP_Dryer_AI_Internship_Report.pdf` (LaTeX sources alongside) |
+| Soutenance keynote | `final_presentation_claude/` — interactive Three.js build plus PDF and PPTX fallbacks |
+| Operations dashboard | `POWERBI DASHBOARD/MAP Dryer AI Dashboard.pbip` |
+| Model artifacts | `models/5s/` |
+| Validation record | `artifacts/FINAL_VALIDATION_2026-08-24.md` |
+| Repository audit | `FINAL_PROJECT_AUDIT.md` |
 
 ## Interpretation boundaries
 

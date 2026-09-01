@@ -4,10 +4,10 @@
   "position": {
     "x": 606,
     "y": 86,
-    "z": 1800,
+    "z": 1600,
     "height": 118,
     "width": 234,
-    "tabOrder": 1800
+    "tabOrder": 1600
   },
   "visual": {
     "visualType": "card",
@@ -92,7 +92,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'VALIDATED ABS ERROR'"
+                  "Value": "'VALIDATED MOISTURE ERROR'"
                 }
               }
             },
@@ -101,7 +101,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -168,7 +168,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6E0DC'"
+                      "Value": "'#D6E2DD'"
                     }
                   }
                 }
@@ -177,7 +177,7 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "10D"
                 }
               }
             }

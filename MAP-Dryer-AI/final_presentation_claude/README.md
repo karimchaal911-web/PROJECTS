@@ -1,7 +1,7 @@
 # FINAL SOUTENANCE — INTELLIGENT DIGITALIZATION OF SOLUBLE MAP PRODUCTION
 
 A presenter-controlled cinematic 3D keynote for the OCP soluble MAP dryer
-digitalization project. **14 scenes · 35 steps · 13–15 minutes · runs offline.**
+digitalization project. **14 scenes · 42 steps · 12–13 minutes · runs offline.**
 
 The primary deliverable is an interactive React + Three.js experience, not a
 slide deck. PDF, PPTX and MP4 exist only as fallbacks, and all three are
@@ -15,9 +15,8 @@ generated from the same captured frames so they cannot drift from it.
 .\RUN_PRESENTATION.ps1
 ```
 
-`RUN_PRESENTATION.ps1` and `RUN_SOUTENANCE.ps1` both exist in the repository
-root **and** in this directory, and all four reach the same launcher. On the day
-you should not have to remember which name belongs to which folder.
+`RUN_PRESENTATION.ps1` is the single supported launcher name. It works from the
+repository root and from this directory.
 
 Opens the presentation fullscreen in Chrome or Edge with no browser chrome.
 Press **F** for fullscreen, then drive it with the arrow keys.
@@ -37,8 +36,10 @@ Nothing is fetched from the network at any point. This is verified, not assumed
 |---|---|
 | `→` `Space` `PgDn` | next beat |
 | `←` `PgUp` | previous beat |
-| `1`–`9`, `0` | jump to scenes 1–10 |
-| `Shift`+`1`–`4` | jump to scenes 11–14 |
+| `G` then `1`–`9` `0` | jump to scenes 1–10 |
+| `G` then `Q` `W` `X` `C` | jump to scenes 11–14 |
+| `Esc` | cancel an armed `G` |
+| `Home` / `End` | first / last scene |
 | `F` | fullscreen |
 | `P` | presenter notes (audience never sees this) |
 | `S` | safe mode — visual downgrade only, position kept |
@@ -153,7 +154,7 @@ cd web
 npm install
 npx vite build                        # → web/dist, ~4.2 MB, fully self-contained
 
-node scripts/capture-scenes.mjs       # 35 stills + console-error report
+node scripts/capture-scenes.mjs       # 41 stills + console-error report
 node scripts/capture-scenes.mjs --offline   # proves it needs no network
 node scripts/record-tour.mjs          # re-record the MP4 backup (~15 min)
 

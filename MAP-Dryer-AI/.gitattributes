@@ -1,0 +1,31 @@
+# MAP Dryer AI — line-ending policy
+#
+# `validate_runtime_contract()` in src/canonical_pipeline.py verifies the
+# SHA-256 of the model and audit artifacts against the values recorded inside
+# them. Any end-of-line translation between commit and checkout changes those
+# bytes and breaks the contract on a fresh clone. The artifacts below are
+# therefore stored and restored verbatim on every platform.
+
+models/5s/*.json                    -text
+models/model_registry.json          -text
+models/prototype_manifest.json      -text
+models/model_metadata.json          -text
+models/anomaly_pipeline/*.json      -text
+models/diagnosis/*.json             -text
+artifacts/*.json                    -text
+data/processed/*.manifest.json      -text
+
+# Serialised estimators and captured media are binary.
+*.joblib  binary
+*.pkl     binary
+*.pbix    binary
+*.pdf     binary
+*.pptx    binary
+*.mp4     binary
+
+# Power BI project sources are UTF-8 text maintained by Power BI Desktop.
+*.tmdl    text
+*.pbip    text
+
+# PowerShell launchers must keep CRLF for Windows PowerShell 5.1.
+*.ps1     text eol=crlf

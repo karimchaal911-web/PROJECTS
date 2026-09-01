@@ -1,6 +1,19 @@
 # FULL SPOKEN SCRIPT
 
-**14 scenes · 35 presenter steps · target 13–14 minutes**
+**14 scenes · 42 presenter steps · target 12–13 minutes**
+
+> Durations below are the scene table's own `seconds` fields (758 s declared,
+> 12 min 38 s), not estimates. If you change a scene's length in
+> `web/src/state/scenes.js`, change it here too.
+>
+> The film was 784 s. Forty-eight seconds of held frames came out — the push
+> across the machine, the settle after the time axis forms, the loop signal, and
+> the QUESTIONS card, which had been budgeted as though the Q&A after it were
+> part of the film. Sixteen seconds went back in, all of it to two beats that
+> were carrying more argument than they had room for: residence-time alignment
+> (scene 07, now two beats) and the handover from artifact to running service
+> (scene 10). Net −26 s, and the slot has about fifty seconds of slack in it for
+> a jury that interrupts.
 
 Read naturally, not from the page. Every number here is verified — see
 `design/RESOURCE_AUDIT.md` for provenance. Where a sentence is marked
@@ -11,7 +24,7 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 01 — AWAKENING · ~50 s
+## SCENE 01 — AWAKENING · ~30 s
 
 > Good morning. What you are looking at is a rotary dryer inside the soluble MAP
 > production line at Jorf Lasfar.
@@ -30,7 +43,11 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 02 — WHY THIS MATERIAL · ~35 s
+## SCENE 02 — WHY THIS MATERIAL · ~21 s *(3 steps)*
+
+> Three presenter-driven beats — **PHOSPHORUS → PLANT NUTRITION → SOLUBLE MAP**.
+> They used to auto-advance on a 1.9 s timer you could not control. Press when
+> you are ready, not when the clock says so.
 
 > Phosphorus is one of the three nutrients a plant cannot substitute. OCP's
 > business is getting it into a form crops can actually take up.
@@ -47,29 +64,79 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 03 — FOLLOW THE MATERIAL · ~60 s
+## SCENE 03 — FOLLOW THE MATERIAL · ~78 s *(8 steps)*
 
-> Let me show you where it comes from.
+> The camera travels WITH the material and STOPS AT EVERY STAGE. One press per
+> stage. The previous cut had four stops for seven stations, so pretreatment,
+> ammonia vaporization, the buffer tanks and centrifugation went past at travel
+> speed and were never seen. Each stage now arrives, settles, is named on
+> screen, gets one sentence, and hands the material on.
+
+### Beat 1 — THE CHAIN
+> Let me show you where the product comes from. Seven stages, one continuous
+> flow. Phosphoric acid and ammonia go in at this end, and from here the
+> material never stops moving.
+
+→
+
+### Beat 2 — 01 PHOSPHORIC-ACID PRETREATMENT
+> The first of the two feeds. The acid is conditioned here before it reaches
+> the reaction.
+
+→
+
+### Beat 3 — 02 AMMONIA VAPORIZATION
+> The second feed. Liquid ammonia is vaporised in these heat exchangers and
+> enters the reaction as a gas.
+
+→
+
+### Beat 4 — 03 NEUTRALIZATION
+> This is where they react, in three agitated reactors in series, and that
+> reaction is the whole chemistry of this plant: phosphoric acid plus ammonia
+> gives monoammonium phosphate in solution.
 >
-> Phosphoric acid is pretreated. Ammonia is vaporised. They react — and that
-> reaction is the whole chemistry of this plant. The solution is buffered,
-> concentrated, crystallised, and the crystals are separated from the mother
-> liquor by centrifugation.
+> Note the low line coming back into this stage. That is mother liquor
+> returning from downstream. I will come back to it.
+
+→
+
+### Beat 5 — 04 BUFFER / STABILIZATION
+> The solution is held and blended in these tanks before crystallization.
 >
-> Then they are dried. Then cooled and conditioned.
+> This stage matters more than it looks. It deliberately mixes and delays —
+> so anything unusual upstream does not arrive downstream as a step, it
+> arrives spread out in time.
+
+→
+
+### Beat 6 — 05 CONCENTRATION & CRYSTALLIZATION
+> The solution is concentrated and crystallised. From this point the product is
+> a wet solid, not a liquid.
+
+→
+
+### Beat 7 — 06 CENTRIFUGATION
+> The crystals are separated from the mother liquor. The crystals go on to the
+> dryer; the mother liquor goes back to neutralization — that is the labelled
+> line — which is what makes this a loop rather than a line.
+
+→
+
+### Beat 8 — INTO THE DRYER
+> Looking back up the whole chain. Then the crystals are dried, then cooled and
+> conditioned.
 >
-> Two things to notice. First, this is continuous — material is at every stage
-> simultaneously. Second, it is *coupled*: the mother liquor goes back to
-> neutralization, and the buffer tanks deliberately mix and delay disturbances.
->
-> **[GUARD]** So when final moisture drifts, you cannot assume the dryer caused
-> it. That is a diagnosis problem, and I will come back to it.
+> **[GUARD]** So the dryer is the last stage, not the only cause. Because the
+> stages are coupled and the mother liquor recycles, when final moisture drifts
+> you cannot attribute it to any one of them. That is a diagnosis problem, and
+> I will come back to it.
 
 →
 
 ---
 
-## SCENE 04 — ENTER THE DRYER · ~75 s *(3 steps)*
+## SCENE 04 — ENTER THE DRYER · ~57 s *(3 steps)*
 
 ### Beat 1 — MACHINE
 > This is the stage that sets final moisture.
@@ -107,7 +174,7 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 05 — THE VISIBILITY GAP · ~80 s *(3 steps)* — **the centre of the talk**
+## SCENE 05 — THE VISIBILITY GAP · ~56 s *(3 steps)* — **the centre of the talk**
 
 ### Beat 1 — DISTANCE BECOMES TIME
 > So let me change what this axis means.
@@ -135,7 +202,7 @@ have to extract from you under questioning.
 >
 > *(silence — let the camera travel; roughly six seconds)*
 >
-> The process never stops. Laboratory visibility does.
+> Two hours between results, and nothing measured in between.
 >
 > And this is not a theoretical concern. Between those two results the product
 > actually moved by five thousandths of a percentage point — a real change, in
@@ -146,7 +213,7 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 06 — THE ENGINEERING RESPONSE · ~60 s *(3 steps)*
+## SCENE 06 — THE ENGINEERING RESPONSE · ~38 s *(2 steps)*
 
 ### Beat 1 — THE QUESTION
 > So: how do we see between measurements?
@@ -170,22 +237,23 @@ have to extract from you under questioning.
 
 →
 
-### Beat 3 — TWO QUESTIONS
-> But filling that gap answers only one question — what is the moisture likely to
-> be right now.
->
-> There is a second, different question: is the process behaving unusually at
-> all? Those are not the same question, they need different models, and the
-> system answers both.
+> One more sentence before we move: filling that gap answers only one question —
+> what is the moisture likely to be right now. There is a second, different
+> question, and a separate model answers it. You will see both in a moment.
 
 →
 
+> *(The old third beat here — "TWO QUESTIONS. ONE SUPERVISION SYSTEM." — was cut.
+> Scene 08 opens on exactly that idea eighty seconds later, with the models
+> actually on screen, and the beat parked the camera at the farthest pose in the
+> film to say it.)*
+
 ---
 
-## SCENE 07 — PHYSICAL BECOMES DIGITAL · ~70 s *(3 steps)*
+## SCENE 07 — PHYSICAL BECOMES DIGITAL · ~78 s *(4 steps)*
 
 ### Beat 1 — SENSORS
-> Let me show you how the process becomes data.
+> Let me show you what actually leaves the equipment.
 
 →
 
@@ -198,26 +266,41 @@ have to extract from you under questioning.
 
 →
 
-### Beat 3 — RESIDENCE-TIME ALIGNMENT
-> And I want to stop on this layer, because it is the part of the method that is
-> easiest to get wrong.
+### Beat 3 — THE DELAY IS PHYSICAL
+> I want to stop here, because this is the part of the method that is easiest to
+> get wrong — and it starts with the machine, not with the data.
 >
-> *(the packet waits)*
+> *(the marker crosses)*
 >
-> The product being sampled now left the dryer roughly twenty-four and a half
-> minutes ago. So the model must not read the process as it is now — it must
-> read the process as it was then, plus the most recent laboratory result that
-> was already available at that moment.
+> The dryer has a length. Material takes about twenty-four and a half minutes to
+> travel it. So the sample the laboratory analyses at nine o'clock is describing
+> product that entered the dryer at twenty-five to nine.
 >
-> **[GUARD]** This is what makes the model causal by construction. No future
-> information reaches training or selection. If I had skipped this, the results
-> later would look far better and mean nothing.
+> And residence time is not a constant I assumed. It is one of the nine measured
+> variables — it moves between twenty-four point one five and twenty-four point
+> eight nine minutes across the dataset, and the runtime uses the value at each
+> timestamp.
+
+→
+
+### Beat 4 — RESIDENCE-TIME ALIGNMENT
+> Which means this. *(the wrong pairing, in red)*
+>
+> If I pair the process variables with the quality result at the same timestamp,
+> I am describing the wrong material. Every input is therefore shifted back by
+> the residence time at that moment — *(the shift)* — and the density and product
+> temperature come from the previous laboratory sample, the one that was already
+> on the bench when that material went in.
+>
+> **[GUARD]** That is what makes the model causal by construction. No future
+> information reaches training or selection. If I had skipped this step, the
+> numbers in the next act would look considerably better and mean nothing.
 
 →
 
 ---
 
-## SCENE 08 — TWO INTELLIGENCE PATHWAYS · ~80 s *(4 steps)*
+## SCENE 08 — TWO INTELLIGENCE PATHWAYS · ~68 s *(3 steps)*
 
 ### Beat 1 — THE SPLIT
 > One stream of data, two models. Sixteen features go to quality, fifteen
@@ -251,7 +334,8 @@ have to extract from you under questioning.
 
 →
 
-### Beat 4 — LEAVING THE REGION
+> *(stay on this beat — the trajectory plays here)*
+>
 > So "anomaly" here has a precise meaning: distance from the region the model
 > learned.
 >
@@ -262,9 +346,13 @@ have to extract from you under questioning.
 
 →
 
+> *(The trajectory used to be its own beat, reached by six units of camera
+> movement — a static cut carrying six seconds of animation. It is now a
+> sub-reveal inside PROCESS INTELLIGENCE.)*
+
 ---
 
-## SCENE 09 — PROVE IT · ~90 s *(4 steps)* — **the technical core**
+## SCENE 09 — PROVE IT · ~98 s *(4 steps)* — **the technical core**
 
 ### Beat 1 — MOISTURE HOLD-OUT
 > Evidence.
@@ -325,19 +413,41 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 10 — VALIDATION BECOMES SUPERVISION · ~65 s *(3 steps)*
+## SCENE 10 — THE MODEL LEAVES THE NOTEBOOK · ~76 s *(3 steps)*
 
-### Beat 1 — THE CHART BECOMES THE VISUAL
-> Here is the part I think matters most practically.
+### Beat 1 — THE MODEL LEAVES THE NOTEBOOK
+> Here is the part I think matters most practically. *(the artifact resolves)*
 >
-> That hold-out trend is not a figure I made for a report. It is already the
-> visual an operator reads.
+> This is what notebook 03 wrote. `quality_moisture_pipeline.joblib`, and beside
+> it the one-class model and its scaler.
+>
+> *(it folds into the service)*
+>
+> And this is `realtime_service.py`. It does not re-implement anything and it does
+> not re-fit anything — it opens those exact files, once, at start. The SHA-256 of
+> the artifact is recorded in the model registry, so that claim is checkable
+> rather than something you have to take from me.
+>
+> *(inference travels to the screen)*
+>
+> Nine milliseconds a cycle, a new answer every five seconds — into an operator's
+> screen instead of into a validation figure.
+>
+> **[GUARD]** This is a prototype running a replay. It is a handover, not a
+> deployment, and nothing here writes back to the process.
+
+> *(The line here used to be "the same chart", over a crossfade between the
+> hold-out scatter and the report's rolling trend. They are different charts of
+> different windows, so the claim was dropped rather than dressed up. What
+> transfers is the ARTIFACT — and that is now something the audience watches
+> happen rather than a sentence they are asked to accept.)*
 
 →
 
 ### Beat 2 — OPERATIONS OVERVIEW
-> This is the real Power BI report, reading live from PostgreSQL over
-> DirectQuery, refreshing about every five seconds.
+> This is the real Power BI report, reading from PostgreSQL over DirectQuery.
+> The replay writes a new row every five seconds; the page itself refreshes on a
+> sixty-second cycle — the pill top right says so.
 >
 > Predicted final moisture. The latest laboratory result beside it. The validated
 > error between them — so the operator can always see how far the estimate was
@@ -345,8 +455,14 @@ have to extract from you under questioning.
 > and critical lines. Process status and severity. The rolling eight-hour trend.
 > The critical process variables. And the diagnosis context.
 >
-> **[GUARD]** Note the prototype-replay indicator, top right. That is on the real
-> screen, deliberately, so this can never be mistaken for a live plant historian.
+> **[GUARD]** This capture is a live replay state, not a mock-up: the freshness
+> pill reads LIVE DATA, the anomaly score is 0.95 with severity HIGH, and the
+> diagnosis and operator-guidance panels are populated because the replay was
+> inside an injected disturbance when it was taken. Predicted 0.0798 %,
+> laboratory 0.0752 %, validated error 0.0013 % — the same scale as the hold-out
+> chart you just saw, because it is the same quantity.
+>
+> **[GUARD]** And say the boundary out loud: prototype, replay, advisory.
 
 →
 
@@ -364,46 +480,61 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 11 — THROUGH THE DASHBOARD · ~65 s *(3 steps)*
+## SCENE 11 — BEHIND THE DASHBOARD · ~60 s *(3 steps)*
 
-### Beat 1 — BEHIND THE PLANE
+### Beat 1 — BEHIND THE DASHBOARD
 > Rather than show you an architecture diagram, let me take you through it.
+>
+> Power BI reads five semantic SQL views. It never loads a model and never runs
+> inference.
 
 →
 
-### Beat 2 — THE RUNTIME
-> Power BI reads five semantic SQL views. It never loads a model file and never
-> runs inference — that separation is deliberate, so the visualisation layer
-> cannot silently change a result.
+### Beat 2 — THE RUNTIME PATH
+> *(we are travelling left to right, in the direction the data travels)*
 >
-> Behind the views, three PostgreSQL tables. Behind those, one Python service
-> that loads the exact artifacts exported by the notebooks — same files, verified
-> by hash — and writes idempotently. Nine milliseconds average inference cycle,
-> forty-seven maximum.
+> The replay first: the held-out test period, two hundred and thirty-seven
+> thousand rows, one row every five seconds.
 >
-> And behind that, the replay: the held-out test period, two hundred and
-> thirty-seven thousand rows, one row every five seconds.
+> Then one Python service that loads the exact artifacts exported by the
+> notebooks — same files, verified by hash — and writes idempotently. Nine
+> milliseconds average inference cycle, forty-seven maximum.
+>
+> Then three PostgreSQL tables. Then the five semantic views. Then Power BI,
+> which reads those views and nothing else — that separation is deliberate, so
+> the visualisation layer cannot silently change a result.
 
 →
 
-### Beat 3 — THE LOOP CLOSES
-> And the replay leads back to the process it describes.
+### Beat 3 — IT ENDS WITH A PERSON
+> And the chain ends here.
 >
-> That is the whole system in one frame. It runs end to end, today, on one
-> machine, with one command.
+> The last step is not an actuator. It is an operator reading evidence and
+> deciding what, if anything, to do.
+>
+> **[GUARD]** Nothing in this system writes back to the process.
+
+> *(This beat used to animate packets travelling from the runtime back INTO the
+> dryer. Read as a still frame that is closed-loop control — which scene 13 then
+> says does not exist. The stream now terminates at the operator terminal, and
+> the visual and the disclaimer finally agree.)*
 
 →
 
 ---
 
-## SCENE 12 — WHAT THIS IS WORTH · ~50 s
+## SCENE 12 — WHAT THIS IS WORTH · ~18 s
 
 > So what does it actually buy.
 >
 > More continuous moisture visibility between laboratory results. Earlier
 > awareness when the multivariable behaviour of the process becomes unusual.
-> Ranked, readable evidence instead of a raw alarm. And a supervision layer that
-> supports production continuity.
+> Ranked, readable evidence instead of a raw alarm.
+>
+> *(Three claims, not four. The fourth — "supports production continuity" —
+> overlapped the closing line of scene 14 and was the least defensible of the
+> set. One signal travels the ring once while you say these; that is the loop's
+> direction, and it is the only motion in the scene.)*
 >
 > **[GUARD]** What I am deliberately not claiming: any return-on-investment
 > figure, any control action, and any reduction in laboratory work. The
@@ -413,7 +544,7 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 13 — TODAY → NEXT · ~55 s *(2 steps)*
+## SCENE 13 — TODAY → NEXT · ~48 s *(2 steps)*
 
 ### Beat 1 — SOLID MEANS BUILT
 > Solid means built and running.
@@ -442,26 +573,31 @@ have to extract from you under questioning.
 
 ---
 
-## SCENE 14 — RETURN · ~45 s *(3 steps)*
+## SCENE 14 — RETURN · ~32 s *(2 steps)*
 
 ### Beat 1 — MORE OF IT VISIBLE
 > This is the first frame of the presentation again. The same hall, the same
 > machine, the same light.
 >
-> The physical process never stopped. Digitalization made more of it visible.
+> *(pause — let them recognise it)*
+>
+> The physical process never stopped. Every one of those points is now a signal
+> the system reads, and that is the whole project.
 
 →
 
-### Beat 2 — FROM MONITORING TO OPERATION
-> That is the direction this work points in: from process monitoring, toward
-> intelligent industrial operation — with a person in the loop at every step.
-
-→
-
-### Beat 3 — QUESTIONS
+### Beat 2 — QUESTIONS
+> From process monitoring, toward intelligent industrial operation — with a
+> person in the loop at every step.
+>
 > Thank you. I would be glad to take your questions.
 
-*(Do not advance further. Stay on this frame.)*
+*(Do not advance further. Stay on this frame — it holds for the whole defence.)*
+
+> *(There used to be a third beat here. Beats 2 and 3 applied the same small
+> dolly twice, which walked the camera off the opening pose four seconds after
+> landing on it — diluting the one rhyme the film is built to deliver. Both were
+> cut; the camera now holds, and QUESTIONS is set in the hero type scale.)*
 
 ---
 
@@ -471,17 +607,17 @@ have to extract from you under questioning.
 Play every beat with the pauses marked.
 
 ## 12-minute path
-* Scene 02: one sentence, skip the product specification.
+* Scene 02: run the three beats fast — one clause each.
 * Scene 04 beat 1: two sentences.
 * Scene 09 beat 2 (candidate comparison): compress to *"I compared five models
   on validation RMSE and the regularised linear one won."*
-* Scene 12: read the four value statements, drop the elaboration.
+* Scene 12: read the three value statements, drop the elaboration.
 
 ## 10-minute emergency path
-Press `1` … then jump directly with the number keys:
-`1` → `4` → `5` → `6` → `9` → `10` → `13` → `14`
+Jump with the **`G` prefix**, then the scene key:
+`G 1` → `G 4` → `G 5` → `G 6` → `G 9` → `G 0` → `G X` → `G C`
 (Scene 05 and Scene 09 must never be cut — they are the problem and the
-evidence.)
+evidence. `G 0` is scene 10, the deliverable; do not cut that either.)
 
 ---
 

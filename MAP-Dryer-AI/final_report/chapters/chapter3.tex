@@ -1,11 +1,9 @@
-\chapter{Project Context, Problem Statement and Objectives}
+\chapter{Problem Statement, Objectives and Evaluation Logic}
 \label{chap:problem}
 
-\section{The decision-latency problem}
+\section{Turning a delayed measurement into an engineering problem}
 
-The present monitoring context combines rich process visibility with delayed quality confirmation. PCS7 provides the industrial supervision environment, while laboratory analyses supply moisture, density and final product temperature approximately every two hours. Between two analyses, an operator can observe that temperatures, air flow, feed, vacuum or pressure have changed but cannot obtain a new measured moisture value immediately. The last laboratory result remains valid as a historical observation, not as proof of the current condition.
-
-This is an Industrial Engineering problem of information latency and production decision support. The goal is to reduce the time needed to form a reasoned operational interpretation, while maintaining the distinction between measurement, prediction and diagnosis. The proposed solution inserts a digital information layer; it does not alter the process control layer.
+The difficulty is temporal. An operator can see that air flow, feed, temperature, vacuum or steam pressure has changed, but the next measured moisture value may arrive almost two hours later. The previous laboratory result remains valid for its sample; it is not evidence that the present product is unchanged.
 
 \begin{figure}[ht]
 \centering
@@ -16,70 +14,77 @@ This is an Industrial Engineering problem of information latency and production 
 \node[anchor=east,font=\small,DeepBlue] at (-.2,-1){laboratory};
 \foreach \x in {0,6,12}{\draw[very thick,AccentOrange] (\x,-.75)--(\x,-1.25);\fill[AccentOrange] (\x,-1) circle (1.6pt);}
 \draw[<->,thick,ChapterPurple] (0,-1.6)--node[below,font=\small]{approximately two hours}(6,-1.6);
-\node[align=center,font=\scriptsize] at (7,1.05){continuous process availability; ticks show the\\chosen five-second prototype visualization grid};
+\node[align=center,font=\scriptsize] at (7,1.05){continuous process availability; ticks illustrate the\\chosen five-second prototype replay grid};
 \end{tikzpicture}
-\caption{Multi-rate timing problem: fast process stream versus sparse laboratory quality.}
-\source{\projectsource.}
+\caption{Multi-rate timing problem: fast process visibility and sparse laboratory confirmation.}
+\source{Author's work.}
 \label{fig:timing}
 \end{figure}
 
-\section{Project objectives and success criteria}
+The project inserts an information layer between those two rhythms. It estimates current moisture, identifies departures from a learned reference and organizes the evidence for verification. It does not alter the process control layer. This distinction shaped both the software architecture and the wording of the dashboard.
 
-The project objectives are to:
-\begin{enumerate}[label=\arabic*.]
-\item digitalize supervision of the soluble MAP process;
-\item reduce dependence on delayed laboratory moisture availability through a continuous estimate;
-\item detect abnormal operating conditions as early as possible;
-\item identify the most likely affected subsystem when an anomaly occurs;
-\item provide diagnostic information that supports faster operator decisions;
-\item centralize process KPIs, model outputs, alerts and quality information in Power BI;
-\item demonstrate a near-real-time architecture using Python, PostgreSQL and Power BI; and
-\item create a prototype that could later receive live PCS7/historian data.
-\end{enumerate}
+\section{Objectives translated into testable criteria}
 
-Success is assessed at prototype level through four evidence groups: correct multi-rate data handling; honest chronological model evaluation; complete replay on the chosen five-second demonstration grid with bounded computation time; and a structurally valid dashboard whose field references resolve to the semantic model. A successful prototype is not equivalent to a production acceptance test.
+The overall objective is to demonstrate a traceable, near-real-time advisory workflow for soluble MAP dryer supervision. I broke it into four questions and linked each question to evidence that can be checked in the repository.
 
-\section{Proposed architecture and responsibility boundary}
+\begin{table}[htbp]
+\centering\small
+\caption{Prototype objectives and final audit criteria}
+\label{tab:success-criteria}
+\begin{tabularx}{\textwidth}{@{}p{0.25\textwidth}p{0.31\textwidth}Y@{}}
+\toprule
+Objective & Audit criterion & Evidence used \\
+\midrule
+Preserve multi-rate meaning & No future process or laboratory value enters a supervised row; laboratory blanks remain sparse. & Timestamp audit, residence shift, strictly previous lab lookup, 1,103 aligned rows. \\
+Improve moisture visibility & Compare the selected model with a credible persistence baseline on one untouched chronological TEST segment. & Holdout errors, bias, residuals and baseline improvement. \\
+Test process novelty & Evaluate the frozen detector on labelled synthetic episodes outside TRAIN and report its response without treating it as a fault classifier. & Validation novelty flag rate, held-out episode response and ranked contributors. \\
+Demonstrate the chain & Load the frozen artifacts, produce traceable records and expose stable SQL fields to the two Power BI pages. & Full accelerated analytical replay, bounded database smoke test, model/schema versions and dashboard checks. \\
+Protect operator authority & Keep measurement, prediction, anomaly, diagnosis and recommendation visibly distinct. & Advisory wording, freshness, laboratory age and no control output. \\
+\bottomrule
+\end{tabularx}
+\source{Final report audit criteria; they are not pre-registered plant acceptance limits.}
+\end{table}
 
-\begin{figure}[ht]
+No approved plant specification, false-alarm cost or response-time baseline was available. I therefore do not invent a production acceptance threshold or savings figure. These audit criteria answer whether the prototype is coherent and informative enough to justify a later shadow study.
+
+\section{Implemented architecture and responsibility boundary}
+
+Python owns preprocessing and every model calculation. PostgreSQL owns persistence and stable Structured Query Language (SQL) views. Power BI filters and visualizes those views; it neither trains nor runs the models. Two replay sources serve different purposes: the canonical held-out TEST interval supports evaluation, while a disclosed two-day dashboard fork provides a visible sequence of demo events. Results from the second source are never substituted for TEST metrics.
+
+My contribution was to connect these parts into one reproducible workflow: causal alignment, model comparison, novelty interpretation, database integration and dashboard information design.
+
+\begin{engineeringbox}[Five-second interval: exact meaning]
+Five seconds is the selected CSV replay, inference-pacing and Power BI visualization rhythm. It is not a confirmed plant historian frequency and does not change the approximately two-hour laboratory reference cycle.
+\end{engineeringbox}
+
+\noindent\textbf{Explicit non-objectives.} The project does not connect to live PCS 7, actuate equipment, certify an alarm or safety function, replace the laboratory, or claim production deployment. Every output is advisory and requires verification.
+
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[node distance=3mm and 9mm]
 \node[data,minimum width=62mm,text width=56mm] (csv)
-  {\textbf{CURRENT PROTOTYPE}\\CSV replay on a chosen five-second grid\\process rows + sparse two-hour lab fields};
+  {\textbf{CURRENT SOURCES}\\canonical TEST for audit\\two-day demo fork for jury replay};
 \node[data,dashed,draw=OCPGreen,minimum width=62mm,text width=56mm,right=of csv] (live)
-  {\textbf{FUTURE PLANT INPUT}\\read-only PCS7/historian process data\\+ timestamped laboratory results};
+  {\textbf{FUTURE PLANT INPUT}\\read-only historian process data\\+ timestamped laboratory results};
 
 \node[flow,minimum width=110mm,text width=103mm,below=8mm of $(csv.south)!0.5!(live.south)$] (contract)
-  {\textbf{1. Data and multi-rate contract}\\event time, units, chosen replay grid, sparse lab timing, validity and provenance};
+  {\textbf{1. Data contract} -- event time, units, replay cadence, sparse laboratory timing and provenance};
 \node[flow,minimum width=110mm,text width=103mm,below=of contract] (py)
-  {\textbf{2. Python analytics}\\validation + residence-aware windows\\feature engineering + moisture inference + novelty diagnosis};
+  {\textbf{2. Python analytics} -- validation, causal alignment, features, Ridge inference and novelty diagnosis};
 \node[flow,minimum width=110mm,text width=103mm,below=of py] (pg)
-  {\textbf{3. PostgreSQL integration boundary}\\transactional event records, model/schema versions and dashboard-oriented views};
+  {\textbf{3. PostgreSQL} -- idempotent event records, model/schema versions and dashboard-oriented views};
 \node[flow,minimum width=110mm,text width=103mm,below=of pg] (pbi)
-  {\textbf{4. Power BI decision support}\\five-second prototype refresh target, current state, trends, lab age, risk and verification guidance};
+  {\textbf{4. Power BI} -- DirectQuery visualization of state, trends, lab age, risk and verification guidance};
 \node[data,minimum width=110mm,text width=103mm,below=of pbi] (operator)
-  {\textbf{5. Human verification and authority}\\PCS7, laboratory evidence and approved OCP procedures remain authoritative};
+  {\textbf{5. Human authority} -- PCS 7, laboratory evidence and approved OCP procedures remain decisive};
 
 \draw[arr] (csv)--(contract);
 \draw[dashedarr] (live)--node[right,font=\scriptsize,align=left]{approval\\required}(contract);
-\draw[arr] (contract)--(py);
-\draw[arr] (py)--(pg);
-\draw[arr] (pg)--(pbi);
-\draw[arr] (pbi)--(operator);
-\node[font=\scriptsize,below=1mm of operator.south] (legend)
-  {\textcolor{DeepBlue}{solid = implemented prototype}\qquad
-   \textcolor{OCPGreen}{dashed = future approved source}};
+\draw[arr] (contract)--(py); \draw[arr] (py)--(pg); \draw[arr] (pg)--(pbi); \draw[arr] (pbi)--(operator);
 \end{tikzpicture}
-\caption{Real-time supervision architecture with explicit multi-rate timing, current/future sources and operator authority.}
-\source{\projectsource.}
+\caption{End-to-end architecture with implemented and future sources separated.}
+\source{Author's work.}
 \label{fig:endtoend}
 \end{figure}
 
-Python is responsible for data validation, temporal alignment, features, inference and diagnostic transformation. PostgreSQL provides idempotent persistence and stable analytical views. Power BI performs visualization, filtering and operator navigation; it does not run autonomous control logic. In the demonstration, the left-hand sources in \cref{fig:endtoend} are replaced by the held-out TEST interval of the same canonical CSV used by Notebooks 01--04, and the service loads the moisture artifact selected in Notebook 03 and the anomaly artifacts exported by Notebook 04. A future live interface must pass OCP cybersecurity, data-governance and operating-procedure requirements before the boundary can move.
-
-\begin{engineeringbox}[Five-second interval: exact meaning]
-Process variables are available continuously through the industrial monitoring and control environment. The five-second interval was selected only for the prototype CSV grid, replay pacing and Power BI refresh demonstration so that near-real-time behaviour could be visualized consistently. It is not presented as the native acquisition or measurement frequency of the OCP instrumentation.
-\end{engineeringbox}
-
-\noindent\textbf{\color{AlertAmber}Explicit non-objectives.}
-The project does not connect to live PCS7, actuate valves or drives, execute closed-loop control, certify a safety function, replace the laboratory, or claim production deployment. Its outputs are advisory and require operator verification.
+\FloatBarrier

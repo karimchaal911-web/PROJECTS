@@ -16,6 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import ffmpegPath from 'ffmpeg-static';
+import { SCENES, TOTAL_SECONDS } from '../src/state/scenes.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -42,23 +43,24 @@ const CHROME = [
  * Seconds to hold each step, taken from the per-scene budgets in
  * speaker_notes/full_script.md and divided across that scene's beats.
  *
- * The backup is meant to be narrated over, so it runs at speaking pace — about
- * fourteen minutes — not at the pace the animation alone would need.
+ * The backup is meant to be narrated over, so it runs at the scene table's own
+ * declared pace — 790 s, 13 min 10 s — not at the pace the animation alone
+ * would need.
  */
-const HOLD = {
-  '01': [50], '02': [35], '03': [60],
-  '04': [25, 25, 25],
-  '05': [26, 24, 30],
-  '06': [20, 22, 18],
-  '07': [22, 26, 22],
-  '08': [20, 20, 20, 20],
-  '09': [24, 20, 24, 22],
-  '10': [20, 25, 20],
-  '11': [20, 23, 22],
-  '12': [50],
-  '13': [26, 29],
-  '14': [16, 16, 13],
-};
+//
+// DERIVED from the scene table, not transcribed from it. The hardcoded version
+// still described fourteen scenes with 35 beats and the old durations, so the
+// backup video would have held the wrong frame for the wrong length on almost
+// every scene after cutting four beats and adding six.
+const HOLD = Object.fromEntries(SCENES.map((sc) => {
+  const n = sc.beats?.length || 1;
+  const each = sc.seconds / n;
+  // 05c is the 6.5 s constant-velocity gap travel: it must play out before the
+  // frame is held, and it is the one moment the speaker is told not to talk over.
+  return [sc.n, Array.from({ length: n }, (_, i) => Math.round(
+    each + (sc.id === 'gap' && i === n - 1 ? 4 : 0)
+  ))];
+}));
 
 async function freePort() {
   return new Promise((resolve, reject) => {

@@ -1,0 +1,21 @@
+feature,used_by,source,formula,unit,limitation
+dryer_air_temperature,both,direct process,-,degC,prototype unit; reconcile plant tag
+cooler_air_temperature,both,direct process,-,degC,prototype unit; reconcile plant tag
+air_flow_rate,both,direct process,-,m3/h,defined repository convention
+wet_product_feed_rate,both,direct process,-,m3/h,volumetric prototype convention; confirm plant basis
+product_inlet_temperature,both,direct process,-,degC,prototype unit; reconcile plant tag
+residence_time,both,direct process,-,min,prototype estimate; not parcel tracking
+vacuum,both,direct process,-,mmH2O,canonical file is positive-valued; confirm plant polarity
+steam_pressure,both,direct process,-,bar,defined repository convention
+fan_speed,both,direct process,-,rpm,defined repository convention
+product_density,moisture,strictly previous lab,-,kg/L,"carried context, not a current fast measurement"
+final_product_temp,moisture,strictly previous lab,-,degC,"carried context, not a current fast measurement"
+temperature_drop,moisture,derived,dryer_air_temperature - final_product_temp,delta degC,uses prior laboratory product temperature
+air_product_delta,both,derived,dryer_air_temperature - product_inlet_temperature,delta degC,temperature-difference proxy
+cooler_delta,anomaly,derived,dryer_air_temperature - cooler_air_temperature,delta degC,path temperature proxy
+air_per_feed,both,derived,air_flow_rate / wet_product_feed_rate,ratio,dimensionless only under the shared volumetric convention
+steam_per_feed,anomaly,derived,steam_pressure / wet_product_feed_rate,bar/(m3/h),heuristic loading proxy
+steam_temp_interaction,moisture,derived,steam_pressure * dryer_air_temperature,bar*degC,"statistical interaction, not heat duty"
+thermal_load,anomaly,derived,steam_pressure * dryer_air_temperature,bar*degC,historical name; not heat duty
+heating_index,moisture,derived,residence_time * dryer_air_temperature,min*degC,"exposure proxy, not energy"
+thermal_exposure,anomaly,derived,residence_time * dryer_air_temperature,min*degC,"exposure proxy, not energy"

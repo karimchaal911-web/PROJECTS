@@ -42,9 +42,44 @@
       "model_id": "anomaly_detector_canonical_92d_v6.0",
       "status": "runtime-demo",
       "artifact_path": "models\\5s\\anomaly_model.joblib",
+      "artifact_sha256": "07bce32b6bf72a2adcc7196b72a7960d0fd3f46925eea291d51d1dbb6722bb61",
+      "scaler_path": "models\\5s\\anomaly_scaler.joblib",
+      "scaler_sha256": "af28219037fd559500ba53ffcb5f54fdc5f0d9d545874392e0152ef56deb4fe1",
+      "reference_profile_path": "models\\5s\\reference_profile.json",
+      "reference_profile_sha256": "b42b3a73bc1d612a319a3b2bad0a74dd637636f2507951a59c58585e1d33cefa",
       "feature_count": 15,
+      "feature_names": [
+        "dryer_air_temperature",
+        "cooler_air_temperature",
+        "air_flow_rate",
+        "wet_product_feed_rate",
+        "product_inlet_temperature",
+        "residence_time",
+        "vacuum",
+        "steam_pressure",
+        "fan_speed",
+        "air_product_delta",
+        "cooler_delta",
+        "air_per_feed",
+        "steam_per_feed",
+        "thermal_load",
+        "thermal_exposure"
+      ],
       "training_dataset_sha256": "ae9216518e73e9b2a5101205774fa8235ffca0964a799b7980fbae6561fb0124",
-      "model_family": "One-Class SVM"
+      "model_family": "One-Class SVM",
+      "source_notebook": "notebooks/04_Model2_AnomalyDetection&Diagnosis.ipynb",
+      "runtime_uses_exact_notebook04_artifacts": true,
+      "validation_flag_rate": 0.05925,
+      "held_out_replay": {
+        "path": "data\\processed\\MAP_Dryer_TEST_Replay_5s.csv",
+        "sha256": "cec99e6a984a11440bfa06230b877f6231299bc9213bd5acb77cfe605553b2c2",
+        "rows": 237600,
+        "laboratory_samples": 165,
+        "start_timestamp": "2026-07-03 06:00:00",
+        "end_timestamp": "2026-07-16 23:59:55",
+        "source_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
+        "source_partition": "held-out chronological TEST"
+      }
     }
   ]
 }

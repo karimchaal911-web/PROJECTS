@@ -1,6 +1,14 @@
 # FINAL PRESENTATION — QA RECORD
 
-**Build reviewed:** 2026-08-27 · **Verdict: ready to present.**
+> **SUPERSEDED — 2026-08-28.** This records the **pre-remediation** build: 14
+> scenes, **35** presenter steps, a Power BI capture reading `DATA · STALE`, and
+> a uniform 2.2 s transition. It was accurate when written and is kept as the
+> baseline the remediation is measured against. For the current build see
+> **`qa/PRESENTATION_REMEDIATION_REPORT.md`** (37 steps, 790 s, re-captured
+> dashboard, five transition tiers), and for the defects it addresses see
+> `qa/PRESENTATION_RUTHLESS_AUDIT.md`.
+
+**Build reviewed:** 2026-08-27 · **Verdict at the time: ready to present.**
 
 Everything below was executed, not asserted. The automated portion is
 reproducible with:

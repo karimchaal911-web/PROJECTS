@@ -37,6 +37,10 @@ export const C = {
   dataTeal: '#2FB6A0',
   dataCyan: '#7FE3D4',
   predict: '#3DD6B0',
+  // Same hue as `predict`, dark enough to survive cream and a projector.
+  // The mint sat at ~1.6:1 on #F5F2E4 — the most important line in the
+  // evidence act was the least legible element on screen.
+  predictInk: '#0E7A62',
   lab: '#F5F2E4',
   warn: '#E8A33D',
   critical: '#D1493F',

@@ -31,9 +31,16 @@ references against the semantic model.
 
 | Layer | Responsibility |
 |---|---|
-| `realtime_pipeline` (Python) | Reads observations, runs the window-feature moisture model and the process-only anomaly/diagnosis models, **writes everything into PostgreSQL every 5 s** (`realtime_service.py`) |
-| PostgreSQL | Stores `dryer_map`, `dryer_model_outputs`, `dryer_abnormal_variables`; exposes `vw_dryer_dashboard_powerbi`, `vw_dryer_contributors_powerbi`, `vw_dryer_lab_samples`, `vw_dryer_anomaly_events`, `vw_dryer_latest` |
-| Power BI (this folder) | **Reads the views only** over DirectQuery with 60-second automatic page refresh. It never loads the joblib models and never executes inference. Data acquisition (5 s) is deliberately faster than report rendering (60 s); the freshness pill reflects ingest age |
+| `realtime_pipeline` (Python) | Reads the dedicated `resources/dashboard_demo/MAP_Dryer_Dashboard_Demo_5s.csv` stream, runs the unchanged moisture and process-only anomaly/diagnosis models, **writes everything into PostgreSQL every 5 s** (`realtime_service.py`) |
+| PostgreSQL | Stores `dryer_map`, `dryer_model_outputs`, `dryer_abnormal_variables`; exposes `vw_dryer_dashboard_powerbi`, `vw_dryer_overview_trends_powerbi`, `vw_dryer_contributors_powerbi`, `vw_dryer_lab_samples`, `vw_dryer_anomaly_events`, `vw_dryer_latest` |
+| Power BI (this folder) | **Reads the views only** over DirectQuery with five-second automatic page refresh. Live KPI cards use the one-row `vw_dryer_latest` snapshot; history charts use the bounded overview view. Power BI never loads joblib models or executes inference |
+
+The checked-in report and canonical `RUN_FINAL_DEMO.ps1` launcher use a
+five-second DirectQuery page refresh. Replay pacing is independent: running
+`RUN_FINAL_DEMO.ps1 -ReplaySeconds 2` accelerates the scenario while retaining
+the five-second display cycle for smooth navigation. Training and evaluation
+continue to use the untouched canonical 92-day dataset; the two-day fork is
+scenario-replay material only.
 
 ## Prerequisites
 
@@ -89,14 +96,15 @@ Encryption note: local development servers usually have SSL disabled; if
 Desktop shows an encryption warning, choose the unencrypted connection for
 `localhost` only.
 
-## Refresh behavior (60-second cadence)
+## Refresh behavior (smooth five-second display cadence)
 
 * The model is **pure DirectQuery** — every visual query goes to PostgreSQL,
   so a refresh always returns whatever `realtime_pipeline` last inserted.
-* Both pages carry an **automatic page refresh** configuration of **60 s**
-  (matching `REPLAY_INTERVAL_SECONDS=60`). To confirm in Desktop: click the
-  page canvas → *Format page → Page refresh* → On, Auto page refresh,
-  1 minute. Desktop honors this while the report is open.
+* Both pages carry an **automatic page refresh** configuration of **5 s**.
+  To confirm in Desktop: click the page canvas → *Format page → Page refresh*
+  → On, Auto page refresh, 5 seconds.
+* `RUN_FINAL_DEMO.ps1 -ReplaySeconds 2` changes only replay pacing. It does
+  not force the 37 query visuals into overlapping two-second repaint cycles.
 * **Manual validation:** *Home → Refresh* (or F5 on the page) after the
   replay service has inserted a new row; the “LAST DATABASE UPDATE” card and
   the trend charts must advance by one minute.

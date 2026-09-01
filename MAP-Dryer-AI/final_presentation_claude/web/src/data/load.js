@@ -46,6 +46,18 @@ export function getData() {
   return cache ?? EMPTY;
 }
 
+/**
+ * Has the real payload arrived?
+ *
+ * <Prewarm> needs this. Every data-driven layer builds its geometry from
+ * `getData()` inside a useMemo, so before the fetches resolve those layers hold
+ * the EMPTY sentinel and their buffers do not exist yet. Warming the GPU at
+ * that moment uploads nothing and the hitch it exists to remove survives.
+ */
+export function isDataLoaded() {
+  return cache !== null;
+}
+
 /** Convenience: min/max of a numeric array, ignoring nulls. */
 export function extent(arr) {
   let lo = Infinity;
@@ -56,22 +68,4 @@ export function extent(arr) {
     if (v > hi) hi = v;
   }
   return Number.isFinite(lo) ? [lo, hi] : [0, 1];
-}
-
-/** Format a moisture value the way the project's data dictionary requires. */
-export function fmtMoisture(v, decimals = 4) {
-  return v == null ? '—' : `${v.toFixed(decimals)} % H₂O`;
-}
-
-export function fmtNum(v, decimals = 2) {
-  if (v == null || !Number.isFinite(v)) return '—';
-  return v.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-}
-
-export function fmtClock(iso) {
-  if (!iso) return '—';
-  return iso.slice(11, 16);
 }

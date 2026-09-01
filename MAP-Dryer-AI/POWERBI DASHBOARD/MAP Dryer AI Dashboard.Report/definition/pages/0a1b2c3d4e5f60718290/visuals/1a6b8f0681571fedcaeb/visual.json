@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "1a6b8f0681571fedcaeb",
   "position": {
-    "x": 1080,
-    "y": 606,
-    "z": 6400,
-    "height": 18,
-    "width": 420,
-    "tabOrder": 6400
+    "x": 1079.5566502463055,
+    "y": 606.2807881773399,
+    "z": 4100,
+    "height": 34.35960591133005,
+    "width": 440.02463054187189,
+    "tabOrder": 4100
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -20,10 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Explainable diagnosis and recommended checks \u2014 advisory only",
+                    "value": "Explainable diagnosis and recommended checks — advisory only",
                     "textStyle": {
                       "fontSize": "8pt",
-                      "color": "#66756F"
+                      "color": "#5e706a"
                     }
                   }
                 ]
@@ -86,6 +85,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

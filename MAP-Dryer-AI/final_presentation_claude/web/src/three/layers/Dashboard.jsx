@@ -3,38 +3,34 @@ import { useFrame, useLoader } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { C } from '../../lib/palette.js';
-import { PBI_PLANE, pbiRectToLocal } from '../../lib/curves.js';
+import { PBI_PLANE, PBI_HIGHLIGHTS } from '../../lib/curves.js';
 import { useChannel } from '../usePresence.js';
 import { WMono } from '../WorldText.jsx';
 
 /**
  * The real Power BI report, placed in the world.
  *
- * These are the actual exported pages of the shipped PBIP project — not a
- * recreation. Nothing is added, removed or restyled, and the highlight
- * sequence only points at elements that genuinely exist on those pages,
- * including the PROTOTYPE · REPLAY pill and the advisory footer.
+ * These are the actual shipped report pages, rendered by
+ * tools/render_dashboard_preview.py from the LIVE PostgreSQL views the report
+ * queries by DirectQuery, and captured at 2x by scripts/capture-dashboard.mjs.
+ * Nothing is added, removed or restyled.
  *
- * The `dashAssemble` channel drives the scene 09 → 10 transformation: the
- * hold-out chart's frame thickens into a card and lands registered over the
- * trend rectangle of this capture. That rectangle was measured from the 1600×900
- * export (see PBI_TREND_UV) rather than eyeballed, which is what makes the
- * transformation honest rather than a sleight of hand.
+ * The capture is a real replay state taken inside an injected disturbance:
+ * anomaly risk 0.95, severity HIGH, ranked contributors present, laboratory
+ * reference 40 minutes old, freshness pill LIVE. The previous capture showed
+ * DATA STALE, "ingested 8525 min ago" and an empty diagnosis under a heading
+ * about real-time supervision, which was the single least defensible thing in
+ * the film.
+ *
+ * `dashAssemble` fades the report up. It no longer pretends to be a morph from
+ * the hold-out chart: the two are different charts of different windows, and
+ * claiming otherwise while showing both was a visual overclaim.
  */
 
 const POS = new THREE.Vector3(76, 10, 26);
 
-// Highlight regions, in UV of the 1600×900 overview export.
-const HIGHLIGHTS = [
-  { id: 'predicted', u: [0.068, 0.213], v: [0.098, 0.228], label: 'PREDICTED FINAL MOISTURE' },
-  { id: 'lab', u: [0.223, 0.368], v: [0.098, 0.228], label: 'LATEST LAB MOISTURE' },
-  { id: 'error', u: [0.378, 0.523], v: [0.098, 0.228], label: 'VALIDATED MOISTURE ERROR' },
-  { id: 'risk', u: [0.533, 0.678], v: [0.098, 0.228], label: 'CURRENT ANOMALY RISK' },
-  { id: 'status', u: [0.688, 0.988], v: [0.098, 0.228], label: 'PROCESS STATUS · SEVERITY' },
-  { id: 'trend', u: [0.069, 0.655], v: [0.240, 0.625], label: 'MOISTURE & RISK TREND — ROLLING 8 h' },
-  { id: 'vars', u: [0.069, 0.655], v: [0.638, 0.972], label: 'CRITICAL PROCESS VARIABLES' },
-  { id: 'diag', u: [0.665, 0.988], v: [0.240, 0.972], label: 'DIAGNOSIS CONTEXT · OPERATOR GUIDANCE' },
-];
+// The capture is a live replay state of the shipped report, not a mock-up:
+// see final_presentation_claude/web/scripts/capture-dashboard.mjs.
 
 export default function Dashboard() {
   const group = useRef();
@@ -59,17 +55,29 @@ export default function Dashboard() {
 
   // fog:false — this is a screen, not a surface in the room. Letting the
   // atmosphere wash it would misrepresent the real dashboard's contrast.
+  // FrontSide, not DoubleSide. Scene 11 walks the camera behind this plane,
+  // and a double-sided report renders its own page MIRRORED at the end of the
+  // runtime corridor — reversed headings and a reversed trend chart, which
+  // reads as a rendering fault rather than as the back of a screen.
   const matA = useMemo(() => new THREE.MeshBasicMaterial({
     map: overview, transparent: true, opacity: 0, toneMapped: false,
-    fog: false, side: THREE.DoubleSide,
+    fog: false, side: THREE.FrontSide,
   }), [overview]);
   const matB = useMemo(() => new THREE.MeshBasicMaterial({
     map: diagnostics, transparent: true, opacity: 0, toneMapped: false,
-    fog: false, side: THREE.DoubleSide,
+    fog: false, side: THREE.FrontSide,
   }), [diagnostics]);
 
-  const rect = useMemo(() => pbiRectToLocal(), []);
+  // What the camera sees once it is behind the report: the back of a screen.
+  // Dark, matte, and edged in the report's own green so the plane still reads
+  // as a physical object at the far end of the runtime.
+  const matBack = useMemo(() => new THREE.MeshBasicMaterial({
+    color: C.inkDeep, transparent: true, opacity: 0, toneMapped: false,
+    fog: false, side: THREE.BackSide,
+  }), []);
+
   const highlightRefs = useRef([]);
+  const backEdge = useRef();
 
   const toLocal = (u, v) => ({
     x: -PBI_PLANE.w / 2 + ((u[0] + u[1]) / 2) * PBI_PLANE.w,
@@ -78,7 +86,21 @@ export default function Dashboard() {
     h: (v[1] - v[0]) * PBI_PLANE.h,
   });
 
-  const boxes = useMemo(() => HIGHLIGHTS.map((h) => ({ ...h, ...toLocal(h.u, h.v) })), []);
+  /**
+   * `side` decides which end of its own box a callout label hangs from.
+   *
+   * Every label used to start at its box's LEFT edge and run right. For the
+   * two regions on the right of the page — the anomaly state strip and the
+   * diagnosis column, which reaches to 99 % of the page width — that put a
+   * forty-character caption outside the report and then outside the FRAME:
+   * "DIAGNOSIS AND OPERATOR GUIDA" was the last thing visible on the film's
+   * most important deliverable. A label belonging to a right-hand region now
+   * hangs leftwards from that region's right edge instead.
+   */
+  const boxes = useMemo(() => PBI_HIGHLIGHTS.map((h) => {
+    const local = toLocal(h.u, h.v);
+    return { ...h, ...local, side: h.u[1] > 0.62 ? 'right' : 'left' };
+  }), []);
 
   useFrame(() => {
     const p = presence.current;
@@ -89,15 +111,23 @@ export default function Dashboard() {
     const a = assemble.current;
     const pg = page.current;
 
-    // The capture fades up under the chart once the frame has become a card.
-    const base = p * THREE.MathUtils.clamp((a - 0.3) / 0.5, 0, 1);
+    // The report is LEGIBLE as soon as it is on screen. It used to be gated
+    // behind clamp((a - 0.3) / 0.5), so at the beat that introduces the
+    // project's actual deliverable the capture sat at 30 % opacity over a
+    // near-black world — an unreadable grey rectangle.
+    const base = p * THREE.MathUtils.clamp(a / 0.55, 0, 1);
     matA.opacity = base * (1 - pg);
     matB.opacity = base * pg;
+    // The back plate does not fade with `dashAssemble`: the object is still
+    // there when the report on its far face has receded.
+    matBack.opacity = p * 0.94;
+    if (backEdge.current) backEdge.current.material.opacity = p * 0.5;
 
     const h = highlight.current;
     highlightRefs.current.forEach((g, i) => {
       if (!g) return;
-      // Reading order, 0.55 s apart, expressed as slices of the channel.
+      // Reading order at ~1.3 s per region across five regions, not eight in
+      // 4.4 s. Each box stays up once named, so the presenter can refer back.
       const local = THREE.MathUtils.clamp(h * boxes.length - i, 0, 1);
       const active = local > 0.02 && local < 0.995;
       g.visible = local > 0.02 && pg < 0.5;
@@ -117,16 +147,18 @@ export default function Dashboard() {
       <mesh position={[0, 0, 0.01]} material={matB}>
         <planeGeometry args={[PBI_PLANE.w, PBI_PLANE.h]} />
       </mesh>
-
-      {/* registration guide: the rectangle the hold-out chart lands on */}
+      <mesh position={[0, 0, -0.02]} material={matBack}>
+        <planeGeometry args={[PBI_PLANE.w, PBI_PLANE.h]} />
+      </mesh>
       <Line
+        ref={backEdge}
         points={[
-          [rect.x0, rect.y0, 0.03], [rect.x1, rect.y0, 0.03],
-          [rect.x1, rect.y1, 0.03], [rect.x0, rect.y1, 0.03],
-          [rect.x0, rect.y0, 0.03],
+          [-PBI_PLANE.w / 2, -PBI_PLANE.h / 2, -0.03], [PBI_PLANE.w / 2, -PBI_PLANE.h / 2, -0.03],
+          [PBI_PLANE.w / 2, PBI_PLANE.h / 2, -0.03], [-PBI_PLANE.w / 2, PBI_PLANE.h / 2, -0.03],
+          [-PBI_PLANE.w / 2, -PBI_PLANE.h / 2, -0.03],
         ]}
         color={C.ocpGreen}
-        lineWidth={1}
+        lineWidth={1.4}
         transparent
         opacity={0}
       />
@@ -144,8 +176,15 @@ export default function Dashboard() {
             transparent
             opacity={0}
           />
-          <WMono position={[b.x - b.w / 2, b.y + b.h / 2 + 0.42, 0.05]} fontSize={0.32}
-            color={C.ocpLime} fillOpacity={0}>
+          {/* Lime on a white report page is invisible; the callout label sits
+              on the dark ground above each box in the report's own green. */}
+          <WMono
+            position={[b.side === 'right' ? b.x + b.w / 2 : b.x - b.w / 2, b.y + b.h / 2 + 0.5, 0.05]}
+            anchorX={b.side}
+            fontSize={0.52}
+            color={C.ocpGreen}
+            fillOpacity={0}
+          >
             {b.label}
           </WMono>
         </group>

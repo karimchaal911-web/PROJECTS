@@ -8,17 +8,17 @@
   },
   "feature_schema": {
     "path": "models\\5s\\feature_schema.json",
-    "sha256": "25306163a66404a59cc06560a34f864845e9cb315ca67c03d9c1fefb409318f7",
+    "sha256": "3551193aa95222931dde1269dd41d4598e85086b707c28d5a5a950486e79a4d9",
     "version": "moisture_direct_16_v6.0",
     "feature_count": 16
   },
   "training_report": {
     "path": "models\\5s\\training_report.json",
-    "sha256": "5339b6714841bae564774a67d18a094f2600b5dc60057751f7b838e070d424f6"
+    "sha256": "68fa12a9f5a7850926e6f01b3467b830b92e9c2704c0a86ed4f68bcf2f595752"
   },
   "model_registry": {
     "path": "models\\model_registry.json",
-    "sha256": "8b20b879cfaf1aa0ff5293f92ba4022ba350095572c44e7c9ed97f86fa81754a"
+    "sha256": "00c1c454bbf1559ce3d4a7fca73e95600b7019f509e515bd09de6c530778a80f"
   },
   "runtime_compatibility_version": "map_runtime_v6",
   "dashboard_contract": {
@@ -35,5 +35,11 @@
       "source_dataset": "data\\processed\\MAP_Dryer_Canonical_5s.csv",
       "source_partition": "held-out chronological TEST"
     }
+  },
+  "anomaly_contract": {
+    "source_notebook": "04_Model2_AnomalyDetection&Diagnosis.ipynb",
+    "evaluation_record": "artifacts\\notebook04_anomaly_evaluation.json",
+    "artifact_sha256": "07bce32b6bf72a2adcc7196b72a7960d0fd3f46925eea291d51d1dbb6722bb61",
+    "feature_count": 15
   }
 }

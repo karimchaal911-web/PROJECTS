@@ -11,7 +11,10 @@
     "capture:offline": "node scripts/capture-scenes.mjs --offline --out ../exports/offline_check",
     "record": "node scripts/record-tour.mjs",
     "probe": "node scripts/probe.mjs",
-    "qa": "npm run build && npm run capture && npm run capture:offline && python ../data_build/qa_checks.py",
+    "perf": "node scripts/qa-perf.mjs",
+    "restore": "node scripts/qa-restore.mjs",
+    "channels": "node scripts/qa-channels.mjs",
+    "qa": "npm run build && npm run capture && npm run capture:offline && npm run channels && python ../data_build/qa_checks.py",
     "serve": "node scripts/serve.mjs"
   },
   "devDependencies": {

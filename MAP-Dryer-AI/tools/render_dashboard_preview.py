@@ -55,8 +55,8 @@ RED_SURFACE = "#FBE2E3"
 GRAY_SURFACE = "#E5E9E7"
 WHITE = "#FFFFFF"
 
-TARGET_BAND = (0.7, 1.1)          # measures 'Target Band Low/High'
-MOISTURE_WATCH = (0.60, 1.15)     # 'Predicted Card BG' watch band
+TARGET_BAND = (0.07018, 0.08074)  # measures 'Target Band Low/High' (TMDL)
+MOISTURE_WATCH = (0.06904, 0.08188)  # 'Predicted/Lab Card BG' watch band (TMDL)
 RISK_WARNING, RISK_CRITICAL = 0.5, 0.8
 
 # 'DAT/Feed/Steam/Airflow/Vacuum Status' normal & watch bands (from TMDL,
@@ -149,7 +149,7 @@ def fetch_state(conn: psycopg.Connection) -> dict:
             )
             row = cur.fetchone()
             if row:
-                lab_before = f"{float(row[1]):.2f} % at {row[0]:%H:%M}"
+                lab_before = f"{float(row[1]):.4f} % at {row[0]:%H:%M}"
             state["event_lab_context"] = (
                 lab_before or "No laboratory result before this event"
             )
@@ -418,18 +418,18 @@ def build_page1(state: dict) -> str:
                     else AMBER_SURFACE if error_value <= 0.10 else RED_SURFACE)
         error_fg = (GREEN if error_value <= 0.05
                     else AMBER_TEXT if error_value <= 0.10 else RED_DARK)
-        error_display = f"{error_value:.3f} %"
+        error_display = f"{error_value:.4f} %"
         error_caption = f"Validated at {validated['timestamp']:%H:%M}"
         error_size = 24
 
     ts = latest.get("Timestamp")
     kpis = [
         ("PREDICTED MOISTURE",
-         f"{predicted:.2f} %" if predicted is not None else "—",
+         f"{predicted:.4f} %" if predicted is not None else "—",
          f"Updated {ts:%H:%M:%S}" if ts else "No prediction yet",
          moisture_card_bg(predicted), TEXT, 24),
         ("LABORATORY MOISTURE",
-         f"{lab_moisture:.2f} %" if lab_moisture is not None else "—",
+         f"{lab_moisture:.4f} %" if lab_moisture is not None else "—",
          (f"Sampled {lab_ts:%H:%M} · {lab_age:.0f} min ago"
           if lab_ts else "—"),
          moisture_card_bg(lab_moisture), TEXT, 24),
@@ -449,7 +449,9 @@ def build_page1(state: dict) -> str:
         parts.append(
             f'<div class="abs card" style="left:{x}px;top:86px;width:234px;'
             f'height:118px;background:{bg};padding:14px 16px;">'
-            f'<div class="kpi-label">{label}</div>'
+            f'<div class="kpi-label"'
+            f'{f" style=\"color:{WHITE};opacity:0.82;\"" if bg == RED_DARK else ""}'
+            f'>{label}</div>'
             f'<div class="kpi-value" style="margin-top:12px;color:{fg};'
             f'font-size:{size}px;">{value}</div>'
             f'<div class="kpi-caption" style="margin-top:8px;color:'
@@ -462,7 +464,14 @@ def build_page1(state: dict) -> str:
     svg = ""
     if trend:
         t_min, t_max = trend[0][0], trend[-1][0]
-        y_lo, y_hi = 0.4, 1.4
+        # Domain follows the data and the target band rather than a fixed
+        # literal, so the series is always framed by what is actually plotted.
+        values = [float(r[1]) for r in trend if r[1] is not None]
+        values += [float(r[3]) for r in trend if r[3] is not None]
+        values += [TARGET_BAND[0], TARGET_BAND[1]]
+        v_lo, v_hi = min(values), max(values)
+        pad = (v_hi - v_lo) * 0.18 or 0.001
+        y_lo, y_hi = v_lo - pad, v_hi + pad
         band_top = chart_h - (TARGET_BAND[1] - y_lo) / (y_hi - y_lo) * chart_h
         band_bot = chart_h - (TARGET_BAND[0] - y_lo) / (y_hi - y_lo) * chart_h
         pred_pts = scale_series(trend, 0, 1, chart_w, chart_h, y_lo, y_hi,
@@ -512,7 +521,7 @@ def build_page1(state: dict) -> str:
         f'<span style="color:{TEAL};">● Laboratory sample</span>'
         f'<span style="color:{RED};">● Anomaly</span>'
         f'<span style="color:{GREEN};opacity:0.5;">▮ Target band '
-        f'{TARGET_BAND[0]:.1f}–{TARGET_BAND[1]:.1f} %</span></div>'
+        f'{TARGET_BAND[0]:.4f}–{TARGET_BAND[1]:.4f} %</span></div>'
         f'<svg width="{chart_w}" height="{chart_h}" '
         f'style="margin-top:4px;">{svg}</svg>{axis}</div>'
     )
@@ -777,7 +786,7 @@ def build_page2(state: dict) -> str:
             f'{peak_risk:.2f}</div></div>'
             f'<div><div class="small-label">Moisture at event</div>'
             f'<div style="font-size:13px;font-weight:700;color:{TEXT};">'
-            f'{f"{moisture_at_peak:.2f} %" if moisture_at_peak is not None else "—"}'
+            f'{f"{moisture_at_peak:.4f} %" if moisture_at_peak is not None else "—"}'
             f'</div></div></div>'
             f'<div class="small-label" style="margin-top:10px;">Latest lab '
             f'context</div>'

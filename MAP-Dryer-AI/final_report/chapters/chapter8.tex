@@ -1,100 +1,106 @@
 \chapter{Results, Validation, Limitations and Future Work}
 \label{chap:validation}
 
-\section{Consolidated prototype results}
+\section{Consolidated result}
 
-The project delivers an end-to-end digital supervision prototype rather than disconnected notebook and runtime experiments. Notebooks 01--04 consume one canonical source in sequence: Notebook 03 exports the selected moisture artifact and Notebook 04 exports the anomaly artifacts. The runtime loads those exact artifacts while replaying the held-out TEST interval. SQL views expose stable dashboard semantics and the PBIP presents an operator workflow. The main quantitative results are summarized in \cref{tab:results-summary}.
+The project now forms one inspectable chain: supplied CSV, causal preprocessing, frozen model artifacts, Python inference, versioned PostgreSQL records and a two-page DirectQuery dashboard. The strongest evidence is not simply that each component runs. It is that the model advantages and failures, source boundaries and interface responsibilities can all be traced to a specific artifact.
 
-\begin{table}[ht]
-\centering\small
-\caption{Consolidated evidence from the final repository}
+\begin{table}[htbp]
+\centering\scriptsize
+\caption{Consolidated quantitative evidence}
 \label{tab:results-summary}
-\begin{tabularx}{\textwidth}{@{}p{0.28\textwidth}p{0.26\textwidth}Y@{}}
+\begin{tabularx}{\textwidth}{@{}p{0.27\textwidth}p{0.26\textwidth}Y@{}}
 \toprule
 Evidence & Result & Correct interpretation \\
 \midrule
-Selected moisture TEST & MAE 0.001069; RMSE 0.001403; $R^2$ 0.824530; $n=165$ & Ridge with the original 16 named features; supplied synthetic prototype evidence only.\\
-Moisture model selection & VALIDATION RMSE 0.0013566 & Five expanding folds tune on TRAIN; later VALIDATION selects Ridge narrowly over Elastic Net.\\
-Runtime consistency & Exact Notebook 03 moisture and Notebook 04 anomaly artifacts & Ordered 16-feature moisture (with causal prior-lab state) and 15-feature process-only anomaly contracts run on TEST replay.\\
-Novelty path & One-Class SVM; validation flag rate 5.925\% & 6,000-row fit sample and separate 20,000-row check; display risk is not probability.\\
-Database smoke replay & 1,500 rows; 2 sparse observations; 0 flags / 0 events; latency 9 / 47 ms avg/max & Bounded held-out replay verifies inference, writes and views; not a full-volume deployment test.\\
-Canonical source & 1,589,760 process rows; 1,104 sparse targets; 1,103 aligned supervised rows & One 92-day source feeds all four notebooks and the held-out runtime replay.\\
-Automated Python tests & 33 passed plus 8 subtests & Verifies implementation, model artifact, supplied-source hash and safety contracts.\\
-Power BI backend validation & Five of five SQL/TMDL physical contracts pass & Live dashboard, contributor, lab, event and overview views are column-compatible and populated as required.\\
+Ridge TEST & MAE 0.001069; RMSE 0.001403; $R^2$ 0.824530; $n=165$ & Untouched synthetic chronological tail; percentage-point errors. \\
+Persistence baseline & MAE 0.001459; RMSE 0.001848 & Ridge improves MAE 26.8\% and RMSE 24.1\%. \\
+Residual audit & Bias 0.000066; Durbin--Watson 1.827; lag-1 autocorrelation 0.084 & Limited short-lag structure on this TEST sequence; not a plant stability claim. \\
+One-Class SVM TEST & 2.654\% total flags; 60.25\% labelled-row response; 2.258\% normal-period flags & Process-novelty response on synthetic labelled episodes. \\
+Episode response & Steam 82.0\%; airflow 79.3\%; feed surge 0\% & Sensitivity varies by departure type; the loading episode needs further work. \\
+Full analytical replay & 237,600 rows in 2.037 s; about 116,626 rows/s & Batch model/feature computation only; database and Power BI excluded. \\
+Database smoke test & 1,500 rows; 9/47 ms average/maximum cycle latency & Bounded integration evidence, not production load qualification. \\
+Dashboard demo & 34,560 rows; 8 injections; 7/8 episode response & Jury presentation coverage only. \\
 \bottomrule
 \end{tabularx}
-\source{Notebook, training report, runtime log and validation outputs \cite{moisturenotebook,anomalynotebook,trainingreport,runtimelog,testrecord,pbivalidation}.}
+\source{Frozen artifacts and reproducible report audit; detailed evidence in Chapters~\ref{chap:models}--\ref{chap:powerbi}.}
 \end{table}
 
-\section{Validation strategy}
+\section{Verification performed on the final repository}
 
-Validation operates at several levels. Unit and integration-contract tests cover timestamp parsing, selected-grid checks, residence-time alignment, prevention of future-row use, exact ordered feature consistency, artifact inference, deterministic generation and hashes, finite replay defaults, structured database configuration, anomaly mapping, diagnostic rules, temporal patterns, subsystem scoring, severity, feedback and database/runtime helpers. The final run passed 33 tests plus 8 subtests with zero failures \cite{testrecord}. Execution time is deliberately omitted because it varies with machine load and is not a performance acceptance measure.
+The current Python suite passes 77 tests plus 8 subtests. It covers timestamp and cadence contracts, causal alignment, feature order, artifact inference, replay behaviour, diagnosis rules, persistence, database helpers and presentation utilities. The Power BI report validator resolves 114 field references across 86 visuals against 303 model fields in six tables, with a 1600$\times$900 canvas.
 
-Integration evidence includes canonical replay contracts and database views. The final live verifier reads physical \code{sourceColumn} bindings from all five current TMDL tables and compares them with the PostgreSQL views. Dashboard and overview each exposed 1,500 version-filtered rows and the lab view two rows; contributors and events were empty because the bounded v6 interval contained no anomaly flags, which those optional evidence views allow. All required column contracts passed. These checks give confidence that the committed artifact is internally coherent. They do not replace load, usability or failure-recovery tests in an OCP-managed environment.
+A live PostgreSQL contract check also passes for all six DirectQuery views. At the time of the final check, the database contained a short 41-row current replay fragment, one laboratory row and no anomaly/contributor event rows. Empty optional event views are valid in a normal interval. This live check proves column compatibility and connectivity at that moment; it is not a substitute for the larger analytical or smoke-test results.
 
-\section{What the prototype demonstrates}
+\begin{table}[htbp]
+\centering\small
+\caption{Validation layers and their remaining boundary}
+\label{tab:validation-layers}
+\begin{tabularx}{\textwidth}{@{}p{0.27\textwidth}p{0.32\textwidth}Y@{}}
+\toprule
+Layer & What passed & What it does not prove \\
+\midrule
+Unit and contract tests & 77 tests + 8 subtests & Plant representativeness or operator acceptance. \\
+Report semantic validation & 86 visuals and all 114 field references resolve & Query latency under deployment concurrency. \\
+Live SQL / Tabular Model Definition Language (TMDL) check & All six views match the semantic model & Long-duration resilience or gateway behaviour. \\
+Model holdout & Chronological soft-sensor and synthetic-scenario anomaly audit & Accuracy on new OCP grades, seasons or real failures. \\
+Presentation replay & Full-screen two-page flow with deterministic events & Independent model validation. \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
-The work demonstrates six feasibility points:
-\begin{enumerate}
-\item a multi-rate stream can preserve sparse quality measurements while supporting inference on the selected near-real-time replay grid;
-\item residence-aware process snapshots and strictly previous laboratory inputs can prevent obvious target leakage;
-\item model selection and holdout results can be versioned and reproduced;
-\item novelty evidence can be converted into cautious, subsystem-oriented guidance;
-\item idempotent storage and purpose-built views can support a frequent DirectQuery workload; and
-\item one dashboard can organize process, quality, risk and diagnosis without implying autonomous control.
-\end{enumerate}
+\section{What I consider demonstrated}
 
-This is a meaningful Industrial Engineering contribution because it organizes the complete production-information loop. The technical value lies not only in the model score but also in data semantics, traceability, latency, operator interpretation and explicit decision authority.
+The work demonstrates that sparse laboratory values can be preserved while a faster process stream supports advisory inference. It shows that residence-aware alignment and strictly previous laboratory context can be implemented without obvious future leakage. It also shows a measurable soft-sensor improvement over a realistic persistence baseline.
 
-\section{Limitations}
+The anomaly result is deliberately narrower. The frozen model responds strongly to two held-out disturbance families and does not flag the feed surge. What is demonstrated is an auditable novelty-to-guidance workflow, not comprehensive fault classification.
 
-The following limitations are material, not footnotes:
+Finally, the complete software chain is coherent. The exact notebook artifacts reach the runtime, event records are idempotent and versioned, SQL views match the semantic model, and the dashboard preserves measurement/prediction semantics. This is an Industrial Engineering contribution because data quality, timing, interpretation and operator authority are treated as one system.
+
+\section{Material limitations}
+
 \begin{itemize}
-\item \textbf{No live PCS7 connection.} The industrial screens informed process understanding, but CSV replay substitutes for PCS7/historian acquisition.
-\item \textbf{Synthetic final demonstration data.} Relationships, anomaly episodes and metric values may be more regular than plant behaviour.
-\item \textbf{Limited real historical data.} Real grade changes, campaigns, equipment states, calibration events and rare faults are not represented at industrial scale.
-\item \textbf{Simulated lab timing.} The two-hour sparsity mirrors observed availability, but laboratory logistics, delays and re-tests are simplified.
-\item \textbf{Prototype visualization interval only.} The five-second grid and refresh were deliberately selected for simulation; they do not describe native instrumentation sampling. Development-machine timing also excludes plant networks, gateways, concurrent users, service throttling and high availability.
-\item \textbf{Statistical diagnostic limits.} Percentile bands are not approved operating, alarm, safety or trip limits; diagnosis is not causal proof.
-\item \textbf{No closed-loop control.} The prototype neither recommends immediate setpoint changes nor commands any actuator.
+\item \textbf{Synthetic source.} The supplied file supports reproducible prototype testing, but it cannot establish performance across real grades, seasons or operating modes.
+\item \textbf{No live plant interface.} PCS 7 screens informed the analysis; CSV replay substitutes for historian and laboratory acquisition.
+\item \textbf{Small supervised evidence.} The dense stream has 1,589,760 rows, but only 1,103 usable moisture targets. Label cadence, not process-row count, governs the supervised evidence.
+\item \textbf{Scenario-dependent novelty detection.} The detector reacts to steam and airflow departures but needs representative plant history and confirmed events for calibration.
+\item \textbf{Demonstration injections.} The two-day dashboard fork improves presentation coverage but cannot add credibility to model validation; it is disclosed and kept separate.
+\item \textbf{Incomplete physical balance.} Wet-cake moisture, dry-solids flow, gas humidity/enthalpy and heat loss are unavailable, so thermal features remain proxies.
+\item \textbf{Plant tag confirmation.} The canonical vacuum field follows the supplied convention; its polarity and pressure reference require confirmation.
+\item \textbf{Prototype timing.} Five-second event/replay cadence and local performance do not qualify historian, network, gateway, concurrent Power BI or failover performance.
+\item \textbf{No alarm or control authority.} Statistical thresholds are not approved operating, alarm, trip or safety limits, and no actuator command exists.
 \end{itemize}
 
-Effective sample size remains a central limitation. The canonical stream contains 1,589,760 process rows, but two-hour laboratory cadence provides 1,104 sparse targets and only 1,103 supervised rows after the initial insufficient-history sample is removed. Label cadence determines supervised information; dense process rows must not be counted as independent quality labels. The single supplied synthetic chronology, despite its TEST $R^2$ of about 0.825, still requires representative plant campaigns before any accuracy or stability claim can be generalized.
+\section{Stage-gated industrialization roadmap}
 
-\section{Industrialization roadmap}
-
-\begin{figure}[b]
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[node distance=5mm]
 \node[flow,minimum width=120mm,text width=113mm] (prototype)
-  {\textbf{CURRENT PROTOTYPE}\\synthetic CSV replay $\rightarrow$ Python inference $\rightarrow$ PostgreSQL views $\rightarrow$ validated PBIP};
+  {\textbf{CURRENT PROTOTYPE}\\synthetic replay $\rightarrow$ Python inference $\rightarrow$ PostgreSQL views $\rightarrow$ Power BI};
 \node[data,minimum width=120mm,text width=113mm,below=7mm of prototype] (gate1)
-  {\textbf{GATE 1 --- representative data and interfaces}\\approved read-only historian/laboratory extract; reconciled tags, units, timestamps, campaigns and quality flags};
+  {\textbf{GATE 1 -- data and semantics}\\approved historian/lab extract; tags, units, clocks, campaigns, shutdowns and quality flags reconciled};
 \node[data,minimum width=120mm,text width=113mm,below=of gate1] (gate2)
-  {\textbf{GATE 2 --- model and service qualification}\\unified inference contract; chronological retraining; uncertainty/drift review; shadow mode; load, restart and recovery tests};
+  {\textbf{GATE 2 -- shadow validation}\\chronological retraining; baseline comparison; confirmed-event review; drift and nuisance-event burden};
 \node[data,minimum width=120mm,text width=113mm,below=of gate2] (gate3)
-  {\textbf{GATE 3 --- operational acceptance}\\cybersecurity and gateway approval; governed alarm terminology; operator usability; ownership, rollback and support procedures};
+  {\textbf{GATE 3 -- operational qualification}\\cybersecurity, gateway/load, recovery, alarm terminology, usability, ownership and rollback};
 \node[flow,draw=OCPGreen,minimum width=120mm,text width=113mm,below=of gate3] (future)
-  {\textbf{POSSIBLE FUTURE ADVISORY SYSTEM}\\read-only industrial supervision with accepted accuracy, latency, stale-state and human-factor criteria};
-\draw[dashedarr] (prototype)--node[right,font=\scriptsize]{evidence required}(gate1);
-\draw[dashedarr] (gate1)--(gate2);
-\draw[dashedarr] (gate2)--(gate3);
-\draw[dashedarr] (gate3)--(future);
+  {\textbf{POSSIBLE ADVISORY SERVICE}\\read-only supervision with accepted accuracy, timing, stale-state and human-factor criteria};
+\draw[dashedarr] (prototype)--(gate1); \draw[dashedarr] (gate1)--(gate2); \draw[dashedarr] (gate2)--(gate3); \draw[dashedarr] (gate3)--(future);
 \end{tikzpicture}
-\caption{Stage-gated path from the current prototype to a possible industrial advisory system.}
-\source{\projectsource.}
+\caption{Evidence gates from the current prototype to a possible industrial advisory service.}
+\source{Author's work.}
 \label{fig:futurearchitecture}
 \end{figure}
 
-{\small
-The first future step is data, not control. An approved historian extract should cover normal campaigns, operating modes, grades, maintenance states, instrument quality flags and laboratory timestamps. Variable names, units, sampling behaviour and approved operating envelopes should be reconciled with production and laboratory experts. Models should then be retrained and evaluated by campaign and time period, with uncertainty, drift and false-alarm cost explicitly reviewed.
+\FloatBarrier
 
-Second, the existing registry, hashes, finite replay defaults and environment validation should be extended into managed deployment controls: authenticated read-only acquisition; network segmentation; an approved secrets manager; redundant or recoverable PostgreSQL; health checks; retention rules; centralized structured logging; registry-backed promotion and rollback; latency and drift monitoring; backup/restore tests; and Power BI gateway/capacity qualification. A shadow-mode period should compare the solution with PCS7 and laboratory results while it has no operational authority.
+The next step should be data, not control. An approved read-only extract should cover normal campaigns, grade changes, shutdowns, maintenance and instrument-quality states, with laboratory sample and result times distinguished. The soft sensor should be retrained and compared by campaign against persistence and simple process baselines. The prototype currently provides point predictions; formal uncertainty estimation could be evaluated later using representative plant data.
 
-Third, diagnosis should improve through representative failure scenarios and operator feedback. Each displayed event can be reviewed as confirmed, rejected or unresolved, with comments and actual cause when known. This can support rule refinement and false-alarm reduction. Alert-management logic should suppress repetitions, respect acknowledged plant states and align with OCP procedures.
+For anomaly detection, confirmed events and normal operating modes are more valuable than another isolated hyperparameter search. A shadow review can label whether an event was actionable, expected, caused by data quality or unresolved. Those labels would support threshold selection, alternative semi-supervised models and a credible nuisance-event measure.
 
-Only after real-data validation, safety engineering, cybersecurity approval, operator studies and robust fail-safe design should any recommendation/control architecture be investigated. Even then, a staged advisory or supervisory recommendation layer is more appropriate than immediate autonomous control. OCP operating authority and approved safety systems must remain decisive.
+Only after data, model and service qualification should OCP consider a persistent advisory deployment. Any later recommendation layer would still require explicit operator authority and approved procedures. Autonomous control is outside the present roadmap.
 
-\noindent\textbf{\color{DeepBlue}Recommended next gate.}
-Run the current software in read-only shadow mode against an approved historian extract, retain laboratory truth unchanged, and conduct joint weekly reviews with production, process, laboratory and automation stakeholders. Progress to operational use only when accuracy, false-alarm burden, timing, failure handling and human factors have documented acceptance criteria.
-}
+\section{Personal contribution summary}
+
+My main contribution was to connect disciplines that are often presented separately. I converted process observations into a defensible data contract, implemented causal alignment, compared the soft sensor against a practical baseline, exposed the anomaly model's missed scenario, built the runtime and database boundary, and shaped the dashboard around operator verification. I also added the evidence audit and report traceability needed to defend both the result and its limits. The remaining work is not hidden technical polish; it is the industrial evidence required before the prototype can leave a controlled environment.

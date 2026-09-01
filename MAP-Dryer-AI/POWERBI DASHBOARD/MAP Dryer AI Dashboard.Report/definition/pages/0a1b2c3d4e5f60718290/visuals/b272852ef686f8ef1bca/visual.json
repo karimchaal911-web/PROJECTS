@@ -3,11 +3,11 @@
   "name": "b272852ef686f8ef1bca",
   "position": {
     "x": 494,
-    "y": 778,
-    "z": 5500,
-    "height": 78,
+    "y": 750,
+    "z": 3400,
+    "height": 106,
     "width": 172,
-    "tabOrder": 5500
+    "tabOrder": 3400
   },
   "visual": {
     "visualType": "lineChart",
@@ -21,13 +21,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
                   "Property": "Timestamp"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Timestamp",
+              "queryRef": "vw_dryer_overview_trends_powerbi.Timestamp",
               "nativeQueryRef": "Timestamp",
               "active": true
             }
@@ -40,14 +40,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "vw_dryer_dashboard_powerbi"
+                      "Entity": "vw_dryer_overview_trends_powerbi"
                     }
                   },
-                  "Property": "Steam Pressure (Trend)"
+                  "Property": "Overview Steam Pressure"
                 }
               },
-              "queryRef": "vw_dryer_dashboard_powerbi.Steam Pressure (Trend)",
-              "nativeQueryRef": "Steam Pressure (Trend)"
+              "queryRef": "vw_dryer_overview_trends_powerbi.Overview Steam Pressure",
+              "nativeQueryRef": "Overview Steam Pressure"
             }
           ]
         }
@@ -59,7 +59,7 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "vw_dryer_dashboard_powerbi"
+                    "Entity": "vw_dryer_overview_trends_powerbi"
                   }
                 },
                 "Property": "Timestamp"
@@ -127,7 +127,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#087C5B'"
+                      "Value": "'#0F766E'"
                     }
                   }
                 }
@@ -135,7 +135,7 @@
             }
           },
           "selector": {
-            "metadata": "vw_dryer_dashboard_powerbi.Steam Pressure (Trend)"
+            "metadata": "vw_dryer_overview_trends_powerbi.Overview Steam Pressure"
           }
         }
       ],
@@ -161,7 +161,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -199,7 +199,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }

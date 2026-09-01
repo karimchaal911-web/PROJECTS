@@ -25,6 +25,38 @@ PRES = ROOT / "final_presentation_claude"
 DATA = PRES / "web" / "public" / "data"
 DIST = PRES / "web" / "dist"
 
+
+
+
+def _expected_steps() -> int:
+    """How many presenter steps the scene table declares.
+
+    Derived, never hardcoded. A step count pinned in this file goes stale the
+    moment a beat is cut or added, and then reports the build as broken for
+    matching its own source — which is exactly what happened when four
+    redundant beats were removed and six new ones added.
+
+    A scene contributes one step per declared beat, or one step if it declares
+    none.
+    """
+    src = (PRES / "web" / "src" / "state" / "scenes.js").read_text(encoding="utf-8")
+    scenes = 0
+    beats = 0
+    scenes_with_beats = 0
+    in_scene = False
+    for line in src.splitlines():
+        if line.startswith("    id: '"):
+            scenes += 1
+            in_scene = True
+        elif line.startswith("    beats: [") and in_scene:
+            scenes_with_beats += 1
+        elif line.startswith("      { id: '"):
+            beats += 1
+    return beats + (scenes - scenes_with_beats)
+
+
+EXPECTED_STEPS = _expected_steps()
+
 results: list[tuple[str, bool, str]] = []
 
 
@@ -206,7 +238,10 @@ def check_offline() -> None:
     total = sum(f.stat().st_size for f in DIST.rglob("*") if f.is_file())
     check("bundle size under 40 MB", total < 40e6, "%.1f MB" % (total / 1e6))
 
-    # The real proof: a full 35-step run with every non-loopback request aborted.
+    # The real proof: a full run with every non-loopback request aborted. The
+    # expected step count is READ FROM THE SCENE TABLE, not hardcoded — it was
+    # pinned at 35, so cutting four redundant beats and adding six new ones
+    # failed this check for describing a build that no longer existed.
     om = PRES / "exports" / "offline_check" / "manifest.json"
     if not om.exists():
         check("blocked-network run recorded", False,
@@ -219,8 +254,9 @@ def check_offline() -> None:
           blocked[0][:60] if blocked else "none")
     check("blocked-network run: no page errors", not errs,
           "%d" % len(errs) if errs else "clean")
-    check("blocked-network run: all 35 steps rendered",
-          len(data.get("steps", [])) == 35, "%d steps" % len(data.get("steps", [])))
+    check("blocked-network run: all %d steps rendered" % EXPECTED_STEPS,
+          len(data.get("steps", [])) == EXPECTED_STEPS,
+          "%d steps" % len(data.get("steps", [])))
 
 
 # ------------------------------------------------------- 4. deliverables ---
@@ -247,7 +283,7 @@ def check_deliverables() -> None:
         check(name, ok, size)
 
     shots = list((PRES / "exports/screenshots").glob("step-*.png"))
-    check("scene stills exported", len(shots) == 35, "%d frames" % len(shots))
+    check("scene stills exported", len(shots) == EXPECTED_STEPS, "%d frames" % len(shots))
 
     mf = PRES / "exports/screenshots/manifest.json"
     if mf.exists():

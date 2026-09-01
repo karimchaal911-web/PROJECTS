@@ -4,10 +4,10 @@
   "position": {
     "x": 21,
     "y": 184,
-    "z": 600,
+    "z": 700,
     "height": 36,
     "width": 44,
-    "tabOrder": 600
+    "tabOrder": 700
   },
   "visual": {
     "visualType": "textbox",
@@ -20,7 +20,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "\u25c9",
+                    "value": "◉",
                     "textStyle": {
                       "fontSize": "12pt",
                       "color": "#9DBFB4"

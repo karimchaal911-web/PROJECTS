@@ -1,102 +1,87 @@
 \chapter{Power BI Supervision Dashboard}
 \label{chap:powerbi}
 
-\section{Operator-centred dashboard design}
+\section{A control-room view, not a model host}
 
-The dashboard is the point at which process, quality and model evidence become a supervision aid. Its design priorities are state visibility, hierarchy and restrained alarm colour. Normal status uses green, low/medium attention uses amber, high anomaly uses red and unavailable/data-quality conditions use grey. Colours never replace text: each state is also labelled. The two pages separate routine monitoring from diagnostic investigation so that explanations do not overload the main view.
+The dashboard is where the analytical work becomes usable. I designed it around two operator questions: \emph{what is happening now?} and \emph{what should I inspect?} The first page keeps moisture, laboratory age, process state and the main variables together. The second page opens the evidence behind an abnormal event. This separation avoids turning routine monitoring into a dense diagnostic screen.
 
-The PBIP uses a DirectQuery semantic model and a deliberately configured five-second automatic page refresh on both pages. Repository validation reports 86 total visuals, 114 field references and 276 model fields across five tables; all field references, navigation actions, refresh settings, ordering and query budgets resolve \cite{pbivalidation}. The interval is a prototype visualization target, not the native plant measurement frequency. Deployment to Power BI Service would still require an appropriate capacity/gateway design, credentials and performance measurements under expected concurrency \cite{powerbiautorefresh}.
+Power BI does not run either model. It uses DirectQuery against PostgreSQL views populated by the Python service. The semantic model formats values, applies filters and computes display measures; prediction, novelty scoring and diagnostic transformation have already occurred before the row reaches Power BI.
 
-\begin{decisionbox}[Dashboard visual source]
-The two figures in this chapter are the final validated 16:9 project renders generated from the SQL-backed preview workflow. They reproduce the final two-page PBIP information architecture without the Power BI Desktop ribbon, authoring panes or credentials. They are faithful layout/value proxies rather than evidence of a deployed Power BI Service application.
-\end{decisionbox}
+The Power BI project requests five-second automatic page refresh. Actual refresh can be slower because Power BI waits on DirectQuery, local rendering and source availability \cite{powerbiautorefresh}. The full-screen capture workflow used for the figures below displays a more conservative 60-second presentation label, while the underlying event stream remains five seconds. Neither interval is a confirmed plant historian frequency.
 
 \section{Page 1: Operations Overview}
 
-\Cref{fig:pbi-overview} presents the overview page. Its PostgreSQL demonstration data come from the held-out chronological TEST interval of the canonical source, not from a separately generated dashboard dataset. The upper cards answer immediate operating questions: current predicted moisture, latest laboratory moisture and age, anomaly risk/status and operational severity. Process tiles expose key thermal, flow, feed, steam and vacuum measurements. Trend panels maintain time context rather than reducing the process to one current value. Laboratory markers remain sparse, while the prediction continues at each prototype replay step.
+\Cref{fig:pbi-overview} uses the final high-precision layout. The upper cards distinguish predicted moisture, laboratory moisture, validated error, anomaly score, operating status and severity. The main trend preserves the time relationship among prediction, sparse laboratory markers and anomaly points. Critical variables remain visible below, while the right-hand assessment and guidance panels translate the latest event into an operator-readable summary.
 
+\clearpage
+\begin{landscape}
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth]{powerbi_overview.png}
-\caption{Final SQL-backed Operations Overview with separate data and process status, moisture supervision and process context.}
-\source{MAP-Dryer-AI final academic-showcase dashboard render; Author's work.}
+\includegraphics[width=.96\linewidth]{powerbi_overview.png}
+\caption{Final Operations Overview capture with high-precision moisture values, process trends and advisory context.}
+\source{Current SQL-backed full-screen dashboard capture; Author's work.}
 \label{fig:pbi-overview}
 \end{figure}
+\end{landscape}
+\clearpage
 
-The captured state deliberately demonstrates freshness handling: the header reports data freshness separately from process status, and the last stored diagnosis remains visible as context. This is not an application failure. It shows that old data are not presented as proof of current operation. The static \texttt{PROTOTYPE · REPLAY} indicator and \texttt{Replay / Refresh: 5 s} wording make clear that five seconds is the demonstration cadence, not native plant acquisition.
+The example shown is an injected dashboard-demo event, not a canonical TEST result or a live plant state. In the capture, 0.0798\% predicted moisture is shown separately from the last 0.0752\% laboratory result, and the validated absolute error card refers to a true sample timestamp. The ``LIVE DATA'' pill means that the capture queried the current PostgreSQL view; the source behind that view is still the controlled replay. This distinction is stated here because the interface itself is designed for a future live source.
 
-The latest-lab presentation is deliberately paired with age. Without age, a carried-forward result could appear current. In this synthetic prototype, validated error is computed only where a represented sparse laboratory observation and a corresponding prediction coexist. The principal distinction is therefore visible in both model and interface:
+Three display rules protect interpretation:
 \begin{itemize}
-\item \textbf{predicted moisture}: continuous model estimate;
-\item \textbf{latest laboratory moisture}: last available measured value with timestamp/age;
-\item \textbf{validated error}: prediction minus laboratory value only at a sample timestamp.
+\item predicted moisture is a continuous model estimate;
+\item laboratory moisture is a sparse reference accompanied by sample time or age; and
+\item validated error is calculated only where a represented laboratory sample and prediction coexist.
 \end{itemize}
 
-DirectQuery measures aggregate only the intended grain. A lightweight eight-hour PostgreSQL view feeds the overview trends, avoiding an expensive latest-lab as-of lookup for every historical point. The report validator also enforces a query-visual budget, which reduces the risk that the selected rapid page refresh launches an unnecessarily large set of source queries.
+Status colour supports scanning but never carries meaning alone. Green, amber, red and grey are paired with text labels. Numeric precision is deliberately greater for moisture and error than for larger process measurements; this prevents a useful small change from disappearing through formatting while avoiding false precision on every variable.
 
-\section{Page 2: Diagnostics and Root Cause}
+\section{Page 2: Diagnostics and Investigation}
 
-The diagnostic page in \cref{fig:pbi-diagnostics} supports investigation after an anomaly is raised. A timeline provides event context; filter controls support event selection; status fields show the probable subsystem, diagnosis, causes and verification guidance; contributor tiles display direct abnormal variables with direction and severity. The wording remains explicitly advisory.
+The diagnostic page in \cref{fig:pbi-diagnostics} begins with a novelty timeline and a selected event. Ranked contributors show which direct variables depart most from their reference profile. The likely subsystem, possible causes and recommended checks appear beside the signature rather than behind a technical model score.
 
+\clearpage
+\begin{landscape}
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth]{powerbi_diagnostics.png}
-\caption{Final SQL-backed Diagnostics and Root Cause page with event context, ranked contributors and verification guidance.}
-\source{MAP-Dryer-AI final academic-showcase dashboard render; Author's work.}
+\includegraphics[width=.96\linewidth]{powerbi_diagnostics.png}
+\caption{Final Diagnostics capture with event selection, ranked contributors and verification guidance.}
+\source{Current SQL-backed full-screen dashboard capture; Author's work.}
 \label{fig:pbi-diagnostics}
 \end{figure}
+\end{landscape}
+\clearpage
 
-The selected synthetic event is labelled medium severity and assigned to the feed-loading subsystem. Wet-product feed rate and product-inlet temperature lead the contributor ranking, while residence time is the only displayed high univariate deviation. This combination demonstrates why the page shows several pieces of evidence and a verification prompt: the subsystem label is a reasoned prioritization, not proof of a root cause.
+The captured high-severity demo event points to the drying-air and exhaust circuit. Vacuum, air flow and fan speed are all low relative to the reference profile, so the displayed checks focus on fan demand, damper position, air leakage and vacuum measurement. This is a probable diagnosis for the generated scenario, not proof that one component failed.
 
-Consecutive anomalous prototype rows separated by at most 30 seconds are grouped into one event. This limits alarm flooding and gives the operator an episode rather than a list of near-identical timestamps. Severity, subsystem and diagnosis for an event are taken from its peak-risk row. The raw score is retained for technical traceability; the risk scale is used for visual interpretation.
+Consecutive anomalous rows separated by no more than 30 seconds are grouped into one candidate event. Grouping reduces row-level repetition, but it does not turn a statistical novelty into an approved process alarm. Alarm management requires governed priorities, ownership, response procedures, performance monitoring and alignment with the site philosophy \cite{iec62682}. The present event list is an advisory investigation aid only.
 
-\section{Dynamic status and selected measures}
+\section{Why the demonstration source is separate}
 
-The semantic model groups measures by current values, lab context, validation, risk/status, trends, critical variables and events. The interface answers three questions in order: \textbf{what is happening}, through process/moisture/lab state; \textbf{where evidence is concentrated}, through direct contributors and subsystem voting; and \textbf{what should be verified}, through cautious diagnosis and an inspection prompt. Unavailable information is displayed as a dash or explicit state rather than zero, and \code{DATA\_QUALITY} is never styled as an equipment anomaly.
+A short jury session cannot rely on the chance that a useful held-out event happens at the right moment. I therefore prepared a two-day demonstration fork with eight disclosed injected episodes. The source preserves normal rows and sparse laboratory values, and the frozen models are not retrained on the injections.
 
-\subsection{Semantic model and DAX logic}
+Across that fork, the model flags 0.071\% of non-injected rows and 58.7\% of injected rows; seven of the eight injected episodes receive a model response. These numbers describe presentation coverage, not independent novelty-model validation. The canonical TEST analysis in Chapter~\ref{chap:models} remains the model evidence and includes the feed-surge miss.
 
-The five semantic tables preserve different grains: one row per process timestamp, recent trend point, true laboratory sample, grouped anomaly event, or ranked event contributor. This prevents contributor joins from multiplying process rows and prevents carried-forward lab context from increasing the sample count. Latest-lab age uses the true lab timestamp and latest process timestamp:
-
-\begin{minipage}{\textwidth}
-\begin{lstlisting}[caption={Simplified DAX pattern for laboratory-result age.}]
-Lab Result Age Minutes =
-IF (
-    ISBLANK ( [Lab Last Sample Timestamp] ) ||
-    ISBLANK ( [Latest Timestamp] ),
-    BLANK (),
-    DATEDIFF ( [Lab Last Sample Timestamp],
-               [Latest Timestamp], SECOND ) / 60.0
-)
-\end{lstlisting}
-\end{minipage}
-
-Freshness has precedence: absent or old data produce \code{STALE} even if the last stored anomaly state was normal; otherwise anomaly, watch and normal states are evaluated. The palette never replaces the text label. Although a critical colour exists for display compatibility, the Python engine does not assign \code{CRITICAL}; its reference-profile quantiles are statistical and not approved safety limits.
-
-\section{Illustrative operator-use scenario}
-
-In a synthetic replay episode, the operator first checks lab-result age and treats the soft-sensor value as an estimate. The trend is then reviewed for coincident changes in air, feed or steam. After selecting the event, ranked contributors and subsystem voting prioritize a verification. For example, low air flow and fan speed may prompt inspection of fan operation, flow instrumentation and exhaust condition. PCS7, approved limits and field information remain authoritative; the model neither changes a setpoint nor acknowledges an alarm.
-
-\begin{table}[ht]
+\begin{table}[htbp]
 \centering\small
-\caption{Operator interpretation guardrails}
-\label{tab:guardrails}
-\begin{tabularx}{\textwidth}{@{}p{0.25\textwidth}YY@{}}
+\caption{Dashboard-demo audit and correct interpretation}
+\label{tab:dashboard-demo}
+\begin{tabularx}{\textwidth}{@{}p{0.30\textwidth}p{0.23\textwidth}Y@{}}
 \toprule
-Displayed item & Appropriate interpretation & Inappropriate interpretation \\
+Item & Result & Meaning \\
 \midrule
-Predicted moisture & Soft-sensor estimate requiring lab confirmation. & A new laboratory measurement.\\
-Anomaly risk & Relative distance from the learned reference. & Probability of equipment failure.\\
-Likely subsystem & Area with concentrated abnormal evidence. & Proven mechanical root cause.\\
-Recommended check & Prioritized verification prompt. & Automatic command or approved instruction.\\
+Source & 34,560 rows / 2 days & Dedicated presentation replay. \\
+Injected scenarios & 8 episodes & Disclosed, deterministic demonstrations. \\
+Normal-period model flags & 0.0706\% & Behaviour on non-injected demo rows; not a plant false-positive rate. \\
+Injected-period model flags & 58.73\% & Visibility during scripted intervals; not plant detection performance. \\
+Episode response & 7 of 8 & Seven demo episodes produce at least one model flag. \\
 \bottomrule
 \end{tabularx}
+\source{\code{resources/dashboard\_demo/MAP\_Dryer\_Dashboard\_Demo\_Audit.json}.}
 \end{table}
 
-\section{Usability and performance considerations}
+\section{Usability and presentation performance}
 
-The current pages are suitable for a controlled demonstration. Industrial use requires operator testing, accessible colour/text cues, terminology aligned with the site alarm philosophy, approved limit ownership and review of nuisance events. Model monitoring should track version, lab error, missing inputs, stale duration, event rate and drift; retraining must follow a versioned approval process. PostgreSQL, gateway and report-query p95/p99 latency must be tested under expected concurrency. The five-second visualization refresh is retained only if end-to-end measurements justify it \cite{powerbiautorefresh}.
+The final launcher opens the report in a PowerPoint-like full-screen presentation workflow so the jury sees the canvas rather than the authoring panes. Page navigation remains manual, but the data state refreshes automatically. Shortening the refresh request to two seconds can make switching pages less smooth because DirectQuery requests and visual rendering overlap. For the defence, stable five-second or conservative presentation refresh is more credible than an aggressive interval that produces lag.
 
-\begin{engineeringbox}[Dashboard contribution]
-The dashboard centralizes the operational narrative without obscuring provenance: process values remain process values, laboratory results retain age, predictions remain estimates, anomaly risk remains statistical and diagnosis remains a verification aid. That semantic discipline is the principal usability achievement of the Power BI layer.
-\end{engineeringbox}
+Industrial use would require operator testing, accessible colour and text cues, approved terminology, nuisance-event review and a clear stale-data procedure. It would also require gateway and capacity measurements under expected concurrency. The current pages demonstrate the information architecture and the software connection; they do not establish a validated human--machine interface.

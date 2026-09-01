@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "beaf6d7a80bbd0481c64",
   "position": {
-    "x": 690,
-    "y": 90,
+    "x": 690.51724137931035,
+    "y": 89.778325123152712,
     "z": 1700,
-    "height": 16,
-    "width": 180,
+    "height": 29.926108374384235,
+    "width": 197.29064039408865,
     "tabOrder": 1700
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -23,7 +22,7 @@
                     "value": "Subsystem",
                     "textStyle": {
                       "fontSize": "7pt",
-                      "color": "#66756F"
+                      "color": "#5e706a"
                     }
                   }
                 ]
@@ -86,6 +85,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

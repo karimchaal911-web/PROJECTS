@@ -28,6 +28,9 @@
     "detector_parameters": {
       "gamma": "scale",
       "nu": 0.02
-    }
+    },
+    "source_notebook": "04_Model2_AnomalyDetection&Diagnosis.ipynb",
+    "feature_count": 15,
+    "artifact_sha256": "07bce32b6bf72a2adcc7196b72a7960d0fd3f46925eea291d51d1dbb6722bb61"
   }
 }

@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "7063decee2d44cf4d258",
   "position": {
-    "x": 494,
-    "y": 632,
-    "z": 5300,
-    "height": 118,
-    "width": 172,
-    "tabOrder": 5300
+    "x": 494.33497536945811,
+    "y": 640.64039408867,
+    "z": 3300,
+    "height": 109.72906403940887,
+    "width": 171.79802955665025,
+    "tabOrder": 3300
   },
   "visual": {
     "visualType": "card",
-    "drillFilterOtherVisuals": true,
     "query": {
       "queryState": {
         "Values": {
@@ -101,7 +100,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#66756F'"
+                      "Value": "'#5E706A'"
                     }
                   }
                 }
@@ -179,6 +178,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

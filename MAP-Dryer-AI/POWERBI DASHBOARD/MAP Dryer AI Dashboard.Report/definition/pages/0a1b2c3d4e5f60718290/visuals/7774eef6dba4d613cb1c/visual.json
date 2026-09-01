@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "7774eef6dba4d613cb1c",
   "position": {
-    "x": 1080,
-    "y": 228,
-    "z": 3700,
-    "height": 24,
-    "width": 300,
-    "tabOrder": 3700
+    "x": 1079.5566502463055,
+    "y": 228.32512315270935,
+    "z": 2300,
+    "height": 32.142857142857139,
+    "width": 420.07389162561577,
+    "tabOrder": 2300
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -20,11 +19,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Current operating assessment",
+                    "value": "Current diagnosis context",
                     "textStyle": {
+                      "fontWeight": "bold",
                       "fontSize": "12pt",
-                      "color": "#17231F",
-                      "fontWeight": "bold"
+                      "color": "#17231f"
                     }
                   }
                 ]
@@ -87,6 +86,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

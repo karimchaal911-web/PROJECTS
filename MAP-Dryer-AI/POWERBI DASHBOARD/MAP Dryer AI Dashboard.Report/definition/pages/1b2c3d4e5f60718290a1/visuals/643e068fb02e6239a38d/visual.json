@@ -1,17 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.11.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "643e068fb02e6239a38d",
   "position": {
-    "x": 860,
-    "y": 524,
+    "x": 860.09852216748766,
+    "y": 524.26108374384239,
     "z": 3400,
-    "height": 16,
-    "width": 200,
+    "height": 27.709359605911327,
+    "width": 219.45812807881774,
     "tabOrder": 3400
   },
   "visual": {
     "visualType": "textbox",
-    "drillFilterOtherVisuals": true,
     "objects": {
       "general": [
         {
@@ -23,7 +22,7 @@
                     "value": "Possible causes",
                     "textStyle": {
                       "fontSize": "9pt",
-                      "color": "#66756F",
+                      "color": "#5E706A",
                       "fontWeight": "bold"
                     }
                   }
@@ -87,6 +86,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }
