@@ -275,8 +275,8 @@ and latency are written with every row.
 
 ## 5. Report rebuild (template-faithful)
 
-`tools/generate_powerbi_report.py` regenerates both PBIR pages at
-1600×900 against `resources/dashboard_templates/*.png`: dark-green 86-px
+`tools/generate_powerbi_report.py` regenerates both PBIR pages in the
+checked-in deterministic 1600×900 layout: dark-green 86-px
 rail with icon tiles, header + LIVE DATA / AUTO 60 SEC / freshness
 pills, six KPI cards with **full-card** measure-driven background and
 text colors, drying-performance trend (predicted line, lab-sample

@@ -887,8 +887,8 @@ env_path = Path(os.environ["MAP_DRYER_ENV_PATH"])
 pipeline_root = Path(os.environ["MAP_DRYER_PIPELINE_ROOT"])
 load_dotenv(env_path, override=False)
 
-source = Path(os.environ.get("SOURCE_CSV_5S", "../resources/dashboard_demo/MAP_Dryer_Dashboard_Demo_5s.csv"))
-warmup = Path(os.environ.get("WARMUP_CSV_5S", "../resources/dashboard_demo/MAP_Dryer_Dashboard_Warmup_5s.csv"))
+source = Path(os.environ.get("SOURCE_CSV_5S", "../data/dashboard_demo/MAP_Dryer_Dashboard_Demo_5s.csv"))
+warmup = Path(os.environ.get("WARMUP_CSV_5S", "../data/dashboard_demo/MAP_Dryer_Dashboard_Warmup_5s.csv"))
 models = Path(os.environ.get("MODELS_5S_DIR", "../models/5s"))
 if not source.is_absolute():
     source = (pipeline_root / source).resolve()

@@ -195,7 +195,7 @@ source of truth stays where it belongs:
 | `data/processed/` | Hold-out replay, gap window, manifold projection |
 | `final_report/` | Process narrative, on-site photographs, PCS7 evidence |
 | `powerbi_dashboard/preview/` | The real dashboard pages |
-| `resources/presentation_resources/` | OCP and SiteAssist art direction |
+| `final_presentation/reference_resources/` | OCP and SiteAssist art direction |
 
 An earlier non-React attempt lived at `final_presentation/`. It was
 deliberately not used as a foundation, reference or storyboard, and was

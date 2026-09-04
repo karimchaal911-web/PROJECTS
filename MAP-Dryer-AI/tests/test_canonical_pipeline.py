@@ -120,7 +120,7 @@ class CanonicalPipelineTests(unittest.TestCase):
         self.assertIsNotNone(prediction.predicted_moisture)
 
     def test_dashboard_warmup_predicts_on_first_visible_row(self):
-        demo_dir = PROJECT_ROOT / "resources" / "dashboard_demo"
+        demo_dir = PROJECT_ROOT / "data" / "dashboard_demo"
         warmup = pd.read_csv(demo_dir / "MAP_Dryer_Dashboard_Warmup_5s.csv")
         first_visible = pd.read_csv(
             demo_dir / "MAP_Dryer_Dashboard_Demo_5s.csv", nrows=1

@@ -49,7 +49,7 @@ TEST_REPLAY = ROOT / "data" / "processed" / "MAP_Dryer_TEST_Replay_5s.csv"
 MODEL_DIR = ROOT / "models" / "5s"
 DASHBOARD_AUDIT = (
     ROOT
-    / "resources"
+    / "data"
     / "dashboard_demo"
     / "MAP_Dryer_Dashboard_Demo_Audit.json"
 )

@@ -3,9 +3,9 @@
   "created_at": "2026-08-28T13:07:49",
   "purpose": "dashboard demonstration/scenario replay only",
   "original_source_dataset": "data\\raw\\MAP_Dryer_Canonical_5s_deterministic.csv",
-  "dashboard_fork": "resources\\dashboard_demo\\MAP_Dryer_Dashboard_Demo_5s.csv",
-  "warmup_context": "resources\\dashboard_demo\\MAP_Dryer_Dashboard_Warmup_5s.csv",
-  "scenario_sidecar": "resources\\dashboard_demo\\MAP_Dryer_Dashboard_Demo_Scenarios.csv",
+  "dashboard_fork": "data\\dashboard_demo\\MAP_Dryer_Dashboard_Demo_5s.csv",
+  "warmup_context": "data\\dashboard_demo\\MAP_Dryer_Dashboard_Warmup_5s.csv",
+  "scenario_sidecar": "data\\dashboard_demo\\MAP_Dryer_Dashboard_Demo_Scenarios.csv",
   "source_metadata": {
     "source_start": "2026-07-15 00:00:00",
     "source_end": "2026-07-16 23:59:55",

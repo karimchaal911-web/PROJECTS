@@ -8,9 +8,8 @@ pipeline first, then this script.
 Output:  powerbi_dashboard/preview/preview_page1_overview.html
          powerbi_dashboard/preview/preview_page2_diagnostics.html
 
-These are layout previews for visual comparison against
-``resources/dashboard_templates/*.png`` — the authoritative report is the
-PBIP project itself.
+These are layout previews for visual inspection; the authoritative report is
+the PBIP project itself.
 
 Run:  python tools/render_dashboard_preview.py
 """

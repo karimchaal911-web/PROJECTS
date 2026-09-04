@@ -219,7 +219,7 @@ charts are native, animatable and projector-legible, while the numbers are
 byte-identical to the notebooks.
 
 ### 6.4 Inspiration references
-`resources/presentation_resources/screenshots/` (project root) — the single
+`final_presentation/reference_resources/screenshots/` — the single
 canonical copy of the reference captures.
 
 | Reference | Extracted principle | Rejected |
@@ -263,4 +263,4 @@ was deliberately **not** read for storyboard, layout, scene composition,
 motion or visual direction, and nothing in it is inherited. It was removed
 in the final repository audit as a superseded deliverable and remains
 recoverable from Git history. This audit and everything under `final_presentation/` derive
-directly from the repository, the report and `resources/`.
+directly from the repository, the report and `reference_resources/`.

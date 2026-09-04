@@ -42,7 +42,7 @@ system or a substitute for operator judgment.
                               Power BI operations dashboard
 ```
 
-The runtime reads `resources/dashboard_demo/MAP_Dryer_Dashboard_Demo_5s.csv`,
+The runtime reads `data/dashboard_demo/MAP_Dryer_Dashboard_Demo_5s.csv`,
 an isolated copy of July 15–16 enriched with eight traceable occurrences of
 scenario families already present in the canonical data. The canonical
 dataset, chronological splits, notebooks, trained artifacts, and reported
@@ -221,8 +221,8 @@ models/5s/                active moisture, anomaly, scaler, schema, and profile
 notebooks/                four-stage analytical workflow
 powerbi_dashboard/        PBIP report, TMDL model, PBIR pages, and SQL definitions
 realtime_pipeline/        environment, database utilities, and replay service
-resources/dashboard_demo/ the two-day replay fork the runtime reads
-resources/presentation_resources/ process and site reference material
+data/dashboard_demo/      the two-day replay fork the runtime reads
+final_presentation/reference_resources/ process and site reference material
 src/                      reusable data, feature, model, anomaly, and diagnosis code
 tests/                    automated behavioral and integration contracts
 tools/                    dashboard-demo, Power BI, report and notebook generators

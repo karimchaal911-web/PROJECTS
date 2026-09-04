@@ -391,7 +391,7 @@ right answer under §4 Option C is the original photograph, better framed.
 
 **What actually fixed it — measurement, not generation.** The photograph is
 1280 × 960 and there is no larger copy anywhere in the project (checked: `assets/`,
-`resources/`, both presentation trees, the report resources). It was being drawn
+`reference_resources/`, both presentation trees, the report resources). It was being drawn
 25.5 world units wide at a camera distance of 18 on a 30 mm lens, which is about
 **2 860 screen pixels across a 1920-wide frame — a 2.2× bilinear magnification**.
 That is the entire defect. Two changes:

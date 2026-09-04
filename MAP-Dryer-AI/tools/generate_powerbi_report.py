@@ -1,9 +1,7 @@
 """Regenerate both PBIR report pages to match the reference templates.
 
 Rebuilds ``MAP Dryer AI Dashboard.Report/definition/pages`` as a
-1600 × 900 layout that mirrors
-``resources/dashboard_templates/dashboard_template_page_1_overview.png``
-and ``..._page_2_diagnostics.png``: dark-green 86-px navigation rail,
+deterministic 1600 × 900 layout: dark-green 86-px navigation rail,
 pill-shaped status controls, six KPI cards with full-card dynamic
 coloring, the drying-performance trend with laboratory sample markers,
 the operating-assessment gauge, five critical-variable tiles, operator

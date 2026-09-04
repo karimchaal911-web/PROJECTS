@@ -9,7 +9,7 @@ This structure avoids a common prototype failure: showing one model in a noteboo
 
 \section{Two replay modes with separate purposes}
 
-The project now uses two explicit sources. The canonical TEST interval supports model and analytical evaluation. It contains 237,600 five-second rows and 165 sparse laboratory observations from 3--16 July 2026. The default jury presentation uses \code{resources/dashboard\_demo/MAP\_Dryer\_Dashboard\_Demo\_5s.csv}, a two-day, 34,560-row fork containing eight disclosed injected episodes. Its normal rows and sparse laboratory values are preserved from the source; the injections make short-session dashboard state changes visible.
+The project now uses two explicit sources. The canonical TEST interval supports model and analytical evaluation. It contains 237,600 five-second rows and 165 sparse laboratory observations from 3--16 July 2026. The default jury presentation uses \code{data/dashboard\_demo/MAP\_Dryer\_Dashboard\_Demo\_5s.csv}, a two-day, 34,560-row fork containing eight disclosed injected episodes. Its normal rows and sparse laboratory values are preserved from the source; the injections make short-session dashboard state changes visible.
 
 The distinction is strict. Canonical TEST metrics assess frozen-model behaviour. Dashboard-demo response assesses whether a scripted presentation sequence reaches the intended views. Injected demo episodes are never counted as independent validation evidence.
 

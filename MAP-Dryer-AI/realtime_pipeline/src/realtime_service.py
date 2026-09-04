@@ -208,7 +208,7 @@ def require_env(name: str) -> str:
 def load_config() -> ServiceConfig:
     source_default = str(
         PROJECT_ROOT
-        / "resources"
+        / "data"
         / "dashboard_demo"
         / "MAP_Dryer_Dashboard_Demo_5s.csv"
     )
@@ -218,7 +218,7 @@ def load_config() -> ServiceConfig:
 
     warmup_default = str(
         PROJECT_ROOT
-        / "resources"
+        / "data"
         / "dashboard_demo"
         / "MAP_Dryer_Dashboard_Warmup_5s.csv"
     )

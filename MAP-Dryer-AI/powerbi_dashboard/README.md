@@ -19,9 +19,9 @@ powerbi_dashboard/
 ```
 
 The two report pages are generated from
-`tools/generate_powerbi_report.py` and mirror the reference templates in
-`resources/dashboard_templates/` (dark-green 86-px navigation rail,
-pill-shaped status controls, full-card heatmap coloring). Re-running the
+`tools/generate_powerbi_report.py` using the checked-in deterministic
+1600×900 layout (dark-green 86-px navigation rail, pill-shaped status
+controls, full-card heatmap coloring). Re-running the
 generator is deterministic; layout previews rendered from the live SQL
 views are produced by `tools/render_dashboard_preview.py` into
 `preview/`. `tools/validate_report_fields.py` checks every visual's field
@@ -31,7 +31,7 @@ references against the semantic model.
 
 | Layer | Responsibility |
 |---|---|
-| `realtime_pipeline` (Python) | Reads the dedicated `resources/dashboard_demo/MAP_Dryer_Dashboard_Demo_5s.csv` stream, runs the unchanged moisture and process-only anomaly/diagnosis models, **writes everything into PostgreSQL every 5 s** (`realtime_service.py`) |
+| `realtime_pipeline` (Python) | Reads the dedicated `data/dashboard_demo/MAP_Dryer_Dashboard_Demo_5s.csv` stream, runs the unchanged moisture and process-only anomaly/diagnosis models, **writes everything into PostgreSQL every 5 s** (`realtime_service.py`) |
 | PostgreSQL | Stores `dryer_map`, `dryer_model_outputs`, `dryer_abnormal_variables`; exposes `vw_dryer_dashboard_powerbi`, `vw_dryer_overview_trends_powerbi`, `vw_dryer_contributors_powerbi`, `vw_dryer_lab_samples`, `vw_dryer_anomaly_events`, `vw_dryer_latest` |
 | Power BI (this folder) | **Reads the views only** over DirectQuery with five-second automatic page refresh. Live KPI cards use the one-row `vw_dryer_latest` snapshot; history charts use the bounded overview view. Power BI never loads joblib models or executes inference |
 

@@ -514,7 +514,7 @@ above has been corrected.
 
 The defect was real and the cause was arithmetic, not grading.
 `soluble_map_storage.jpg` is **1280 × 960** — a phone frame, and the largest copy
-that exists anywhere in the project (`assets/`, `resources/`, both presentation
+that exists anywhere in the project (`assets/`, `reference_resources/`, both presentation
 trees and the report resources were all checked). It was being drawn 25.5 world
 units wide at a camera distance of 18 on a 30 mm lens: about **2 860 screen
 pixels across a 1920-wide frame, a 2.2× bilinear magnification.** More than half

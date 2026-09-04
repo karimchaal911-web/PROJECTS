@@ -44,7 +44,7 @@ from realtime_service import load_artifacts, predict_moisture  # noqa: E402
 CANONICAL_PATH = (
     PROJECT_ROOT / "data" / "raw" / "MAP_Dryer_Canonical_5s_deterministic.csv"
 )
-OUTPUT_DIR = PROJECT_ROOT / "resources" / "dashboard_demo"
+OUTPUT_DIR = PROJECT_ROOT / "data" / "dashboard_demo"
 OUTPUT_PATH = OUTPUT_DIR / "MAP_Dryer_Dashboard_Demo_5s.csv"
 WARMUP_PATH = OUTPUT_DIR / "MAP_Dryer_Dashboard_Warmup_5s.csv"
 SCENARIO_PATH = OUTPUT_DIR / "MAP_Dryer_Dashboard_Demo_Scenarios.csv"
