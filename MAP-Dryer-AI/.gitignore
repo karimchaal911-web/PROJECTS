@@ -4,6 +4,11 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -61,10 +66,20 @@ venv/
 /final_report/*.fdb_latexmk
 /final_report/*.synctex.gz
 
-# Local environment files
+# Local environment files. Keep the checked-in template visible.
 .env
+.env.*
+!.env.example
+
+# Editor, OS, log and temporary clutter
+.idea/
 .DS_Store
 Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.temp
+*.bak
 
 # Power BI Desktop local state (never contains report/model source).
 # Credentials live in Power BI's credential store, not in the repository.
